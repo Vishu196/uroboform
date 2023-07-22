@@ -9,7 +9,7 @@ Created on Tue Nov  8 08:10:39 2022
 import numpy as np
 from scipy.signal import find_peaks
 
-from . import Evaluation_Basics as ev_b
+from Evaluation import Evaluation_Basics as ev_b
 
 class grid:
     def __init__(self, image, orientation, coord, max_pos):
