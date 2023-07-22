@@ -10,7 +10,7 @@ import cmath
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from outliers import smirnov_grubbs as grubbs
+#from outliers import smirnov_grubbs as grubbs
 from scipy import signal
 from scipy.fftpack import rfft, irfft
 from scipy.optimize import curve_fit
