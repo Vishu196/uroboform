@@ -10,8 +10,8 @@ import numpy as np
 from scipy.signal import find_peaks
 import time
 
-from . import Evaluation_Basics as ev_b
-from . import Bildfun
+from Evaluation import Evaluation_Basics as ev_b
+from Evaluation import Bildfun
 
 # import grid design 
 [grid_height, grid_width], look_up = Bildfun.grid_params()
