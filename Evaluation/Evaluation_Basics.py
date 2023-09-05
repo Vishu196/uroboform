@@ -16,6 +16,8 @@ from scipy.fftpack import rfft, irfft
 from scipy.optimize import curve_fit
 from scipy.stats import linregress
 
+debug = True
+
 #%%
 def bandfilter(x, limits):
     [x0,x1] = limits
@@ -42,18 +44,23 @@ def gauss_limited(x, k, sigma, mu, offset, max_cut):
 def main_freq(B):
     B = B - np.mean(B)
     wfun = signal.windows.blackman(len(B))
-    image_window = B * wfun 
-    
+    image_window = B * wfun
+
+
     # Anwendung der FFT
     y   = np.fft.fft(image_window)#, norm = 'forward')
-    
+    if debug:
+        print("y: " + str(len(y)))
     n_g = spek_interpol1(abs(y))
     f_g = n_g / len(B)
+    # if debug:
+    #     print("f_g: " + str(f_g))
     return image_window, n_g, f_g
 
 def spek_interpol1(A, lower_half = True):
     # Spektrale Interpolation
     A_size      = len(A)
+
     if lower_half:
         n_0         = np.argmax (A[0:int(A_size/2)])
     else:

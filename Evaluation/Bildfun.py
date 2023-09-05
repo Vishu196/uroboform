@@ -7,9 +7,12 @@ Created on Tue Nov  8 08:10:39 2022
 
 # import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.signal import find_peaks
 
 from Evaluation import Evaluation_Basics as ev_b
+
+debug = True
 
 class grid:
     def __init__(self, image, orientation, coord, max_pos):
@@ -42,7 +45,7 @@ def grid_params():
         else:
             look_up[i,0] = [d_row, d_col+grid_width]   
             look_up[i,1] = [d_row, d_col]   
-            
+
     return [grid_height, grid_width], look_up
 
 def read_binary(grids,image, plot = False):
@@ -132,6 +135,8 @@ def weighted_average(array):
         av_val = np.sum(valid_vals[:,0]*valid_vals[:,1])/np.sum(valid_vals[:,1])
     except IndexError:
         av_val = np.nan
+    if debug:
+        print("avg_value:" + str(av_val))
     return av_val
 
 
@@ -139,9 +144,13 @@ def line_index(mean_range_in, th_edge, i0, rank = 1):
     mean_range = ev_b.bandfilter(mean_range_in, [0,int(len(mean_range_in)/6)])
     stripes, s_dic = find_peaks(mean_range, distance = 50/2, height = th_edge)
     stripes_min, s_dic_min = find_peaks(-mean_range, distance = 50/2, height = -th_edge)
-    
+
+    if debug:
+        print("stripes, s_dic: " + str(stripes) + " ," + str(s_dic))
     if len(stripes) >= 1 and rank <= len(s_dic['peak_heights']):
         s_max = stripes[np.argsort(s_dic['peak_heights'])[-rank]] + i0
+        if debug:
+            print("sorted: " + str(np.argsort(s_dic['peak_heights'])))
     else:
         s_max = np.nan
     if len(stripes) >= 3 and len(stripes_min) >= 3:
@@ -152,6 +161,8 @@ def line_index(mean_range_in, th_edge, i0, rank = 1):
             stripes_min = np.append(stripes_min, len(mean_range)-1)
             s_dic_min['peak_heights'] = np.append(s_dic_min['peak_heights'],-mean_range[len(mean_range)-1])
         s_min = stripes_min[np.argmax(s_dic_min['peak_heights'][1:len(stripes_min)-1])+1] + i0
+        if debug:
+            print("stripes_min, s_dic_min: " + str(stripes_min) + " ," + str(s_dic_min))
     else: 
         s_min = np.nan
     return s_max, s_min
@@ -164,6 +175,7 @@ def delete_edges(cut_ver, ideal_d):
             cut_ver = np.delete(cut_ver,i_cut)
     
     # (ev_b.decumulate(cut_ver) < 280).any() # lösche den richtigen Wert, wenn zu viele Kanten detektiert wurden!
+    # delete the correct value if too many edges were detected!
     close_edges = np.where(ev_b.decumulate(cut_ver) < ideal_d-20)[0]
     for i_close in np.arange(len(close_edges)-1,-1,-1):
         d_cut_ver_0 = []
@@ -196,9 +208,12 @@ def detect_through(im_col, th_edge):
     through_loc = np.where(th_through)[0]
     through_loc = np.insert(through_loc,0,0)
     through_loc = np.append(through_loc, len(im_diff))
-    
+
     d_through = ev_b.decumulate(through_loc)
     cut_through = np.where(d_through > 33)[0]
+    if debug:
+        print("th_through: " + str(through_loc))
+        print("cut_through: " + str(cut_through))
     return through_loc, cut_through
 
 def find_edges(image2):
@@ -206,34 +221,51 @@ def find_edges(image2):
     mean1 = np.mean(image2,1)
     
     freq_range = 150
+    if debug:
+        print("len mean0: " + str(len(mean0)))
+        print("len mean1: " + str(len(mean1)))
+        print("range0: " + str(len(mean0)-freq_range))
+        print("range1: " + str(len(mean1) - freq_range))
+
     main_d_0 = np.median([1/ev_b.main_freq(mean0[i:i+freq_range])[2] for i in np.arange(0,len(mean0)-freq_range,50)])
     main_d_1 = np.median([1/ev_b.main_freq(mean1[i:i+freq_range])[2] for i in np.arange(0,len(mean1)-freq_range,50)])
+    if debug:
+        print("main_d_0: " + str(main_d_0))
+        print("main_d_1: " + str(main_d_1))
+
     if main_d_0 > 13 and main_d_1 > 13:
         
         th_edge = np.mean(image2)
-        
         mid = int(len(mean0)/2)
         search_range = 150
         mean_range0 = mean0[mid-search_range:mid+search_range]
         i0 = mid-search_range
-        
+        if debug:
+            print("th_edge: " + str(th_edge))
+            print("i0: " + str(i0))
+
         rank = 0
         while rank < 5:
             rank += 1
             s_max = line_index(mean_range0, th_edge, i0, rank) [0]
+            print("s_max, rank: " + str(s_max) + " ," + str(rank))
             if not np.isnan(s_max):
                
                 im_col = ev_b.bandfilter(image2[:,s_max],[0,int(np.size(image2,0)/6)])
-                    
+                if debug:
+                    print("len im_col: " + str(len(im_col)))
                 std_col = [np.std(im_col[i:i+150]) for i in np.arange(len(im_col)-150)]
+                if debug:
+                    print("len std_col: " + str(len(std_col)))
                 if np.amin(std_col)/(np.amax(im_col)-np.amin(im_col)) <= 0.085:
                     break
         
         try:
             cut_hor = []
             if rank != 5:
+                if debug:
+                    print("rank1: " + str(rank))
                 through_loc, cut_through = detect_through(im_col, th_edge)
-        
                 for i in np.arange(len(cut_through)):
                     if through_loc[cut_through[i]] == 0 and im_col[through_loc[cut_through[i]]+1] > th_edge:
                         cut_hor.append(through_loc[cut_through[i]+1])
@@ -246,7 +278,7 @@ def find_edges(image2):
                 cut_hor = np.array(cut_hor)
                 
                 cut_hor = delete_edges(cut_hor,225)
-            # # teste ob ein Wert doppelt vorhanden ist
+            # # teste ob ein Wert doppelt vorhanden ist - test if a value is duplicated
             # hor_twice = np.where(cut_hor[1:] == cut_hor[:-1])[0]
             # for i_twice in np.arange(len(hor_twice)-1,-1,-1):
             #     cut_hor = np.delete(cut_hor,hor_twice[i_twice])
@@ -257,8 +289,10 @@ def find_edges(image2):
         if len(cut_hor) >= 2:
             mean_range1 = mean1[cut_hor[0]:cut_hor[1]]
             s_max,s_min = line_index(mean_range1, th_edge, cut_hor[0])
-            
-            # linke Kanten
+            if debug:
+                print("s_max, s_min: " + str(s_max) + " ," + str(s_min))
+
+            # linke Kanten - left sides
             try:
                 cut_ver = []
                 im_row_low = ev_b.bandfilter(image2[s_min,:],[0,int(np.size(image2,1)/6)])
@@ -272,7 +306,7 @@ def find_edges(image2):
                         if through_loc[cut_through[i_row_low]] != 0:
                             cut_ver.append(through_loc[cut_through[i_row_low]])
                 
-                #rechte Kanten
+                #rechte Kanten- right sides
                 im_row = ev_b.bandfilter(image2[s_max,:],[0,int(np.size(image2,1)/6)])
                 std_row = [np.std(im_row[i:i+200]) for i in np.arange(len(im_row)-200)]
                 if np.amin(std_row)/(np.amax(im_row)-np.amin(im_row)) <= 0.088:
@@ -283,7 +317,7 @@ def find_edges(image2):
                 
                 cut_ver = np.sort(cut_ver)
                 
-                # in jedem 280 px Bereich darf maximal ein cut liegen!
+                # in jedem 280 px Bereich darf maximal ein cut liegen!- there may be a maximum of one cut in each 280 px area!
                 cut_ver = delete_edges(cut_ver,300)
                     
             except IndexError:

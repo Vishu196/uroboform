@@ -10,8 +10,11 @@ import numpy as np
 from scipy.signal import find_peaks
 import time
 
+debug = True
+
 from Evaluation import Evaluation_Basics as ev_b
 from Evaluation import Bildfun
+
 
 # import grid design 
 [grid_height, grid_width], look_up = Bildfun.grid_params()
@@ -37,6 +40,7 @@ def calc_d_k(lines):
 def check_grids(grids):    
     for row in np.arange(np.size(grids,0)):
         for col in np.arange(np.size(grids,1)):
+            # print("check_grids values:")
             # print(row,col, len(grids[row,col].max_pos))
             while (ev_b.decumulate(grids[row,col].max_pos) > 100).any():
                 for i_fill in np.flip(np.where(ev_b.decumulate\
@@ -131,15 +135,25 @@ def get_mask_pos(field,row,col,i_max,grid_width,grid_height):
     return mask_pos
 
 def grid_pos(image, mode='gauss'):
+
+    if debug:
+        print("image:" + str(image))
+        print("len image: " + str(np.size(image,0)) +", " + str(np.size(image,1)))
     image2  = np.copy(image[::2,::2])
-    
+
+    if debug:
+        print("image2:" + str(image2))
+        print("len image2: " + str(np.size(image2, 0)) + ", " + str(np.size(image2, 1)))
     # start = time.time()
     # grad    = np.gradient(image2)
     # dur = time.time()-start
     # print(dur)
     
     cut_hor, cut_ver = Bildfun.find_edges(image2)
-    
+    if debug:
+        print("Cut hor:" + str(cut_hor))
+        print("Cut ver:" + str(cut_ver))
+
     if len (cut_ver) >= 2 and len (cut_hor) >= 2:
         if cut_ver[0]*2 < 10:
             cut_ver = np.delete(cut_ver,0)
@@ -155,7 +169,11 @@ def grid_pos(image, mode='gauss'):
         
         cut_ver = cut_ver.astype(int)
         cut_hor = cut_hor.astype(int)
-        
+
+        if debug:
+            print("Cut hor1:" + str(cut_hor))
+            print("Cut ver1:" + str(cut_ver))
+
         time_0 = time.time()
         
         grids   = np.empty((len(cut_hor)-1,len(cut_ver)-1), dtype = object)
@@ -167,6 +185,9 @@ def grid_pos(image, mode='gauss'):
                 # breakpoint()
                 grid0       = image[int(cut_hor[row]*2):int(cut_hor[row+1]*2),
                                     int(cut_ver[col]*2):int(cut_ver[col+1]*2)]
+                # if debug:
+                #     print("grid0: " + str(grid0))
+
                 # grad_grid0  = grad[0][cut_hor[row]:cut_hor[row+1],cut_ver[col]:cut_ver[col+1]]
                 # grad_grid1  = grad[1][cut_hor[row]:cut_hor[row+1],cut_ver[col]:cut_ver[col+1]]
                 
@@ -174,7 +195,9 @@ def grid_pos(image, mode='gauss'):
                 mean2_1     = np.mean(image2[cut_hor[row]:cut_hor[row+1],cut_ver[col]:cut_ver[col+1]],1)
                 mean_grad0  = np.mean(np.abs(np.gradient(ev_b.bandfilter(mean2_0,[0,int(len(mean2_0)/6)]))))#np.mean(np.abs(grad_grid0))
                 mean_grad1  = np.mean(np.abs(np.gradient(ev_b.bandfilter(mean2_1,[0,int(len(mean2_1)/6)]))))#np.mean(np.abs(grad_grid1))
-
+                # if debug:
+                #     print("mean_grad0: " + str(mean_grad0))
+                #     print("mean_grad1: " + str(mean_grad1))
                 if mean_grad1 > mean_grad0:
                     orientation = 'hor'
                 else:
@@ -193,7 +216,10 @@ def grid_pos(image, mode='gauss'):
                     
                     grid_cut        = cut_grid(grid_rot)
                     max_pos, pres   = ev_b.subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode)
-                    # print(row,col)
+                    # if debug:
+                        # print("grid_cut: " + str(grid_cut))
+                        # print("max_pos: " + str(max_pos))
+                        # print("row: " + str(row) + " ,col: " + str(col))
                     if len(max_pos) > 1 and ev_b.decumulate(max_pos)[-1] > 65:
                         max_pos = max_pos[:-1]
                     if len(max_pos) > 1 and ev_b.decumulate(max_pos)[0] > 65:
@@ -202,7 +228,7 @@ def grid_pos(image, mode='gauss'):
                     max_pos = pres  = []
     
                 grids[row,col]  = Bildfun.grid(grid_rot, orientation, [cut_hor[row]*2, cut_ver[col]*2], max_pos)
-        
+
         time_1 = time.time()
         
         # im_0 = []
@@ -214,8 +240,14 @@ def grid_pos(image, mode='gauss'):
         # print(count)
         # if count == 250: breakpoint()
         grids = check_grids(grids)
-        index, ind_ori = Bildfun.read_binary(grids,image)    
-    
+
+        index, ind_ori = Bildfun.read_binary(grids,image)
+        if debug:
+            print("index: " + str(index))
+            print("ind_ori: " + str(ind_ori))
+            # for a in np.arange(0,3):
+            #     for b in np.arange(0,3):
+            #         print("original grids: " + str(grids[a,b].orientation) + ", " + str(a) + " ," + str(b))
         time_2 = time.time()
         # find k per image
         # d_mean = []
@@ -223,17 +255,25 @@ def grid_pos(image, mode='gauss'):
             for col in np.arange(np.size(grids,1)):
                 field = grids[row,col]
                 # print(field.max_pos)
-                if ((field.orientation == 'hor' and 
+                if ((field.orientation == 'hor' and
                         (len(field.max_pos) == 7 or row == np.size(grids,0)-1)) or
                     (field.orientation == 'ver' and 
                         (len(field.max_pos) >= 9 or col == np.size(grids,1)-1))):
-                    field.max_pos = field.max_pos[1:] # lösche 0. Streifen auch am rechten/ unteren Rand
+                    field.max_pos = field.max_pos[1:]
+                    # if debug:
+                    #     print("field grids:" + str(field.orientation)+ ", " + str(row) + " ," + str(col))
+                    #     print("grids:" + str(grids[row,col].orientation) + ", " + str(row) + " ," + str(col))
+
+                    # lösche 0. Streifen auch am rechten/ unteren Rand - delete 0. stripe also at right/bottom edge
                 # d_mean_0 = np.mean(ev_b.decumulate(field.max_pos[:9]))
                 # d_mean.append([d_mean_0, field.px_num])
         
         d_k = get_d_k(grids, grid_width,grid_height) #Bildfun.weighted_average(d_mean)
         k   = d_k * px_size/200
-        
+        if debug:
+            print("k: " + str(k))
+        #     print("dk grids: " + str(grids[row,col].max_pos))
+
         time_3 = time.time()
         center_hor = []
         center_ver = []
@@ -244,6 +284,7 @@ def grid_pos(image, mode='gauss'):
                 look_el = look_up[index,1] 
         else:
             look_el = [0,0]
+
         for row in np.arange(np.size(grids,0)):
             for col in np.arange(np.size(grids,1)):
                 field = grids[row,col]
@@ -262,6 +303,8 @@ def grid_pos(image, mode='gauss'):
                     center_ver.append([np.mean(np.array(center)),field.px_num])
                     # print('ver', len(center))
         times = [time_0, time_1, time_2, time_3]
+        if debug:
+            print("times: " + str(times))
     
     else:
         center_ver  = [[],[]],[[],[]]   

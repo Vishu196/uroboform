@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 
-plt.rcParams["text.usetex"] = True
-plt.rcParams["font.size"] = "14"
-plt.rcParams['text.latex.preamble'] = r"\usepackage{upgreek}"
+# plt.rcParams["text.usetex"] = True
+# plt.rcParams["font.size"] = "14"
+# plt.rcParams['text.latex.preamble'] = r"\usepackage{upgreek}"
 import numpy as np
 import pandas as pd
 # import scipy
 
-import pickle
-from scipy.stats import linregress
+# import pickle
+# from scipy.stats import linregress
 import time
 
 from Basics import exp_params
@@ -27,6 +27,8 @@ regular = True
 folder =  'D:\\Vaishnavi\\Master Thesis\\uroboformV\\images'   #'G:\\mte\\PMMF\\CMM-07-05'
 # breakpoint()
 im_range = [6460, 6630]
+# the function reads, sorts all bmp images from the folder, coverts to grayscale,
+# rotates if necessary and returns array of images.
 images = exp_params.read_images(folder)#, num=im_range)
 
 # mask & cam parameter
@@ -48,9 +50,14 @@ duration = []
 time_list = []
 
 grid_list = []
+
+# for all images, all values are received from grid_pos function call, they are appended to
+# the respective arrays made above, eg value of xi_ret will be obtained from grid_pos and added to
+# xi_i array
+
 for image0 in images[:]:
     # breakpoint()
-    # split images im grinds 
+    # split images im grids
     start = time.time()
     # image = scipy.ndimage.rotate(image0, 0.6, mode = "nearest")
     # breakpoint()
@@ -59,11 +66,11 @@ for image0 in images[:]:
     stop = time.time()
     times.insert(0, start)
     times.append(stop)
-    # print(stop-start)
+    print("duration: " + str(stop-start))
     if count % 20 == 0:
-        print(count)
-    #     plt.imshow(image0,'gray')
-    #     plt.show()# print(count)
+        print("count= " + str(count))
+        # plt.imshow(image0,'gray')
+        # plt.show()
     im_size = np.size(image0)
     duration.append(stop - start)
     xi_i.append(xi_ret)
@@ -77,9 +84,8 @@ for image0 in images[:]:
     count += 1
 
 time_arr = np.array(time_list)#[20:150])
-print("time array: "+time_arr)
 time_diff = time_arr[:, 1:] - time_arr[:, :-1]
-print(np.mean(time_diff, 0))
+# print(np.mean(time_diff, 0))
 
 # %% save results
 results = np.zeros((len(loc), 5), dtype=object)
@@ -94,9 +100,11 @@ results[:, 2] = np.array(index_list)
 results[:, 3] = np.array(ori_list)
 results[:, 4] = np.array(k_list)
 
+# creating a table with all values from result
 res_table = pd.DataFrame(results)
 res_table.columns = 'xi_i', 'zeta_i', 'index', 'orientation', 'k'
 
+# storing the results from table to csv file, naming done based on regular bool value
 if regular:
     res_name = folder + '\\results_' + f'{im_range[0]:05d}' + '-' + f'{im_range[1]:05d}' + '.csv'
 else:
