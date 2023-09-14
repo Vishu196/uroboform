@@ -1,0 +1,30 @@
+# CMake generation dependency list for this directory.
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeCXXInformation.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeCommonLanguageInclude.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeGenericSystem.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeInitializeConfigs.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeLanguageInformation.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakePackageConfigHelpers.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeRCInformation.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeSystemSpecificInformation.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/CMakeSystemSpecificInitialize.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Compiler/MSVC-CXX.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Compiler/MSVC.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/GNUInstallDirs.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Platform/Windows-Initialize.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Platform/Windows-MSVC-CXX.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Platform/Windows-MSVC.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Platform/Windows.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/Platform/WindowsPaths.cmake
+D:/ProgramData/cmake-3.27.4-windows-x86_64/share/cmake-3.27/Modules/WriteBasicConfigVersionFile.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/CMakeFiles/3.27.4/CMakeCXXCompiler.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/CMakeFiles/3.27.4/CMakeRCCompiler.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/CMakeFiles/3.27.4/CMakeSystem.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/CMakeLists.txt
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/xtensor.pc.in
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtensor-master/xtensor-master/xtensorConfig.cmake.in
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtl-master/xtl-master/xtlConfig.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtl-master/xtl-master/xtlConfigVersion.cmake
+D:/Vaishnavi/Master Thesis/Main Project/C++code/uRoboForm/xtl-master/xtl-master/xtlTargets.cmake
