@@ -94,3 +94,4 @@ docs/*.tmp
 # Generated files
 *.pc
 
+C++code/uRoboForm/opencv/
