@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtensor-master\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtl-master\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtensor-master\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtensor-master\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtl-master\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\xtensor-master\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
