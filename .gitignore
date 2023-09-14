@@ -5,5 +5,92 @@
 *.csv
 *.bmp
 testing.py
-testing.py
-testing.py
+
+#files for visual studio to ignore - https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
+# Build results
+[Dd]ebug/
+x64/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Files built by Visual Studio
+*.tlog
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+#files for C++ to ignore - https://github.com/github/gitignore/blob/main/C%2B%2B.gitignore
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+#files of Xtensor lib to ignore-https://github.com/xtensor-stack/xtensor/blob/master/.gitignore
+
+# Doxygen output
+docs/html/
+docs/xml/
+
+# Vim tmp files
+*.swp
+*~
+
+# Generated directory
+include/tmp/
+
+# Build directory
+build/
+
+# Test build artefacts
+test/test_xtensor
+test/CMakeCache.txt
+test/Makefile
+test/CMakeFiles/
+test/cmake_install.cmake
+
+# Documentation build artefacts
+docs/CMakeCache.txt
+docs/xml/
+docs/build/
+docs/*.tmp
+
+# Generated files
+*.pc
+
