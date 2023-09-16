@@ -1,6 +1,5 @@
 // ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
@@ -8,11 +7,16 @@
 #include <vector>
 #include <NumCpp/Core/Slice.hpp>
 #include "NumCpp.hpp"
-
+#include <complex>
+#include <cmath>
 #include <cstdlib>
-#include <iostream>
 #include <chrono>
 #include <thread>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327
+#endif
+
 //#define Debug
 using namespace cv;
 using namespace std;
@@ -62,8 +66,6 @@ float* Mean1(int rows, int cols, int** array)
 	}
 	return Mean1Arr;
 }
-
-
 
 auto Image2Array(Mat mat)
 {
@@ -150,20 +152,39 @@ Mat ImageSlice(Mat image, int n)
 	return imgCopy;
 }
 
+double* BlackmanWindow(int n, bool sflag)
+{
+	const double a0 = 0.42;
+	const double a1 = 0.5;
+	const double a2 = 0.08;
+	int wLen = n;
+	double* wFun = 0;
+	wFun = new double[n];
+
+	for (int i = 0; i < n; ++i)
+	{
+		double wi = 0.0;
+		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
+		wFun[i] = wi;
+	}
+	return wFun;
+}
+
 int main(int argc, char** argv)
 {
 	// Read the image file
 	Mat image = imread("D:/Vaishnavi/C++Trial/Images/001.bmp",IMREAD_GRAYSCALE);
+	//To display the image:
 	//imshow("displayimage", image);
 	//waitKey(0);
 
-	using std::chrono::high_resolution_clock;
+	//to calculate function runtime in ms:
+	/*using std::chrono::high_resolution_clock;
 	using std::chrono::duration_cast;
 	using std::chrono::duration;
 	using std::chrono::milliseconds;
-
 	auto t1 = high_resolution_clock::now();
-
+	*/
 	
 	auto ImageArray = Image2Array(image);
 	//cout << "ImageArray: " << ImageArray << endl;
@@ -171,31 +192,17 @@ int main(int argc, char** argv)
 	
 	auto Mean0Arr = nc::mean(image2, nc::Axis::ROW);
 	auto Mean1Arr = nc::mean(image2, nc::Axis::COL);
-	//cout << "Mean0Arr: " << Mean0Arr << endl;
-	//cout << "\n\n\n";
-	//cout << "Mean1Arr: " << Mean1Arr << endl;
-	//float* Mean0Arr = Mean0(ArrayRows, ArrayCols, ImageArray);
-	//float* Mean1Arr = Mean1(ArrayRows, ArrayCols, ImageArray);
 
-	auto t2 = high_resolution_clock::now();
-	/* Getting number of milliseconds as an integer. */
-	auto ms_int = duration_cast<milliseconds>(t2 - t1);
+	double* wFun = BlackmanWindow(150, true);
 
-	/* Getting number of milliseconds as a double. */
-	duration<double, std::milli> ms_double = t2 - t1;
-
-	std::cout << ms_int.count() << "ms\n";
-	std::cout << ms_double.count() << "ms\n";
-	for (int h = 0; h < image2.numRows(); h++)
+	printf("wFun: \n");
+	for (int h = 0; h < 151; h++)
 	{
-		for (int w = 0; w < image2.numCols(); w++)
-		{
-			//cout << image2(h, w) << ",";
-
-		}
-		//printf("\n \n \n");
+		printf("%e,", wFun[h]);
 	}
+	printf("\n");
 	
+	//auto t2 = high_resolution_clock::now();
 
 	// Converting the array of pixels to new image and displaying the image:
 	/*Mat NewImage = Array2Image(image.rows, image.cols, image.step, ImageArray);
@@ -204,30 +211,30 @@ int main(int argc, char** argv)
 	//waitKey(0);
 	*/
 #ifdef Debug
+
+	// Getting number of milliseconds as an integer.
+	auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+	// Getting number of milliseconds as a double.
+	duration<double, std::milli> ms_double = t2 - t1;
+
+	std::cout << ms_int.count() << "ms\n";
+	std::cout << ms_double.count() << "ms\n";
+
 	int rows = image2.numRows();
 	int cols = image2.numCols();
 	cout << "No. of rows: " << rows << endl;
 	cout << "No. of cols: " << cols << endl;
 
-	int rows2 = image2.rows;
-	int cols2 = image2.cols;
-	cout << "No. of rows: " << rows2 << endl;
-	cout << "No. of cols: " << cols2 << endl;
-
-	printf("mean0: \n");
-	for (int w = 0; w < image2.cols; w++)
+	for (int h = 0; h < image2.numRows(); h++)
 	{
-		printf("%f,", Mean0Arr[w]);
+		for (int w = 0; w < image2.numCols(); w++)
+		{
+			cout << image2(h, w) << ",";
+		}
+		printf("\n \n \n");
 	}
-	printf("\n");
 
-	printf("mean1: \n");
-	for (int h = 0; h < image2.rows; h++)
-	{
-		printf("%f,", Mean1Arr[h]);
-	}
-	printf("\n");
-	return 0;
 #endif
 	return 0;
 }
