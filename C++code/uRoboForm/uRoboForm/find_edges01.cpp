@@ -1,8 +1,5 @@
 #include "find_edges01.h"
 
-
-
-
 static const int freq_range = 150;
 
 find_edges01::find_edges01(nc::NdArray<int>Image)
