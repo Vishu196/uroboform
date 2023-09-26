@@ -21,7 +21,7 @@ public:
 
 	nc::NdArray<int>cut_hor,cut_ver;
 
-	auto mean_range0();
+	//auto mean_range0();
 	
 
 };

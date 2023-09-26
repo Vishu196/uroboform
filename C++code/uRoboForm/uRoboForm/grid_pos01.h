@@ -1,6 +1,6 @@
 #pragma once
 #include "NumCpp.hpp"
-#include <string>
+
 using namespace std;
 
 class grid_pos01
@@ -18,7 +18,7 @@ private:
 
 	auto flip_grid(nc::NdArray<int>grid0);
 	auto cut_grid(nc::NdArray<int>grid_rot);
-	auto subpx_max_pos(nc::NdArray<int>grid_cut, int stripe_width, float px_size, string mode);
+	auto subpx_max_pos(nc::NdArray<int>grid_cut, int stripe_width, float px_size, char mode);
 
 
 public: 

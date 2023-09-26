@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -111,12 +111,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\prash\Downloads\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;C:\Users\prash\Downloads\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,18 +130,45 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\prash\Downloads\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;C:\Users\prash\Downloads\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="bandfilter.cpp" />
+    <ClCompile Include="cnrData.cpp" />
+    <ClCompile Include="decumulate.cpp" />
+    <ClCompile Include="extraFunc.cpp" />
+    <ClCompile Include="fftTest.cpp" />
+    <ClCompile Include="find_edges01.cpp" />
+    <ClCompile Include="find_edges02.cpp" />
+    <ClCompile Include="grid.cpp" />
+    <ClCompile Include="grid_pos01.cpp" />
+    <ClCompile Include="grid_pos02.cpp" />
+    <ClCompile Include="grid_pos03.cpp" />
+    <ClCompile Include="main_app.cpp" />
+    <ClCompile Include="ResultData.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bandfilter.h" />
+    <ClInclude Include="cnrData.h" />
+    <ClInclude Include="decumulate.h" />
+    <ClInclude Include="find_edges01.h" />
+    <ClInclude Include="find_edges02.h" />
+    <ClInclude Include="grid.h" />
+    <ClInclude Include="grid_pos01.h" />
+    <ClInclude Include="grid_pos02.h" />
+    <ClInclude Include="grid_pos03.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="ResultData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

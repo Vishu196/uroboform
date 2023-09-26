@@ -1,16 +1,19 @@
 #include "main.h"
 #include "find_edges01.h"
 
+
 //#define Debug
+
 
 int main()
 {
 	// Read the image file in grayscale
 	Mat image = imread("D:/Vaishnavi/C++Trial/Images/001.bmp",IMREAD_GRAYSCALE);
 
+
 	return 0;
 }
-
+ 
 int main01()
 {
 	fftw_complex* in, * y;

@@ -12,7 +12,7 @@ auto find_edges01:: SliceImage()
 	return image2 = ImageArray(nc::Slice(0, ImageArray.numRows(), 2), nc::Slice(0, ImageArray.numCols(), 2));
 }
 
-auto find_edges01::FindMean0()
+nc::NdArray<double> find_edges01::FindMean0()
 {
 	return Mean0 = nc::mean(image2, nc::Axis::ROW);
 }
