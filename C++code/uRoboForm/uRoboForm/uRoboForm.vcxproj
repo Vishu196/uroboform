@@ -147,7 +147,6 @@
     <ClCompile Include="cnrData.cpp" />
     <ClCompile Include="decumulate.cpp" />
     <ClCompile Include="extraFunc.cpp" />
-    <ClCompile Include="fftTest.cpp" />
     <ClCompile Include="find_edges01.cpp" />
     <ClCompile Include="find_edges02.cpp" />
     <ClCompile Include="grid.cpp" />

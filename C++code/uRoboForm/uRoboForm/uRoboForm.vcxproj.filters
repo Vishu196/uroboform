@@ -21,9 +21,6 @@
     <ClCompile Include="find_edges01.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fftTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="extraFunc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
