@@ -1,13 +1,18 @@
 #include "main.h"
 #include "find_edges01.h"
 #include <chrono>
-auto BlackmanWindow(int n, bool sflag)
+
+//#define Debug	
+
+typedef nc::NdArray<double> ArrD;
+
+ArrD BlackmanWindow(int n, bool sflag)
 {
 	const double a0 = 0.42;
 	const double a1 = 0.5;
 	const double a2 = 0.08;
 	int wLen = n-1;
-	auto wFun = nc::NdArray<double>(n,1);
+	ArrD wFun = nc::NdArray<double>(n,1);
 
 	for (int i = 0; i < n; ++i)
 	{
@@ -18,30 +23,60 @@ auto BlackmanWindow(int n, bool sflag)
 	return wFun;
 }
 
-auto spek_interpol(nc::NdArray<double>A) {
+double spek_interpol(ArrD A) {
 
-	auto A_size = nc::size(A);
-	auto A2_size = A_size / 2;
+	uint32_t A_size = nc::size(A);
+	uint32_t A2_size = A_size / 2;
 
-	auto A2 = nc::NdArray<double>(A2_size,1);
+	ArrD A2 = nc::NdArray<double>(A2_size,1);
 	A2 = A[nc::Slice(A2_size)];
 	auto n_0 = nc::argmax(A2);
 
-	auto y_ln1 = nc::log(A[n_0[0]+1]);
-	auto y_ln0 = nc::log(A[n_0[0]]);
-	auto y_ln_1 = nc::log(A[n_0[0]-1]);
+	double y_ln1 = nc::log(A[n_0[0]+1]);
+	double y_ln0 = nc::log(A[n_0[0]]);
+	double y_ln_1 = nc::log(A[n_0[0]-1]);
 	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	auto n_g = (n_0[0] + tmp/2);
+	double n_g = (n_0[0] + tmp/2);
 
 	return n_g;
 }
 
-//#define Debug
-auto Main_Freq(nc::NdArray<double>B0, int start, int stop)
+ArrD FFT(ArrD image_window,int size)
+{
+	const int N = 256;
+	fftw_complex  y[N];
+	double in[N];
+	fftw_plan p;
+
+	for (int i = 0; i < N; i++) {
+		if (i < size) {
+			in[i] = image_window[i];
+		}
+		else {
+			in[i] = 0;
+		}
+	}
+	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+
+	fftw_execute(p);
+	std::complex<double>* yy;
+	yy = reinterpret_cast<std::complex<double> *>(y);
+	auto y1 = nc::NdArray<double>(N, 1);
+
+	for (int i = 0; i < N; i++)
+	{
+		y1[i] = nc::abs(yy[i]);
+	}
+
+	fftw_destroy_plan(p);
+	return y1;
+}
+
+double Main_Freq(ArrD B0, int start, int stop)
 {
 	const int size = stop - start;
 	auto B = nc::NdArray<double>(size,1);
-	auto image_window = nc::NdArray<double>(150,1);
+	ArrD image_window = nc::NdArray<double>(150,1);
 
 	for (int k = 0; k < size; k++) {
 		B[k] = B0[k + start];
@@ -55,40 +90,17 @@ auto Main_Freq(nc::NdArray<double>B0, int start, int stop)
 		B1[i] = B[i] - Mean[0];
 	}
 	
-	auto wFun = BlackmanWindow(150, true);
+	ArrD wFun = BlackmanWindow(150, true);
 	for (int i = 0; i< 150; i++)
 	{
 		image_window[i] = B1[i] * wFun[i];
 	}
 
-	const int N = 256;
-	fftw_complex  y[N];
-	double in[N];
-	fftw_plan p;
-	
-	for (int i = 0; i < N; i++) {
-		if (i < size) {
-			in[i] = image_window[i];
-		}
-		else {
-			in[i] = 0;
-		}
-	}
-	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-	
-	fftw_execute(p); 
-	std::complex<double>* yy;
-	yy = reinterpret_cast<std::complex<double> *>(y);
-	auto y1 = nc::NdArray<double>(N,1);
+	ArrD y1 = FFT(image_window, size);
 
-	for (int i = 0; i < N; i++)
-	{
-		y1[i] = nc::abs(yy[i]);
-	}
-	auto n_g = spek_interpol(y1);
-	auto f_g = n_g / nc::size(B);
+	double n_g = spek_interpol(y1);
+	double f_g = n_g / nc::size(B);
 
-	fftw_destroy_plan(p);
 	return f_g;
 }
 
