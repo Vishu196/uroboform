@@ -11,3 +11,5 @@
 
 using namespace cv;
 using namespace std;
+
+static const int freq_range = 150;

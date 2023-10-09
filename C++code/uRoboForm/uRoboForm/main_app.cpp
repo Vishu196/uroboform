@@ -5,7 +5,7 @@
 //#define Debug	
 
 typedef nc::NdArray<double> ArrD;
-
+/*
 ArrD BlackmanWindow(int n, bool sflag)
 {
 	const double a0 = 0.42;
@@ -103,6 +103,7 @@ double Main_Freq(ArrD B0, int start, int stop)
 
 	return f_g;
 }
+*/
 
 int main()
 {
@@ -119,7 +120,7 @@ int main()
 	const auto step = image.step;
 	uint8_t* p = image.data;
 
-	auto ncArray = nc::NdArray<nc::uint8>(nRows, nCols);
+	auto ncArray = nc::NdArray<int>(nRows, nCols);
 	for (int i = 0; i < nRows; i++)
 	{
 		for (int j = 0; j < nCols; j++)
@@ -129,6 +130,11 @@ int main()
 
 	}
 
+	find_edges01 img(ncArray);
+	ArrD main_d_0 = img.Execute(ncArray, freq_range);
+	cout << "main_d_0: " << main_d_0;
+
+	/*
 	auto p2 = ncArray(nc::Slice(0, nRows, 2), nc::Slice(0, nCols, 2));
 	auto mean0 = nc::mean(p2, nc::Axis::ROW);
 	auto mean1 = nc::mean(p2, nc::Axis::COL);
@@ -145,6 +151,7 @@ int main()
 	main_d_0 = nc::median(t1);
 
 	cout << "main_d_0: " << main_d_0;
+	*/
 
 	auto t02 = high_resolution_clock::now();
 
