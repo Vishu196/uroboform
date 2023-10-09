@@ -16,10 +16,6 @@ private:
 
 	nc::NdArray<int>ImageArray; //2D array of int
 	
-
-	ArrI SliceImage(ArrI ImageArray);
-	ArrD FindMean0(ArrI image2);
-	ArrD FindMean1();
 	ArrD BlackmanWindow(int n, bool sflag);
 	ArrD FFT(ArrD image_window, int size);
 	double Spek_Interpol(ArrD A);
@@ -28,10 +24,6 @@ private:
 public:
 
 	find_edges01(nc::NdArray<int>Image);
-	
-	nc::NdArray<int>image2; //2D array of int
-	ArrD main_d_0 = nc::NdArray<double>(1, 1);
-	ArrD main_d_1 = nc::NdArray<double>(1, 1);
 	ArrD Execute(ArrI ImageArray,int freq_range);
 	
 };

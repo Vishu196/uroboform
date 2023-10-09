@@ -7,26 +7,12 @@ find_edges01::find_edges01(nc::NdArray<int>Image)
 	ArrI ImageArray = Image;
 }
 
-ArrI find_edges01:: SliceImage(ArrI ImageArray)
+/*ArrI find_edges01::SliceImage(ArrI ImageArray)
 {
 	ArrI image2 = nc::NdArray<int>(ImageArray.numRows() / 2, ImageArray.numCols() / 2);
 	image2 = ImageArray(nc::Slice(0, ImageArray.numRows(), 2), nc::Slice(0, ImageArray.numCols(), 2));
 	return image2;
-}
-
-ArrD find_edges01::FindMean0(ArrI image2)
-{
-	ArrD Mean0 = nc::NdArray<double>(image2.numRows()/2, 1);
-	Mean0 = nc::mean(image2, nc::Axis::ROW);
-	return Mean0;
-}
-
-ArrD find_edges01::FindMean1()
-{
-	ArrD Mean1 = nc::NdArray<double>(1, image2.numCols() / 2);
-	Mean1 = nc::mean(image2, nc::Axis::COL);
-	return Mean1;
-}
+}*/
 
 ArrD find_edges01::BlackmanWindow(int n, bool sflag)
 {
@@ -128,8 +114,12 @@ double find_edges01::Main_Freq(ArrD B0, int start, int stop)
 
 ArrD find_edges01::Execute(ArrI ImageArray, int freq_range)
 {
-	ArrI image2 = SliceImage(ImageArray);
-	ArrD Mean0 = FindMean0(image2);
+	ArrD main_d_0 = nc::NdArray<double>(1, 1);
+	ArrD main_d_1 = nc::NdArray<double>(1, 1);
+	int nRows = ImageArray.numRows();
+	int nCols = ImageArray.numCols();
+	auto image2 = ImageArray(nc::Slice(0, nRows, 2), nc::Slice(0, nCols, 2));
+	auto Mean0 = nc::mean(image2, nc::Axis::ROW);
 	auto t1 = nc::NdArray<double>(12, 1);
 	int j = 0;
 	for (int i = 0; i < (nc::size(Mean0) - freq_range); i += 50)
