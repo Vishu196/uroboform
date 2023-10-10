@@ -148,7 +148,7 @@
     <ClCompile Include="decumulate.cpp" />
     <ClCompile Include="extraFunc.cpp" />
     <ClCompile Include="find_edges01.cpp" />
-    <ClCompile Include="find_edges02.cpp" />
+    <ClCompile Include="find_edges.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="grid_pos01.cpp" />
     <ClCompile Include="grid_pos02.cpp" />
@@ -162,7 +162,7 @@
     <ClInclude Include="cnrData.h" />
     <ClInclude Include="decumulate.h" />
     <ClInclude Include="find_edges01.h" />
-    <ClInclude Include="find_edges02.h" />
+    <ClInclude Include="find_edges.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="grid_pos01.h" />
     <ClInclude Include="grid_pos02.h" />

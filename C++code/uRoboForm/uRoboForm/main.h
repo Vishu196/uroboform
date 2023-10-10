@@ -3,12 +3,11 @@
 #include <iostream>
 #include <string>
 #include <numeric>
-#include <vector>
-#include <NumCpp/Core/Slice.hpp>
-#include "NumCpp.hpp"
 #include <complex>
 #include <cmath>
 #include <chrono>
+#include <NumCpp/Core/Slice.hpp>
+#include "NumCpp.hpp"
 
 using namespace cv;
 using namespace std;

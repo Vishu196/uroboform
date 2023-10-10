@@ -1,26 +1,30 @@
 #include "raw_edges.h"
 
-static struct stage12 s12;
-
 raw_edges::raw_edges(Mat ImageR)
 {
 	Mat image = ImageR;
 }
 
+static struct stage12 s12;
+
 static void buffer_s12_init() {
+
+	s12.imgRows = 0;
+	s12.imgCols = 0;
+	s12.th_edge = 0;
+
 	s12.mean0 = 0;
 	s12.mean1 = 0;
 	s12.mean0 = new double[720];
 	s12.mean1 = new double[540];
 
-
-	s12.img = new int* [1080];;// new int[1080][1440];
+	s12.img = new int* [1080];
 	for (int h = 0; h < 1080; h++)
 	{
 		s12.img[h] = new int[1440];
 	}
 
-	s12.img2 = new int* [540];;// new int[1080][1440];
+	s12.img2 = new int* [540];
 	for (int h = 0; h < 540; h++)
 	{
 		s12.img2[h] = new int[720];
@@ -329,6 +333,8 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	memcpy(s12.mean1, Mean1, Image2.rows * sizeof(double));
 	s12.main_d_0 = main_d_0;
 	s12.main_d_1 = main_d_1;
+	s12.imgRows = Image.rows;
+	s12.imgCols = Image.cols;
 	s12.th_edge = th_edge;
 
 	return s12;

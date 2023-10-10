@@ -1,16 +1,15 @@
 #pragma once
-#include "NumCpp.hpp"
 
 class bandfilter
 {
 public:
 
-	bandfilter(nc::NdArray<double>x, nc::NdArray<int>limits);
-	nc::NdArray<double>f_x, f_x_cut, x_cut;
+	bandfilter(double* x, int* limits);
+	
 
-	auto Find_RFFT();
-	auto Find_IRFFT();
-	auto Calc_Bandfilter(nc::NdArray<double>x, nc::NdArray<int>limits);
+	double* RFFT(double* x);
+	double* IRFFT();
+	double* Bandfilter(double* x, int* limits);
 
 
 };

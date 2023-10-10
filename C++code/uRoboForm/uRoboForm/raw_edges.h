@@ -11,6 +11,8 @@ struct stage12
 {	
 	int** img;
 	int** img2;
+	int imgRows;
+	int imgCols;
 	double* mean0;
 	double* mean1;
 	double main_d_0;
@@ -32,12 +34,12 @@ private:
 	double* FFTR (double* image_window, int size);
 	double Spek_InterpolR (double* A);
 	double Main_FreqR (double* B0, int start, int stop);
-
+	
 public:
 
 	raw_edges(Mat ImageR);
 	struct stage12 ExecuteR(Mat image, int freq_range);
-
+	
 	
 };
 

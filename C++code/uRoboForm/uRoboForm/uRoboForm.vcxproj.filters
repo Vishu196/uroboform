@@ -24,7 +24,7 @@
     <ClCompile Include="extraFunc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="find_edges02.cpp">
+    <ClCompile Include="find_edges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bandfilter.cpp">
@@ -56,7 +56,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="find_edges02.h">
+    <ClInclude Include="find_edges.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bandfilter.h">
