@@ -31,24 +31,6 @@ ArrD find_edges01::BlackmanWindow(int n, bool sflag)
 	return wFun;
 }
 
-double find_edges01::Spek_Interpol(ArrD A) {
-
-	uint32_t A_size = nc::size(A);
-	uint32_t A2_size = A_size / 2;
-
-	ArrD A2 = nc::NdArray<double>(A2_size, 1);
-	A2 = A[nc::Slice(A2_size)];
-	auto n_0 = nc::argmax(A2);
-
-	double y_ln1 = nc::log(A[n_0[0] + 1]);
-	double y_ln0 = nc::log(A[n_0[0]]);
-	double y_ln_1 = nc::log(A[n_0[0] - 1]);
-	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	double n_g = (n_0[0] + tmp / 2);
-
-	return n_g;
-}
-
 ArrD find_edges01::FFT(ArrD image_window, int size)
 {
 	const int N = 256;
@@ -68,7 +50,7 @@ ArrD find_edges01::FFT(ArrD image_window, int size)
 
 	fftw_execute(p);
 	std::complex<double>* yy;
-	yy = reinterpret_cast<std::complex<double> *>(y);
+	yy = reinterpret_cast<std::complex<double>*>(y);
 	auto y1 = nc::NdArray<double>(N, 1);
 
 	for (int i = 0; i < N; i++)
@@ -78,6 +60,24 @@ ArrD find_edges01::FFT(ArrD image_window, int size)
 
 	fftw_destroy_plan(p);
 	return y1;
+}
+
+double find_edges01::Spek_Interpol(ArrD A) {
+
+	uint32_t A_size = nc::size(A);
+	uint32_t A2_size = A_size / 2;
+
+	ArrD A2 = nc::NdArray<double>(A2_size, 1);
+	A2 = A[nc::Slice(A2_size)];
+	auto n_0 = nc::argmax(A2);
+
+	double y_ln1 = nc::log(A[n_0[0] + 1]);
+	double y_ln0 = nc::log(A[n_0[0]]);
+	double y_ln_1 = nc::log(A[n_0[0] - 1]);
+	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
+	double n_g = (n_0[0] + tmp / 2);
+
+	return n_g;
 }
 
 double find_edges01::Main_Freq(ArrD B0, int start, int stop)

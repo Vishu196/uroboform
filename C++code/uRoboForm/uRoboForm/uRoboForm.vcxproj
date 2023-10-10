@@ -154,6 +154,7 @@
     <ClCompile Include="grid_pos02.cpp" />
     <ClCompile Include="grid_pos03.cpp" />
     <ClCompile Include="main_app.cpp" />
+    <ClCompile Include="raw_edges.cpp" />
     <ClCompile Include="ResultData.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +168,7 @@
     <ClInclude Include="grid_pos02.h" />
     <ClInclude Include="grid_pos03.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="raw_edges.h" />
     <ClInclude Include="ResultData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

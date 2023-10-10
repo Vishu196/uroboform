@@ -51,6 +51,9 @@
     <ClCompile Include="grid_pos03.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="raw_edges.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="find_edges02.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raw_edges.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
