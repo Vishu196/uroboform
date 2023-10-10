@@ -310,6 +310,9 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	}
 	main_d_1 = Median(n2, t2);
 
+	//this value will be needed in 2nd bock which is calculated here
+	double th_edge = MeanR(cols, Mean0);
+
 	//To do - add mutex protection later
 
 	for (int i = 0; i < Image.rows; i++)
@@ -326,6 +329,7 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	memcpy(s12.mean1, Mean1, Image2.rows * sizeof(double));
 	s12.main_d_0 = main_d_0;
 	s12.main_d_1 = main_d_1;
-	
+	s12.th_edge = th_edge;
+
 	return s12;
 }

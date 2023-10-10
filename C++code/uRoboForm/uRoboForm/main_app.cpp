@@ -19,7 +19,7 @@ int main()
 
 	raw_edges i1(image);
 	struct stage12 s12 = i1.ExecuteR(image, freq_range);
-	cout << s12.main_d_0;
+	cout << s12.th_edge << endl;
 
 	auto t02 = high_resolution_clock::now();
 

@@ -8,13 +8,14 @@ using namespace cv;
 #endif
 
 struct stage12
-{
-	double main_d_0;
-	double main_d_1;
+{	
 	int** img;
 	int** img2;
 	double* mean0;
 	double* mean1;
+	double main_d_0;
+	double main_d_1;
+	double th_edge;
 };
 
 class raw_edges
