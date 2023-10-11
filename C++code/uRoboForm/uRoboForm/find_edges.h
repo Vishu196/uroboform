@@ -30,6 +30,12 @@ struct FP
 	int s_dic_size;
 };
 
+struct LI 
+{
+	int s_max;
+	int s_min;
+};
+
 struct stage23
 {
 	int** img;
@@ -46,17 +52,20 @@ private:
 	int ideal_d;*/
 
 	double* Bandfilter(double *x,int *limits, int x_size);
-	std::complex<double>* RFFT(double* x, int x_size);
-	double* IRFFT(std::complex<double>* x, int x_size);
+	double* RFFT(double* x, int x_size);
+	double* IRFFT(double* x, int x_size);
 	struct FP Find_Peaks(double *arr, int n, double th_edge);
-	int Line_Index(double* mean_range0, int arr_size, double th_edge,int i0,int rank);
+	int* ArgSort(double* s_dic, int s_dic_size);
+	int* insertXint(int size, int* arr, int x, int pos);
+	double* insertXdouble(int size, double* arr, double x, int pos);
+	struct LI Line_Index(double* mean_range0, int arr_size, double th_edge,int i0,int rank);
 	struct DT Detect_Through(double* im_col, double th_edge);
 	int* Delete_Edges(int* cut_hor, int ideal_d);
 
 public:
 
 	find_edges(struct stage12 s12);
-	struct stage23 Execute(void);
+	int Execute(void);
 	
 
 };

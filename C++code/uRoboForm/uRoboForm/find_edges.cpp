@@ -73,8 +73,8 @@ find_edges::find_edges(struct stage12 s12)
 
 struct FP find_edges::Find_Peaks(double* arr, int n, double th_edge)
 {
-	int* stripes = new int[12];
-	double* s_dic = new double[12];
+	int* stripes = new int[12]();
+	double* s_dic = new double[12]();
 	int a = 0;
 	int count = 0;
 
@@ -107,74 +107,69 @@ struct FP find_edges::Find_Peaks(double* arr, int n, double th_edge)
 	return peaks;
 }
 
-std::complex<double>* find_edges::RFFT(double* x, int x_size)
+double* find_edges::RFFT(double* x, int x_size)
 {
-	int N = 1;
-	while (N < x_size)
-		N *= 2;
-	
-	fftw_complex* y = 0;
-	y = new fftw_complex[N];
-	double* in = new double[N]();
+	int N = x_size;
+	double* y = new double[N];
 	fftw_plan p;
 
-	for (int i = 0; i < N; i++) {
-		if (i < x_size) {
-			in[i] = x[i];
-		}
-		else {
-			in[i] = 0;
-		}
-	}
-	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+	p = fftw_plan_r2r_1d(N, x, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	fftw_execute(p);
-	std::complex<double>* yy;
-	yy = reinterpret_cast<std::complex<double> *>(y);
 	
 	fftw_destroy_plan(p);
-	delete[] in;
+
+
+	
+	double* yy = new double[N]();
+	yy[0] = y[0];
+	int j = 0;
+	for (int i = 1; i < N; i+=2)
+	{
+		yy[i] = y[i-j];
+		j++;
+	}
+	int k = 1;
+	for (int i = 2; i < N + 1; i+=2)
+	{
+		yy[i] = y[N - k];
+		k++;
+	}
 
 	return yy;
 }
 
-double* find_edges::IRFFT(std::complex<double>* x, int x_size)
+double* find_edges::IRFFT(double* x, int x_size)
 {
-	int N = 1;
-	while (N < x_size)
-		N *= 2;
+	int N = x_size;
+	double* y = new double[N]();
 
-	fftw_complex* y = 0;
-	y = new fftw_complex[N];
+	double* xx = new double[N]();
+	xx[0] = x[0];
+	xx[1] = x[1];
+	for (int i = 2; i < N/2; i ++)
+	{
+		xx[i] = x[(2*i) -1];
+	}
 
-	fftw_complex* in = new fftw_complex[N]();
+	for (int i = N; i >N/2 ; i--)
+	{
+		xx[i-1] = x[2*(N-i) + 2];
+	}
+
 	fftw_plan p;
 
-	fftw_complex* xx;
-	xx = reinterpret_cast<fftw_complex*>(x);
-
-	for (int i = 0; i < N; i++) 
-	{
-		if (i < x_size) 
-		{
-			in[i][0] = xx[i][0];
-			in[i][1] = xx[i][1];
-		}
-		else {
-			in[i][0] = 0;
-			in[i][1] = 0;
-		}
-	}
-	p = fftw_plan_dft_1d(N, in, y, FFTW_BACKWARD, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
+	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+	
 	fftw_execute(p);
-	double* yy;
-	yy = reinterpret_cast<double*>(y);
-
+	
 	fftw_destroy_plan(p);
-	delete[] in;
+	//delete[] in;
+	for (int i = 0; i < N; i++) {
+		y[i] /= N;
+	}
 
-	return yy;
+	return y;
 }
 
 double* find_edges::Bandfilter(double* x, int* limits, int x_size)
@@ -182,31 +177,100 @@ double* find_edges::Bandfilter(double* x, int* limits, int x_size)
 	int x0 = limits[0];
 	int x1 = limits[1];
 
-	std::complex<double>* f_x = new std::complex<double>[x_size]();
+	double* f_x = RFFT(x, x_size);
 
-	f_x = RFFT(x, x_size);
-
-	std::complex<double>* f_x_cut;
+	double* f_x_cut;
 	f_x_cut = f_x;
 
-	for (int i = 0; i <= x0; i++)
+	for (int i = 0; i < x0; i++)
 	{
 		f_x_cut[i] = 0;
 	}
 
-	for (int i = x1+1; i < x_size; i++)
+	for (int i = x1; i <= x_size; i++)
 	{
 		f_x_cut[i] = 0;
 	}
 
-	double* x_cut = new double[x_size]();
-
-	x_cut = IRFFT(f_x_cut, x_size);
+	double* x_cut = IRFFT(f_x_cut, x_size);
 
 	return x_cut;
 }
 
-int find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank = 1)
+int* find_edges::ArgSort(double* s_dic, int s_dic_size)
+{
+	int* indice_arr = new int[s_dic_size]();
+	double* sorted_arr = new double[s_dic_size]();
+
+	for (int i = 0; i < s_dic_size; i++)
+	{
+		for (int j = i; j < (s_dic_size - 1); j++)
+		{
+			if (s_dic[i] > s_dic[j + 1])
+			{
+				sorted_arr[i] = s_dic[j + 1];
+			}
+		}
+	}
+
+	for (int i = 0; i < s_dic_size; i++)
+	{
+		for (int j = i; j < (s_dic_size); j++)
+		{
+			if (sorted_arr[i] == s_dic[j])
+			{
+				indice_arr[i] = j;
+
+			}
+		}
+
+	}
+
+	return indice_arr;
+}
+
+int* find_edges::insertXint(int size, int* arr,int x, int pos)
+{
+	if (pos>size)
+	{
+		size++;
+		arr[size] = x;
+	}
+	else
+	{
+		size++;
+		// shift elements forward 
+		for (int i = size; i >= pos; i--)
+			arr[i] = arr[i - 1];
+
+		// insert x at pos 
+		arr[pos - 1] = x;
+	}
+
+	return arr;
+}
+
+double* find_edges::insertXdouble(int size, double* arr, double x, int pos)
+{
+	if (pos > size)
+	{
+		size++;
+		arr[size] = x;
+	}
+	else
+	{
+		size++;
+		// shift elements forward 
+		for (int i = size; i >= pos; i--)
+			arr[i] = arr[i - 1];
+
+		// insert x at pos 
+		arr[pos - 1] = x;
+	}
+	return arr;
+}
+
+struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank = 1)
 {
 	int s_max, s_min;
 	int s = arr_size;
@@ -217,24 +281,63 @@ int find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, i
 	double* mean_range = new double[s]();
 	mean_range = Bandfilter(mean_range_in, limits, s);
 
-	double* mean_rangeN = new double[s];
+	double* mean_rangeN = new double[s]();
 	for(int i = 0; i <= s; i++)
 	{
-		mean_rangeN[i] = -mean_range[i];
+		mean_rangeN[i] = mean_range[i] * (-1);
 	}
 	struct FP peaks_max = Find_Peaks(mean_range, s, th_edge);
 	struct FP peaks_min = Find_Peaks(mean_rangeN, s, -th_edge);
 
 	if (peaks_max.stripe_size >=1 && rank <= peaks_max.s_dic_size)
 	{
-		s_max = 
+		int* indice_arr = new int[peaks_max.s_dic_size]();
+		indice_arr = ArgSort(peaks_max.s_dic, peaks_max.s_dic_size);
+		int tmp = peaks_max.s_dic_size - rank;
+		s_max = peaks_max.stripes[tmp] + i0;
+	}
+	else
+	{
+		s_max = std::nan("");
+	}
+	if ((peaks_max.stripe_size >= 3 && peaks_min.stripe_size>=3 ))
+	{
+		if (peaks_min.stripes[0] > 25)
+		{
+			peaks_min.stripes = insertXint(peaks_min.stripe_size, peaks_min.stripes, 0, 0);
+			peaks_min.s_dic = insertXdouble(peaks_min.s_dic_size, peaks_min.s_dic, mean_rangeN[0], 0);
+		}
+		if (s-peaks_min.stripes[(peaks_min.stripe_size-1)] > 25)
+		{
+				peaks_min.stripes = insertXint(peaks_min.stripe_size, peaks_min.stripes, (s-1), (peaks_min.stripe_size+1));
+				peaks_min.s_dic = insertXdouble(peaks_min.s_dic_size, peaks_min.s_dic, mean_rangeN[(s - 1)], (peaks_min.s_dic_size+1));
+		}
+
+		int s_dic_min_size = peaks_min.s_dic_size - 2;
+		double* s_dic_min = new double[s_dic_min_size]();
+		for (int i = 0; i < (peaks_min.s_dic_size-1); i++)
+		{
+			s_dic_min[i] = peaks_min.s_dic[i + 1];
+		}
+
+		int n_0 = std::distance(s_dic_min, std::max_element(s_dic_min, s_dic_min + (peaks_min.s_dic_size - 2)));
+
+		s_min = peaks_min.stripes[n_0 + 1] + i0;
 
 	}
+	else
+	{
+		s_min = std::nan("");
+	}
 
-	return 0;
+	struct LI index;
+	index.s_max = s_max;
+	index.s_min = s_min;
+
+	return index;
 }
 
-struct stage23 find_edges::Execute(void)
+int find_edges::Execute(void)
 {
 	
 	int size_mean0 = s21.imgCols / 2;
@@ -253,12 +356,10 @@ struct stage23 find_edges::Execute(void)
 
 	int rank = 0;
 	
-	while (rank < 5)
-	{
-		rank = +1;
-		int s_max = Line_Index(mean_range0, s21.th_edge, i0, rank);
+	rank =+ 1;
+	struct LI index = Line_Index(mean_range0, R, s21.th_edge, i0, rank);
+	int s_max = index.s_max;
+	
 
-	}
-
-	return s23;
+	return s_max;
 }
