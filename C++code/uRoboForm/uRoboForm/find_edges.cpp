@@ -73,8 +73,8 @@ find_edges::find_edges(struct stage12 s12)
 
 struct FP find_edges::Find_Peaks(double* arr, int n, double th_edge)
 {
-	int* stripes = new int[12]();
-	double* s_dic = new double[12]();
+	int* stripes = new int[n]();
+	double* s_dic = new double[n]();
 	int a = 0;
 	int count = 0;
 
@@ -85,10 +85,19 @@ struct FP find_edges::Find_Peaks(double* arr, int n, double th_edge)
 				stripes[a] = i;
 				s_dic[a] = arr[i];
 				a++;
+				if (a>0) {
+					if (stripes[a] - stripes[a-1] < 25)
+					{
+						stripes[a] = stripes[a + 1];
+						s_dic[a] = s_dic[a + 1];
+						count++;
+					}
+				}
+
 			}
 		}
 	}
-	for (int a = 0; a < 11; a++)
+	/*for (int a = 0; a < 12; a++)
 	{
 		if (stripes[a + 1] - stripes[a] < 25)
 		{
@@ -96,8 +105,7 @@ struct FP find_edges::Find_Peaks(double* arr, int n, double th_edge)
 			s_dic[a + 1] = s_dic[a + 2];
 			count++;
 		}
-	}
-
+	}*/
 	struct FP peaks;
 	peaks.stripes = stripes;
 	peaks.s_dic = s_dic;
@@ -119,8 +127,6 @@ double* find_edges::RFFT(double* x, int x_size)
 	
 	fftw_destroy_plan(p);
 
-
-	
 	double* yy = new double[N]();
 	yy[0] = y[0];
 	int j = 0;
@@ -152,7 +158,7 @@ double* find_edges::IRFFT(double* x, int x_size)
 		xx[i] = x[(2*i) -1];
 	}
 
-	for (int i = N; i >N/2 ; i--)
+	for (int i = N; i > N/2 ; i--)
 	{
 		xx[i-1] = x[2*(N-i) + 2];
 	}
@@ -293,7 +299,7 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 	{
 		int* indice_arr = new int[peaks_max.s_dic_size]();
 		indice_arr = ArgSort(peaks_max.s_dic, peaks_max.s_dic_size);
-		int tmp = peaks_max.s_dic_size - rank;
+		int tmp = peaks_max.s_dic_size - rank -1;
 		s_max = peaks_max.stripes[tmp] + i0;
 	}
 	else
