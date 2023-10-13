@@ -359,7 +359,11 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 		double* s_dic_min = new double[s_dic_min_size]();
 		for (int i = 0; i < (peaks_min.s_dic_size-1); i++)
 		{
-			s_dic_min[i] = peaks_min.s_dic[i+1];
+			if (i < peaks_min.s_dic_size)
+			{
+				s_dic_min[i] = peaks_min.s_dic[i + 1];
+			}
+			
 		}
 
 		int n_0 = (int)std::distance(s_dic_min, std::max_element(s_dic_min, s_dic_min + (peaks_min.s_dic_size - 1)));
@@ -388,7 +392,11 @@ int* find_edges::decumulateInt(int* x, int size)
 
 	for (size_t i = 0; i < size-1; i++)
 	{
-		x1[i] = x[i+1];
+		if (i < n)
+		{
+			x1[i] = x[i + 1];
+		}
+		
 	}
 	for (int i = 0; i < n; i++)
 	{
@@ -415,7 +423,7 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	}
 	
 	int n = size - 1;
-	bool* signbit = new bool[size];
+	bool* signbit = new bool[size]();
 	for(int i = 0; i < size; i++)
 	{ 
 		signbit[i] = !(std::signbit(im_diff[i]));
@@ -443,11 +451,8 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	}
 
 	int* through_loc = new int[count]();
-	for (int i = 0; i < count; i++)
-	{
-		through_loc[i] = through_loc1[i];
-	}
-
+	std::copy(through_loc1, through_loc1 + count, through_loc);
+	
 	through_loc = insertXint(count, through_loc, 0, 0);
 	count++;
 	through_loc = insertXint(count, through_loc, size, count);
@@ -469,18 +474,14 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	}
 
 	int* cut_through = new int[j]();
-	for (int i = 0; i < j; i++)
-	{
-		cut_through[i] = cut_through1[i];
-	}
+	std::copy(cut_through1, cut_through1 + j, cut_through);
 	
-
 	struct DT thro;
 	thro.through_loc = through_loc;
 	thro.cut_through = cut_through;
 
-	//delete[] im_diff;
-	//delete[] signbit;
+	delete[] im_diff;
+	delete[] signbit;
 	delete[] through_loc1;
 	delete[] th_through;
 	delete[] cut_through1;
