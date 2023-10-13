@@ -205,16 +205,6 @@ int* find_edges::ArgSort(double* s_dic, int s_dic_size)
 	std::copy(s_dic, s_dic + s_dic_size, sorted_arr);
 
 	std::sort(sorted_arr, sorted_arr + s_dic_size);
-	/*for (int i = 0; i < s_dic_size; i++)
-	{
-		for (int j = 0; j < (s_dic_size - i); j++)
-		{
-			if (s_dic[j] > s_dic[j + 1])
-			{
-				sorted_arr[i] = s_dic[j+1];
-			}
-		}
-	}*/
 
 	for (int i = 0; i < s_dic_size; i++)
 	{
@@ -228,7 +218,7 @@ int* find_edges::ArgSort(double* s_dic, int s_dic_size)
 		}
 
 	}
-
+	delete[] sorted_arr;
 	return indice_arr;
 }
 
@@ -252,7 +242,7 @@ int* find_edges::insertXint(int size, int* arr,int x, int pos)
 		// insert x at pos 
 		temp[pos] = x;
 	} 
-
+	delete[] arr;
 	return temp;
 }
 
@@ -277,6 +267,7 @@ double* find_edges::insertXdouble(int size, double* arr, double x, int pos)
 		// insert x at pos 
 		temp[pos] = x;
 	}
+	delete[] arr;
 	return temp;
 }
 
@@ -287,9 +278,6 @@ double find_edges::std_dev(double* arr, int start, int stop)
 	int size = stop - start;
 
 	double* B = new double[size]();
-
-	double* image_window = 0;
-	image_window = new double[size]();
 
 	for (int k = 0; k < size; k++)
 	{
@@ -308,6 +296,7 @@ double find_edges::std_dev(double* arr, int start, int stop)
 		standardDeviation += pow(B[i] - mean, 2);
 	}
 
+	delete[] B;
 	return sqrt(standardDeviation / size);
 }
 
@@ -333,6 +322,7 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 		indice_arr = ArgSort(peaks_max.s_dic, peaks_max.s_dic_size);
 		int tmp = indice_arr[peaks_max.s_dic_size - rank];
 		s_max = peaks_max.stripes[tmp] + i0;
+		delete[] indice_arr;
 	}
 	else
 	{
@@ -359,7 +349,7 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 		double* s_dic_min = new double[s_dic_min_size]();
 		for (int i = 0; i < (peaks_min.s_dic_size-1); i++)
 		{
-			if (i < peaks_min.s_dic_size)
+			if (i < peaks_min.s_dic_size - 1) 
 			{
 				s_dic_min[i] = peaks_min.s_dic[i + 1];
 			}
@@ -369,7 +359,7 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 		int n_0 = (int)std::distance(s_dic_min, std::max_element(s_dic_min, s_dic_min + (peaks_min.s_dic_size - 1)));
 
 		s_min = peaks_min.stripes[n_0 + 1] + i0;
-
+		delete[] s_dic_min;
 	}
 	else
 	{
@@ -380,6 +370,9 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 	index.s_max = s_max;
 	index.s_min = s_min;
 
+	delete[] mean_range;
+	delete[] mean_rangeN;
+	
 	return index;
 }
 
