@@ -43,7 +43,7 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 	uint8_t* myCopyData = imgCopy.data;
 	int width = image.cols;
 	int height = image.rows;
-	int _stride = image.step / n;//in case cols != strides
+	int _stride = (int)image.step / n;//in case cols != strides
 	for (int i = 0; i < height; i += n)
 	{
 		for (int j = 0; j < width; j += n)
@@ -162,7 +162,7 @@ double* raw_edges::BlackmanWindowR(int n)
 
 	for (int i = 0; i < n; ++i)
 	{
-		float wi = 0.0;
+		double wi = 0.0;
 		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
 		wFun[i] = wi;
 	}
@@ -210,12 +210,12 @@ double raw_edges::Spek_InterpolR (double* A) {
 
 	double* A2 = 0;
 	A2 = new double[A2_size]();
-	for (int i = 0; i < A2_size; i++)
+	for (uint32_t i = 0; i < A2_size; i++)
 	{
 		A2[i] = A[i];
 	}
 
-	int n_0 = std::distance(A2, std::max_element(A2, A2 + A2_size));
+	int n_0 = (int)std::distance(A2, std::max_element(A2, A2 + A2_size));
 
 	double y_ln1 = log(A[n_0 + 1]);
 	double y_ln0 = log(A[n_0]);
@@ -282,8 +282,8 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	double* Mean0 = Mean0R(rows, cols, ImgArr2);
 	
 	double main_d_0 = 0;
-	uint32_t size_Mean0 = cols;
-	int n1 = ((size_Mean0 - freq_range) / 50) + 1;
+	int size_Mean0 = cols;
+	const int n1 = ((size_Mean0 - freq_range) / 50) + 1;
 	//int n1 = 12;
 	double* t1 = 0;
 	t1 = new double[n1]();
@@ -299,11 +299,10 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 
 	double* Mean1 = Mean1R(rows, cols, ImgArr2);
 	double main_d_1 = 0;
-	uint32_t size_Mean1 = rows;
-	int n2 = ((size_Mean1 - freq_range) / 50) + 1;
+	int size_Mean1 = rows;
+	const int n2 = ((size_Mean1 - freq_range) / 50) + 1;
 	//int n2 = 8;
-	double* t2 = 0;
-	t2 = new double[n2]();
+	double* t2 = new double[n2]();
 
 	int k = 0;
 	for (int i = 0; i < (size_Mean1 - freq_range); i += 50)
@@ -321,12 +320,12 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 
 	for (int i = 0; i < Image.rows; i++)
 	{
-		memcpy(s12.img, ImgArr, (Image.cols * sizeof(int)));
+		memcpy(s12.img[i], ImgArr[i], (Image.cols * sizeof(int)));
 	}
 	
 	for (int i = 0; i < Image2.rows; i++)
 	{
-		memcpy(s12.img2, ImgArr2, (Image2.cols* sizeof(int)));
+		memcpy(s12.img2[i], ImgArr2[i], (Image2.cols* sizeof(int)));
 	}
 	
 	memcpy(s12.mean0, Mean0, Image2.cols * sizeof(double));
