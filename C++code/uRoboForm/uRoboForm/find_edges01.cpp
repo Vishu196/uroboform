@@ -122,7 +122,8 @@ ArrD find_edges01::Execute(ArrI ImageArray, int freq_range)
 	auto Mean0 = nc::mean(image2, nc::Axis::ROW);
 	auto t1 = nc::NdArray<double>(12, 1);
 	int j = 0;
-	for (int i = 0; i < (nc::size(Mean0) - freq_range); i += 50)
+	int ran = nc::size(Mean0) - freq_range;
+	for (int i = 0; i < ran; i += 50)
 	{
 		double tmp = Main_Freq(Mean0, i, i + freq_range);
 		t1[j] = 1 / tmp;

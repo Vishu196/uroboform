@@ -108,7 +108,7 @@ Mat ImageSlice(Mat image, int n)
 	uint8_t* myCopyData = imgCopy.data;
 	int width = image.cols;
 	int height = image.rows;
-	int _stride = image.step / n;//in case cols != strides
+	int _stride = (int)image.step / n;//in case cols != strides
 	for (int i = 0; i < height; i += n)
 	{
 		cout << endl;
@@ -134,31 +134,5 @@ Mat ImageSlice(Mat image, int n)
 	return imgCopy;
 }
 
-int* FindPeaks(double arr[], int n, float th_edge)
-{
-	int* stripes = 0;
-	stripes = new int[12];
-	float* s_dic = 0;
-	s_dic = new float[12];
-	int a = 0;
-
-	for (int i = 1; i < n - 1; i++)
-	{
-		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1]) {
-			if (arr[i] > th_edge) {
-				stripes[a] = i;
-				s_dic[a] = arr[i];
-				a++;
-			}
-		}
-	}
-	for (int a = 0; a < 11; a++)
-	{
-		if (stripes[a + 1] - stripes[a] < 25)
-			stripes[a + 1] = stripes[a + 2];
-	}
-
-	return stripes;
-}
 
 
