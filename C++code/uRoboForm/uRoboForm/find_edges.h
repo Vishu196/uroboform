@@ -24,6 +24,8 @@ struct DT
 {
 	int* through_loc;
 	int* cut_through;
+	int cut_throu_size;
+	int thro_loc_size;
 };
 
 struct FP

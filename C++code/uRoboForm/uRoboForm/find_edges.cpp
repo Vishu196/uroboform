@@ -472,6 +472,8 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	struct DT thro;
 	thro.through_loc = through_loc;
 	thro.cut_through = cut_through;
+	thro.cut_throu_size = j;
+	thro.thro_loc_size = count;
 
 	delete[] im_diff;
 	delete[] signbit;
@@ -544,9 +546,32 @@ int find_edges::Execute(void)
 		{
 			list<int> cut_hor;
 			cut_hor.clear();
+			int* cut_hor_arr = new int[cut_hor.size()]();
 			if (rank != 5)
 			{
-				struct DT throu = Detect_Through(im_col, s21.th_edge, len);
+				struct DT t = Detect_Through(im_col, s21.th_edge, len);
+
+				for (int i = 0; i < t.cut_throu_size; i++)
+				{
+					if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[t.through_loc[t.cut_through[i]]+1] > s21.th_edge)) 
+					{
+						cut_hor.push_back(t.through_loc[t.cut_through[i] + 1]);
+					}
+					else if (t.cut_through[i] == (t.thro_loc_size - 2))
+					{
+						cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+					}
+					else if (im_col[t.through_loc[t.cut_through[i]] + 1] > s21.th_edge)
+					{
+						if (t.through_loc[t.cut_through[i]] > 10)
+						{
+							cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+						}
+						cut_hor.push_back(t.through_loc[t.cut_through[i] + 1]);
+					}
+				}
+				
+				std::copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
 			}
 
 		}
