@@ -614,6 +614,7 @@ int find_edges::Execute(void)
 			struct LI index = Line_Index(mean_range1, s1, s21.th_edge, j0, rank=1);
 			s_max = index.s_max;
 			s_min = index.s_min;
+			int s_m = (int)s_max;
 			int s_mi = (int)s_min;
 
 			try
@@ -631,6 +632,62 @@ int find_edges::Execute(void)
 
 				int n2 = wid - 200;
 				double* std_row = new double[n2]();
+				int k = 0;
+				for (int i = 0; i < n2; i++)
+				{
+					double tmp = std_dev(im_row_low, i, i + 200);
+					std_row[k] = tmp;
+					k++;
+				}
+				double cc1 = *min_element(std_row, std_row + n2);
+				double cc2 = (*max_element(im_row_low, im_row_low + wid)) - (*min_element(im_row_low, im_row_low + wid));
+				double condition2 = cc1 / cc2;
+				if (condition2 <= 0.085)
+				{
+					struct DT t = Detect_Through(im_row_low, s21.th_edge, wid);
+
+					for (int i_row_l = 0; i_row_l < t.cut_throu_size; i_row_l++)
+					{
+						if (t.through_loc[t.cut_through[i_row_l]]  != 0)
+						{
+							cut_ver.push_back(t.through_loc[t.cut_through[i_row_l]]);
+						}
+					}
+				}
+
+				double* img_row = new double[wid]();
+				for (int i = 0; i < wid; i++)
+				{
+					img_row[i] = (double)s21.img2[s_m][i];
+				}
+
+				double* im_row = new double[wid]();
+				im_row = Bandfilter(img_row, 0, y, wid);
+
+				int l = 0;
+				for (int i = 0; i < n2; i++)
+				{
+					double tmp = std_dev(im_row, i, i + 200);
+					std_row[k] = tmp;
+					k++;
+				}
+
+				double c11 = *min_element(std_row, std_row + n2);
+				double c22 = (*max_element(im_row, im_row + wid)) - (*min_element(im_row, im_row + wid));
+				double condition3 = cc1 / cc2;
+				if (condition3 <= 0.088)
+				{
+					struct DT t = Detect_Through(im_row, s21.th_edge, wid);
+
+					for (int i_row_h = 0; i_row_h < t.cut_throu_size; i_row_h++)
+					{
+						if (t.through_loc[t.cut_through[i_row_h]] != 0)
+						{
+							cut_ver.push_back(t.through_loc[t.cut_through[i_row_h] + 1]);
+						}
+					}
+				}
+				cut_ver.sort();
 			}
 			catch (const std::out_of_range& err)
 			{
