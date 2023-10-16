@@ -300,7 +300,7 @@ double find_edges::std_dev(double* arr, int start, int stop)
 	return sqrt(standardDeviation / size);
 }
 
-struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank)
+struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank = 1)
 {
 	double s_max, s_min;
 	int s = arr_size;
@@ -345,18 +345,18 @@ struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_e
 			peaks_min.s_dic_size++;
 		}
 
-		const int s_dic_min_size = (peaks_min.s_dic_size) - 1;
+		const int s_dic_min_size = (peaks_min.stripe_size) - 2;
 		double* s_dic_min = new double[s_dic_min_size]();
-		for (int i = 0; i < (peaks_min.s_dic_size-1); i++)
+		for (int i = 0; i < s_dic_min_size; i++)
 		{
-			if (i < peaks_min.s_dic_size - 1) 
+			if (i < s_dic_min_size)
 			{
 				s_dic_min[i] = peaks_min.s_dic[i + 1];
 			}
 			
 		}
 
-		int n_0 = (int)std::distance(s_dic_min, std::max_element(s_dic_min, s_dic_min + (peaks_min.s_dic_size - 1)));
+		int n_0 = (max_element(s_dic_min, s_dic_min + s_dic_min_size) - s_dic_min);
 
 		s_min = peaks_min.stripes[n_0 + 1] + i0;
 		delete[] s_dic_min;
@@ -484,10 +484,27 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	return thro;
 }
 
+int* find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
+{
+	for (int i_cut = (arr_size - 1); i_cut < (-1); i_cut--)
+	{
+		for (int j = 0; j < arr_size; j++)
+		{
+			bool c1 = abs(cut_arr[j] - cut_arr[i_cut]) > (ideal_d - 40);
+			bool c2 = abs(cut_arr[j] - cut_arr[i_cut]) > (ideal_d + 40);
+			
+		}
+	}
+	return 0;
+}
+
 int find_edges::Execute(void)
 {
-	if (s21.main_d_0 && s21.main_d_1)
+	list<int> cut_hor;
+	list<int> cut_ver;
+	if ((s21.main_d_0 > 13) && (s21.main_d_1 > 13))
 	{	
+		double s_max, s_min;
 		int size_mean0 = s21.imgCols / 2;
 		const int mid = size_mean0 / 2;
 		const int search_range = 150;
@@ -508,7 +525,7 @@ int find_edges::Execute(void)
 		{
 			rank += 1;
 			struct LI index = Line_Index(mean_range0, R, s21.th_edge, i0, rank);
-			double s_max = index.s_max;
+			s_max = index.s_max;
 			int s_m = (int) s_max;
 			bool res = isnan(s_max);
 			if (!res)
@@ -541,10 +558,10 @@ int find_edges::Execute(void)
 			}
 	
 		}
-	
+		list<int> cut_hor;
+		list<int> cut_ver;
 		try
 		{
-			list<int> cut_hor;
 			cut_hor.clear();
 			int* cut_hor_arr = new int[cut_hor.size()]();
 			if (rank != 5)
@@ -575,18 +592,59 @@ int find_edges::Execute(void)
 			}
 
 		}
-		catch (const std::exception&)
+		catch (const std::out_of_range& err)
 		{
-
+			cut_hor.clear();
 		}
-	
-	
+		if (cut_hor.size() >= 2)
+		{
+			list<int>::iterator it = cut_hor.begin();
+			advance(it, 1);
+			int j0 = cut_hor.front();
+			int j1 = *it;
+			int k = 0;
+			int s1 = j1 - j0;
+			double* mean_range1 = 0;
+			mean_range1 = new double[s1]();
+			for (int i = j0; i <= j1; i++)
+			{
+					mean_range1[k] = s21.mean1[i];
+					k++;				
+			}
+			struct LI index = Line_Index(mean_range1, s1, s21.th_edge, j0, rank=1);
+			s_max = index.s_max;
+			s_min = index.s_min;
+			int s_mi = (int)s_min;
+
+			try
+			{
+				int y = s21.imgCols / 2 / 6;
+				int wid = s21.imgCols / 2;
+				double* img_row_l = new double[wid]();
+				for (int i = 0; i < wid; i++)
+				{
+					img_row_l[i] = (double)s21.img2[s_mi][i];
+				}
+
+				double* im_row_low = new double[wid]();
+				im_row_low = Bandfilter(img_row_l, 0, y, wid);
+
+				int n2 = wid - 200;
+				double* std_row = new double[n2]();
+			}
+			catch (const std::out_of_range& err)
+			{
+				cut_ver.clear();
+			}
+		}
+		else
+		{
+			cut_ver.clear();
+		}
 	}
 	else
 	{
-		list<int> cut_hor;
 		cut_hor.clear();
-		list<int> cut_ver;
 		cut_ver.clear();
 	}
 	return 0;

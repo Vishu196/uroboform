@@ -68,7 +68,7 @@ private:
 	int* decumulateInt(int* x, int size);
 	struct LI Line_Index(double* mean_range_in, int arr_size, double th_edge,int i0,int rank);
 	struct DT Detect_Through(double* im_col, double th_edge, int size);
-	int* Delete_Edges(int* cut_hor, int ideal_d);
+	int* Delete_Edges(int* cut_arr, int ideal_d, int arr_size);
 
 public:
 
