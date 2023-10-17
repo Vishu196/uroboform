@@ -26,8 +26,8 @@ static void buffer_s21_init() {
 
 static void buffer_s23_init()
 {
-	s23.cut_hor = new int[2];
-	s23.cut_ver = new int[2]; 
+	s23.cut_hor = {};
+	s23.cut_ver = {};
 
 	s23.img = new int* [1080];;// new int[1080][1440];
 	for (int h = 0; h < 1080; h++)
@@ -498,7 +498,7 @@ int* find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 	return 0;
 }
 
-int find_edges::Execute(void)
+struct stage23 find_edges::Execute(void)
 {
 	list<int> cut_hor;
 	list<int> cut_ver;
@@ -558,8 +558,6 @@ int find_edges::Execute(void)
 			}
 	
 		}
-		list<int> cut_hor;
-		list<int> cut_ver;
 		try
 		{
 			cut_hor.clear();
@@ -664,26 +662,28 @@ int find_edges::Execute(void)
 				double* im_row = new double[wid]();
 				im_row = Bandfilter(img_row, 0, y, wid);
 
+				int n3 = wid - 200;
+				double* std_row_h = new double[n3]();
 				int l = 0;
-				for (int i = 0; i < n2; i++)
+				for (int i = 0; i < n3; i++)
 				{
 					double tmp = std_dev(im_row, i, i + 200);
-					std_row[k] = tmp;
-					k++;
+					std_row_h[l] = tmp;
+					l++;
 				}
 
-				double c11 = *min_element(std_row, std_row + n2);
+				double c11 = *min_element(std_row_h, std_row_h + n2);
 				double c22 = (*max_element(im_row, im_row + wid)) - (*min_element(im_row, im_row + wid));
-				double condition3 = cc1 / cc2;
+				double condition3 = c11 / c22;
 				if (condition3 <= 0.088)
 				{
-					struct DT t = Detect_Through(im_row, s21.th_edge, wid);
+					struct DT t1 = Detect_Through(im_row, s21.th_edge, wid);
 
-					for (int i_row_h = 0; i_row_h < t.cut_throu_size; i_row_h++)
+					for (int i_row_h = 0; i_row_h < t1.cut_throu_size; i_row_h++)
 					{
-						if (t.through_loc[t.cut_through[i_row_h]] != 0)
+						if (t1.through_loc[t1.cut_through[i_row_h]] != 0)
 						{
-							cut_ver.push_back(t.through_loc[t.cut_through[i_row_h] + 1]);
+							cut_ver.push_back(t1.through_loc[t1.cut_through[i_row_h] + 1]);
 						}
 					}
 				}
@@ -704,5 +704,22 @@ int find_edges::Execute(void)
 		cut_hor.clear();
 		cut_ver.clear();
 	}
-	return 0;
+
+	s23.cut_hor.assign(cut_hor.begin(), cut_hor.end());
+	s23.cut_ver.assign(cut_ver.begin(), cut_ver.end());
+
+	int cols2 = s21.imgCols / 2;
+	int rows2 = s21.imgRows / 2;
+
+	for (int i = 0; i < s21.imgRows; i++)
+	{
+		memcpy(s23.img[i], s21.img[i], (s21.imgCols * sizeof(int)));
+	}
+
+	for (int i = 0; i < (rows2); i++)
+	{
+		memcpy(s23.img2[i], s21.img2[i], (cols2 * sizeof(int)));
+	}
+	
+	return s23;
 }

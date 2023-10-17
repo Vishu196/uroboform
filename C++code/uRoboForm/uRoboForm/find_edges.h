@@ -46,8 +46,8 @@ struct stage23
 {
 	int** img;
 	int** img2;
-	int* cut_hor;
-	int* cut_ver;
+	list<int> cut_hor;
+	list<int> cut_ver;
 };
 
 class find_edges
@@ -73,7 +73,7 @@ private:
 public:
 
 	find_edges(struct stage12 s12);
-	int Execute(void);
+	struct stage23 Execute(void);
 	
 
 };

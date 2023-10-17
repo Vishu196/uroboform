@@ -22,17 +22,22 @@ int main()
 	cout << "Stage 1 complete." << endl;
 
 	find_edges edge(s12);
-	int s_max = edge.Execute();
-
-	cout << "s_max = " << s_max << endl;
+	struct stage23 s23 = edge.Execute();
+	
+	cout << "cut_hor: ";
+	for (auto v : s23.cut_hor)
+		cout << v << ",";
+	cout << endl << "cut_ver: ";
+	for (auto v : s23.cut_ver)
+		cout << v << ",";
 
 	auto t02 = high_resolution_clock::now();
 
 	/* Getting number of milliseconds as an integer. */
 	auto ms_int = duration_cast<milliseconds>(t02 - t01);
-	duration<double, std::milli> ms_double = t02 - t01;
-
-	std::cout << "T1 : " << ms_double.count() << "ms\n";
+	duration<double, milli> ms_double = t02 - t01;
+	cout << endl;
+	cout << "T1 : " << ms_double.count() << "ms\n";
 
 	
 
