@@ -300,7 +300,7 @@ double find_edges::std_dev(double* arr, int start, int stop)
 	return sqrt(standardDeviation / size);
 }
 
-struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank = 1)
+struct LI find_edges::Line_Index(double* mean_range_in,int arr_size, double th_edge, int i0, int rank)
 {
 	double s_max, s_min;
 	int s = arr_size;
@@ -484,6 +484,19 @@ struct DT find_edges::Detect_Through(double* im_col, double th_edge , int size)
 	return thro;
 }
 
+int* find_edges::deleteXint(int size, int* arr, int pos)
+{
+	size--;
+
+	if (pos > size)
+		return NULL;
+	
+	for (int i = size; i > pos; i--)
+			arr[i-2] = arr[i-1];
+	
+	return arr;
+}
+
 int* find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 {
 	for (int i_cut = (arr_size - 1); i_cut < (-1); i_cut--)
@@ -492,7 +505,12 @@ int* find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 		{
 			bool c1 = abs(cut_arr[j] - cut_arr[i_cut]) > (ideal_d - 40);
 			bool c2 = abs(cut_arr[j] - cut_arr[i_cut]) > (ideal_d + 40);
-			
+			bool c = (!(c1 && c2));
+
+			if (c)
+			{
+				cut_arr = deleteXint(arr_size, cut_arr,i_cut);
+			}
 		}
 	}
 	return 0;
@@ -710,6 +728,9 @@ struct stage23 find_edges::Execute(void)
 
 	int cols2 = s21.imgCols / 2;
 	int rows2 = s21.imgRows / 2;
+
+	s23.imgCols = s21.imgCols;
+	s23.imgRows = s21.imgRows;
 
 	for (int i = 0; i < s21.imgRows; i++)
 	{

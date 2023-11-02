@@ -5,8 +5,6 @@
 
 using namespace std;
 
-
-
 struct stage21
 {
 	int** img;
@@ -46,6 +44,8 @@ struct stage23
 {
 	int** img;
 	int** img2;
+	int imgRows;
+	int imgCols;
 	list<int> cut_hor;
 	list<int> cut_ver;
 };
@@ -69,6 +69,8 @@ private:
 	struct LI Line_Index(double* mean_range_in, int arr_size, double th_edge,int i0,int rank);
 	struct DT Detect_Through(double* im_col, double th_edge, int size);
 	int* Delete_Edges(int* cut_arr, int ideal_d, int arr_size);
+	int* deleteXint(int size, int* arr, int pos);
+
 
 public:
 
