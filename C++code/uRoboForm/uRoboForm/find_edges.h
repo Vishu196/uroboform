@@ -48,6 +48,8 @@ struct stage23
 	int imgCols;
 	list<int> cut_hor;
 	list<int> cut_ver;
+	int cut_hor_s;
+	int cut_ver_s;
 };
 
 class find_edges

@@ -29,13 +29,16 @@ static void buffer_s23_init()
 	s23.cut_hor = {};
 	s23.cut_ver = {};
 
-	s23.img = new int* [1080];;// new int[1080][1440];
+	s23.cut_hor_s = 0;
+	s23.cut_ver_s = 0;
+
+	s23.img = new int* [1080];
 	for (int h = 0; h < 1080; h++)
 	{
 		s23.img[h] = new int[1440];
 	}
 
-	s23.img2 = new int* [540];;// new int[1080][1440];
+	s23.img2 = new int* [540];
 	for (int h = 0; h < 540; h++)
 	{
 		s23.img2[h] = new int[720];
@@ -725,6 +728,9 @@ struct stage23 find_edges::Execute(void)
 
 	s23.cut_hor.assign(cut_hor.begin(), cut_hor.end());
 	s23.cut_ver.assign(cut_ver.begin(), cut_ver.end());
+
+	s23.cut_hor_s = cut_hor.size();
+	s23.cut_ver_s = cut_ver.size();
 
 	int cols2 = s21.imgCols / 2;
 	int rows2 = s21.imgRows / 2;
