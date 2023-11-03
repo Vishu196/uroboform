@@ -12,6 +12,8 @@ struct stage32
 	int imgCols;
 	list<int> cut_hor;
 	list<int> cut_ver;
+	int cut_hor_s;
+	int cut_ver_s;
 };
 
 struct stage34
@@ -28,6 +30,6 @@ private:
 public:
 
 	grid_pos01(struct stage23 s23);
-	struct stage34 Execute(void);
+	int Execute(void);
 };
 

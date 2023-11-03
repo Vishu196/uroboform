@@ -1,6 +1,7 @@
 #include "main.h"
 #include "raw_edges.h"
 #include "find_edges.h"
+#include "grid_pos01.h"
 
 
 //#define Debug	
@@ -30,6 +31,9 @@ int main()
 	cout << endl << "cut_ver: ";
 	for (auto v : s23.cut_ver)
 		cout << v << ",";
+
+	grid_pos01 grid(s23);
+	int a = grid.Execute();
 
 	auto t02 = high_resolution_clock::now();
 
