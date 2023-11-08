@@ -68,9 +68,9 @@ grid_pos01::grid_pos01(struct stage23 s23)
  
 int grid_pos01::Execute(void) 
 {
-	if ( (s32.cut_ver_s >= 2) && (s32.cut_hor_s >=2))
+	if ((s32.cut_ver_s >= 2) && (s32.cut_hor_s >= 2))
 	{
-		if (s32.cut_ver.front()*2 <10)
+		if (s32.cut_ver.front() * 2 < 10)
 		{
 			s32.cut_ver.pop_front();
 		}
@@ -92,9 +92,49 @@ int grid_pos01::Execute(void)
 		int* cut_ver_arr = new int[s32.cut_ver.size()]();
 		std::copy(s32.cut_ver.begin(), s32.cut_ver.end(), cut_ver_arr);
 
-		
+		int** grids = 0;
+		grids = new int* [500];
+		for (int h = 0; h < 500; h++)
+		{
+			grids[h] = new int[800];
+		}
 
+		memset(grids, 0, sizeof(grids[0][0]) * s32.cut_hor_s * s32.cut_ver_s);
+
+		int image_size = s32.imgCols * s32.imgRows;
+		double five_percent = image_size * 0.05;
+
+		for (int row = 0; row < s32.cut_hor.size()- 1; row++)
+		{
+			for (int col = 0; col < s32.cut_ver.size() - 1; col++)
+			{
+				int x1 = cut_hor_arr[row] * 2;
+				int x2 = (cut_hor_arr[row + 1]) * 2;
+				int y1 = cut_ver_arr[col] * 2;
+				int y2 = (cut_ver_arr[col + 1]) * 2;
+
+				int** grid0 = 0;
+				grid0 = new int* [x2-x1];
+				for (int h = 0; h < (x2-x1); h++)
+				{
+					grid0[h] = new int[y2-y1];
+				}
+
+				for (int x = x1; x < x2; x++)
+				{
+					for (int y = y1; y < y2; y++)
+					{
+						grid0[x-x1][y-y1] = s32.img[x][y];
+					}
+			    }
+
+
+
+			}
+
+			
+
+		}
 	}
-
 	return 0;
 }
