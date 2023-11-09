@@ -54,11 +54,9 @@ struct stage23
 
 class find_edges
 {
+	friend class grid_pos01;
 private:
-	/*
-	float cond_col, cond_row_low, cond_row;
-	int ideal_d;*/
-
+	
 	double* Bandfilter(double *x,int start, int end, int x_size);
 	double* RFFT(double* x, int x_size);
 	double* IRFFT(double* x, int x_size);

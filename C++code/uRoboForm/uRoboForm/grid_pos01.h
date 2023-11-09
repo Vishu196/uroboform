@@ -26,6 +26,15 @@ class grid_pos01
 {
 private:
 	int** flip_grid(int** grid0, int axis, int l, int w);
+	double* Mean0R(int rows, int cols, int** array);
+	double* Mean1R(int rows, int cols, int** array);
+	double MeanR(int rows, double* array);
+	double* Bandfilter(double* x, int start, int end, int x_size);
+	double* RFFT(double* x, int x_size);
+	double* IRFFT(double* x, int x_size);
+	double* gradient(double* x, int x_size);
+
+
 
 public:
 

@@ -22,11 +22,13 @@ struct stage12
 
 class raw_edges
 {
+	friend class grid_pos01;
+
 private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
 	int** Image2ArrayR (Mat ImageR2);
-	double* Mean0R (int rows, int cols, int** array);
+	double* Mean0R(int rows, int cols, int** array);
 	double* Mean1R(int rows, int cols, int** array);
 	double MeanR(int rows, double* array);
 	double Median(int size, double* array);
@@ -40,6 +42,7 @@ public:
 	raw_edges(Mat ImageR);
 	struct stage12 ExecuteR(Mat image, int freq_range);
 	
+
 	
 };
 
