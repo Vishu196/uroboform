@@ -231,6 +231,7 @@ double* grid_pos01::gradient(double* x, int x_size)
 
 int grid_pos01::Execute(void) 
 {
+	string orientation;
 	if ((s32.cut_ver_s >= 2) && (s32.cut_hor_s >= 2))
 	{
 		if (s32.cut_ver.front() * 2 < 10)
@@ -275,13 +276,17 @@ int grid_pos01::Execute(void)
 				int x2 = (cut_hor_arr[row + 1]) * 2;
 				int y1 = cut_ver_arr[col] * 2;
 				int y2 = (cut_ver_arr[col + 1]) * 2;
+				int s1 = x2 - x1;
+				int s2 = y2 - y1;
 
 				int** grid0 = 0;
-				grid0 = new int* [x2-x1];
-				for (int h = 0; h < (x2-x1); h++)
+				grid0 = new int* [s1];
+				for (int h = 0; h < (s1); h++)
 				{
-					grid0[h] = new int[y2-y1];
+					grid0[h] = new int[s2];
 				}
+				//memset(grid0, 0, sizeof(grid0[0][0]) * s1 * s2);
+
 
 				for (int x = x1; x < x2; x++)
 				{
@@ -353,6 +358,53 @@ int grid_pos01::Execute(void)
 
 				double mean_0grad0 = MeanR(w2, mean_grad0);
 				double mean_1grad1 = MeanR(w1, mean_grad1);
+
+				int** grid_rot = 0;
+				grid_rot = new int* [s1];
+				for (int h = 0; h < (s1); h++)
+				{
+					grid_rot[h] = new int[s2];
+				}
+				
+				int** grid_rot1 = 0;
+				grid_rot1 = new int* [s2];
+				for (int h = 0; h < (s2); h++)
+				{
+					grid_rot1[h] = new int[s1];
+				}
+
+				if (mean_1grad1 > mean_0grad0)
+				{
+					orientation = "hor";
+				}
+				else
+				{
+					orientation = "ver";
+				}
+
+				if (orientation == "hor")
+				{
+					for (int i = 0; i < s2; i++)
+					{
+						for (int j = 0; j < s1; j++)
+						{
+							grid_rot1[i][j] = grid0[j][i];
+						}
+					}
+
+
+				}
+
+				else
+				{
+					for (int i = 0; i < s1; i++)
+					{
+						for (int j = 0; j < s2; j++)
+						{
+							grid_rot[i][j] = grid0[i][j];
+						}
+					}
+				}
 
 
 			}
