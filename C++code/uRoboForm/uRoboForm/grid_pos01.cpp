@@ -8,6 +8,8 @@ static void buffer_s32_init()
 	s32.cut_hor = {};
 	s32.cut_ver = {};
 
+	s32.imgRows = 0;
+	s32.imgCols = 0;
 	s32.cut_hor_s = 0;
 	s32.cut_ver_s = 0;
 	
@@ -268,9 +270,9 @@ int grid_pos01::Execute(void)
 		int image_size = s32.imgCols * s32.imgRows;
 		double five_percent = image_size * 0.05;
 
-		for (int row = 0; row < s32.cut_hor.size()- 1; row++)
+		for (int row = 0; row < (s32.cut_hor.size()- 1); row++)
 		{
-			for (int col = 0; col < s32.cut_ver.size() - 1; col++)
+			for (int col = 0; col < (s32.cut_ver.size() - 1); col++)
 			{
 				int x1 = cut_hor_arr[row] * 2;
 				int x2 = (cut_hor_arr[row + 1]) * 2;
@@ -287,14 +289,18 @@ int grid_pos01::Execute(void)
 				}
 				//memset(grid0, 0, sizeof(grid0[0][0]) * s1 * s2);
 
-
-				for (int x = x1; x < x2; x++)
+				if (x2>x1 && y2>y1)
 				{
-					for (int y = y1; y < y2; y++)
+					for (int x = x1; x < x2; x++)
 					{
-						grid0[x-x1][y-y1] = s32.img[x][y];
+						for (int y = y1; y < y2; y++)
+						{
+							grid0[x - x1][y - y1] = s32.img[x][y];
+						}
 					}
-			    }
+				}
+
+				
 
 				int x11 = cut_hor_arr[row];
 				int x22 = cut_hor_arr[row + 1];
@@ -360,18 +366,7 @@ int grid_pos01::Execute(void)
 				double mean_1grad1 = MeanR(w1, mean_grad1);
 
 				int** grid_rot = 0;
-				grid_rot = new int* [s1];
-				for (int h = 0; h < (s1); h++)
-				{
-					grid_rot[h] = new int[s2];
-				}
 				
-				int** grid_rot1 = 0;
-				grid_rot1 = new int* [s2];
-				for (int h = 0; h < (s2); h++)
-				{
-					grid_rot1[h] = new int[s1];
-				}
 
 				if (mean_1grad1 > mean_0grad0)
 				{
@@ -384,19 +379,29 @@ int grid_pos01::Execute(void)
 
 				if (orientation == "hor")
 				{
+					grid_rot = new int* [s2];
+					for (int h = 0; h < (s2); h++)
+					{
+						grid_rot[h] = new int[s1];
+					}
+
 					for (int i = 0; i < s2; i++)
 					{
 						for (int j = 0; j < s1; j++)
 						{
-							grid_rot1[i][j] = grid0[j][i];
+							grid_rot[i][j] = grid0[j][i];
 						}
 					}
-
-
 				}
 
 				else
-				{
+				{					
+					grid_rot = new int* [s1];
+					for (int h = 0; h < (s1); h++)
+					{
+						grid_rot[h] = new int[s2];
+					}
+
 					for (int i = 0; i < s1; i++)
 					{
 						for (int j = 0; j < s2; j++)
@@ -405,7 +410,6 @@ int grid_pos01::Execute(void)
 						}
 					}
 				}
-
 
 			}
 
