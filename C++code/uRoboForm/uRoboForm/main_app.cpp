@@ -31,6 +31,8 @@ int main()
 	cout << endl << "cut_ver: ";
 	for (auto v : s23.cut_ver)
 		cout << v << ",";
+	cout << endl;
+	cout << "Stage 2 complete." << endl;
 
 	grid_pos01 grid(s23);
 	int a = grid.Execute();
