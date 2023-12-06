@@ -34,6 +34,11 @@ static void buffer_s34_init()
 		s34.img[h] = new int[1440];
 	}
 
+	/*s34.grids = new Grid*[3];
+	for (int i = 0; i < 3; i++)
+	{
+		s34.grids[i] = new Grid(s32.img, s32.imgRows, orientation, im_loc, Grid::max_pos);
+	}*/
 }
 
 static void buffers_init(void)
@@ -231,6 +236,122 @@ double* grid_pos01::gradient(double* x, int x_size)
 
 }
 
+int* decumulateInt(int* x, int size)
+{
+	const size_t n = size - 1;
+	int* xi = new int[n]();
+	int* x1 = new int[n]();
+	int* x2 = new int[n]();
+
+	for (size_t i = 0; i < size - 1; i++)
+	{
+		if (i < n)
+		{
+			x1[i] = x[i + 1];
+		}
+
+	}
+	for (int i = 0; i < n; i++)
+	{
+		x2[i] = x[i];
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		xi[i] = x1[i] - x2[i];
+	}
+
+	delete[] x1;
+	delete[] x2;
+
+	return xi;
+}
+
+int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
+{
+	int** grid_cut = 0;
+	grid_cut = new int* [x];
+	for (int h = 0; h < x; h++)
+	{
+		grid_cut[h] = new int[y];
+	}
+
+	int len = x / 2;
+	int wid = y / 2;
+
+	int** grid_rot2 = 0;
+	grid_rot2 = new int* [len];
+	for (int h = 0; h < len; h++)
+	{
+		grid_rot2[h] = new int[wid];
+	}
+
+	int s = 0;
+	int t = 0;
+	for (int i = 0; i < len; i += 2)
+	{
+		for (int j = 0; j < wid; j += 2) 
+		{
+			grid_rot2[s][t] = grid_rot[i][j];
+			s++;
+			t++;
+		}
+	}
+
+	double* mean_row = 0;
+	mean_row = new double[len];
+
+	mean_row = Mean1R(len, wid, grid_rot2);
+	double im_mean = MeanR(len, mean_row);
+
+	double val_range = (*max_element(grid_rot2, grid_rot2 + len)) - (*min_element(grid_rot2, grid_rot2 + len));
+
+	std::vector<int> where_out;
+	for (int i = 0; i < len; i++) {
+		if (((mean_row[i] < im_mean - 0.075 * val_range) || (mean_row[i] >= im_mean + 0.075 * val_range)) && (i < len / 4 || i >= len * 3 / 4)) 
+		{
+			where_out.push_back(i);
+		}
+	}
+
+	if (where_out.size() >= 1) 
+	{
+		where_out.insert(where_out.begin(), 0);
+		where_out.push_back(len - 1);
+		int* where_out_arr = new int[where_out.size()]();
+		std::copy(where_out.begin(), where_out.end(), where_out_arr);
+
+		int* where_arg1 = decumulateInt(where_out_arr, (int)where_out.size());
+		int where_arg = *max_element(where_out_arr, where_out_arr + where_out.size());
+		int x11 = where_out[where_arg] * 2;
+		int x22 = where_out[where_arg + 1] * 2;
+		int p = 0;
+		int q = 0;
+		for (int i = x11; i < x22; i++)
+		{
+			for (int j = 0; j < y; j++)
+			{
+				grid_cut[p][q] = grid_rot[i][j];
+				p++;
+				q++;
+			}
+		}
+	}
+
+	else
+	{
+		for (int i = 0; i < x; i ++)
+		{
+			for (int j = 0; j < y; j ++)
+			{
+				grid_cut[i][j] = grid_rot[i][j];
+			}
+		}
+	}
+
+	return grid_cut;
+}
+
 int grid_pos01::Execute(void) 
 {
 	string orientation;
@@ -259,10 +380,10 @@ int grid_pos01::Execute(void)
 		std::copy(s32.cut_ver.begin(), s32.cut_ver.end(), cut_ver_arr);
 
 		int** grids = 0;
-		grids = new int* [500];
-		for (int h = 0; h < 500; h++)
+		grids = new int* [s32.cut_hor_s];
+		for (int h = 0; h < s32.cut_hor_s; h++)
 		{
-			grids[h] = new int[800];
+			grids[h] = new int[s32.cut_ver_s];
 		}
 
 		memset(grids, 0, sizeof(grids[0][0]) * s32.cut_hor_s * s32.cut_ver_s);
@@ -298,9 +419,7 @@ int grid_pos01::Execute(void)
 							grid0[x - x1][y - y1] = s32.img[x][y];
 						}
 					}
-				}
-
-				
+				}				
 
 				int x11 = cut_hor_arr[row];
 				int x22 = cut_hor_arr[row + 1];
@@ -367,7 +486,6 @@ int grid_pos01::Execute(void)
 
 				int** grid_rot = 0;
 				
-
 				if (mean_1grad1 > mean_0grad0)
 				{
 					orientation = "hor";
@@ -411,10 +529,34 @@ int grid_pos01::Execute(void)
 					}
 				}
 
+				int grid_rot_size = s1 * s2;
+				if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
+				{
+					int** grid_cut = 0;
+
+					if (orientation == "hor")
+					{
+						grid_cut = new int* [s2];
+						for (int h = 0; h < (s2); h++)
+						{
+							grid_cut[h] = new int[s1];
+						}
+						grid_cut = cutGrid(grid_rot, s2, s1);
+					}
+					else
+					{
+						grid_cut = new int* [s1];
+						for (int h = 0; h < (s1); h++)
+						{
+							grid_cut[h] = new int[s2];
+						}
+						grid_cut = cutGrid(grid_rot, s1, s2);
+					}
+
+				}
+
+
 			}
-
-			
-
 		}
 	}
 	return 0;
