@@ -288,15 +288,20 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 
 	int s = 0;
 	int t = 0;
-	for (int i = 0; i < len; i += 2)
-	{
-		for (int j = 0; j < wid; j += 2) 
+	
+		for (int i = 0; i < x; i += 2)
 		{
-			grid_rot2[s][t] = grid_rot[i][j];
-			s++;
-			t++;
+			for (int j = 0; j < (y - 1); j += 2)
+			{
+				grid_rot2[s][t] = grid_rot[i][j];
+				if (t < wid - 1)
+					t++;
+			}
+			if (s < len - 1)
+				s++;
+			t = 0;
 		}
-	}
+	
 
 	double* mean_row = 0;
 	mean_row = new double[len];
@@ -304,7 +309,24 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 	mean_row = Mean1R(len, wid, grid_rot2);
 	double im_mean = MeanR(len, mean_row);
 
-	double val_range = (*max_element(grid_rot2, grid_rot2 + len)) - (*min_element(grid_rot2, grid_rot2 + len));
+	int* max = 0;
+	max = new int[len];
+	for (int i = 0; i < len; i++)
+	{
+		max[i] = *std::max_element(grid_rot2[i], grid_rot2[i] + wid);
+	}
+	int max_val = *std::max_element(max, max + len);
+
+	int* min = 0;
+	min = new int[wid];
+	for (int i = 0; i < len; i++)
+	{
+		min[i] = *std::min_element(grid_rot2[i], grid_rot2[i] + wid);
+	}
+	int min_val = *std::min_element(min, min + len);
+	
+	int val_range = max_val - min_val;
+		// int val_range = max - (min_element(grid_rot2, grid_rot2 + len));
 
 	std::vector<int> where_out;
 	for (int i = 0; i < len; i++) {
@@ -322,7 +344,7 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 		std::copy(where_out.begin(), where_out.end(), where_out_arr);
 
 		int* where_arg1 = decumulateInt(where_out_arr, (int)where_out.size());
-		int where_arg = *max_element(where_out_arr, where_out_arr + where_out.size());
+		int where_arg = max_element(where_arg1, where_arg1 + where_out.size()) - where_arg1;
 		int x11 = where_out[where_arg] * 2;
 		int x22 = where_out[where_arg + 1] * 2;
 		int p = 0;
@@ -332,9 +354,12 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 			for (int j = 0; j < y; j++)
 			{
 				grid_cut[p][q] = grid_rot[i][j];
-				p++;
-				q++;
+				if (q < y - 1)
+					q++;
 			}
+			if (p < x - 1)
+				p++;
+			q = 0;
 		}
 	}
 
