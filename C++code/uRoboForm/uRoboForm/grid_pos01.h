@@ -1,6 +1,6 @@
 #pragma once
 #include "find_edges.h"
-
+#include "grid.h"
 
 using namespace std;
 
@@ -19,7 +19,7 @@ struct stage32
 struct stage34
 {
 	int** img;
-	int grids; //confirm the datatype
+	Grid** grids; //confirm the datatype
 };
 
 struct subPX
@@ -39,16 +39,14 @@ private:
 	double* RFFT(double* x, int x_size);
 	double* IRFFT(double* x, int x_size);
 	double* gradient(double* x, int x_size);
-	int** cutGrid(int** grid_rot, int s1, int s2);
+	int** cutGrid(int** grid_rot, int x, int y);
 	struct subPX subpx_max_pos(int** cutGrid, int stripeW, float px_size, string mode);
 	struct subPX subpx_gauss(double* B_cut, double B_max, double B_min, double d_m);
 	struct subPX subpx_parabel(double* B_cut, double B_max, double B_min, double d_m);
 
-
-
 public:
-
 	grid_pos01(struct stage23 s23);
+
 	int Execute(void);
 };
 
