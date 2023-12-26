@@ -377,9 +377,167 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 	return grid_cut;
 }
 
+struct FP grid_pos01::Find_Peaks(double* arr, int n, double th_edge)
+{
+	int* stripes = new int[n]();
+	double* s_dic = new double[n]();
+	int a = 0;
+	int count = 0;
+
+	for (int i = 1; i < n - 1; i++)
+	{
+		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1]) 
+		{
+			if (arr[i] > th_edge) {
+				stripes[a] = i;
+				s_dic[a] = arr[i];
+				a++;
+				if (a > 0) {
+					if (stripes[a] - stripes[a - 1] < 25)
+					{
+						stripes[a] = stripes[a + 1];
+						s_dic[a] = s_dic[a + 1];
+						count++;
+					}
+				}
+
+			}
+		}
+	}
+
+	struct FP peaks;
+	peaks.stripes = stripes;
+	peaks.s_dic = s_dic;
+	peaks.stripe_size = count;
+	peaks.s_dic_size = count;
+
+	return peaks;
+}
+
+int* grid_pos01::insertXint(int size, int* arr, int x, int pos)
+{
+	int* temp = new int[size + 1];
+	std::copy(arr, arr + size, temp);
+
+	if (pos > size)
+		return NULL;
+	if (pos == size)
+	{
+		temp[size] = x;
+	}
+	else
+	{
+		// shift elements forward 
+		for (int i = size; i > pos; i--)
+			temp[i] = temp[i - 1];
+
+		// insert x at pos 
+		temp[pos] = x;
+	}
+	delete[] arr;
+	return temp;
+}
+
+int* grid_pos01::deleteXint(int size, int* arr, int pos)
+{
+	size--;
+
+	if (pos > size)
+		return NULL;
+
+	for (int i = size; i > pos; i--)
+		arr[i - 2] = arr[i - 1];
+
+	return arr;
+}
+
+struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_width, float px_size, string mode)
+{
+	struct subPX p;
+	if (mode == "phase")
+	{
+		//p = subpx_phase(cutGrid);
+	}
+	else
+	{
+		double* B = new double[y];
+		B = Mean0R(x, y, cutGrid);
+
+		double filt = 64 / 640 * y;
+
+		double* B_cut = new double[y]();
+		B_cut = Bandfilter(B, 0, (int)filt, y);
+		
+		double d_min = stripe_width / (double)1000 * 2 / px_size / 2;
+
+		double prom = (*std::max_element(B_cut, B_cut + y)) - (*std::min_element(B_cut, B_cut + y));
+		
+		double* B_cut_N = new double[y]();
+		for (int i = 0; i < y; i++)
+		{
+			B_cut_N[i] = B_cut[i] * (-1);
+		}
+
+		//the functiom Find_peaks needs to be chnaged as per current requirement and then called here
+		// the below func call is incorrect 
+		struct FP B_max = Find_Peaks(B_cut, y, d_min);
+		struct FP B_min = Find_Peaks(B_cut_N, y, d_min);
+
+		if ((B_max.stripe_size>=1) && (B_min.stripe_size>=1))
+		{
+			if ((B_min.stripes[0]>B_max.stripes[0]) && (B_max.stripes[0] >= 0.9*d_min))
+			{
+				B_min.stripes = insertXint(B_min.stripe_size, B_min.stripes, 0, 0);
+				B_min.stripe_size++;
+			}
+			if ((B_min.stripes[B_min.stripe_size-1] < B_max.stripes[B_max.stripe_size-1]) && (y- B_max.stripes[B_max.stripe_size-1] >= 0.9*d_min))
+			{
+				B_min.stripes = insertXint(B_min.stripe_size, B_min.stripes, (y - 1), (B_min.stripe_size));
+				B_min.stripe_size++;
+			}
+			if ((B_max.stripes[0] - B_min.stripes[0] > 0) && (B_max.stripes[0] - B_min.stripes[0] < 0.8*d_min))
+			{
+				B_min.stripes = deleteXint(B_min.stripe_size, B_min.stripes, 0);
+				B_min.stripe_size--;
+			}
+
+			int* d0 = new int[B_max.stripe_size]();
+			d0 = decumulateInt(B_min.stripes, B_min.stripe_size);
+
+			double* dB_Min = new double [B_min.stripe_size]();
+						
+			for (int i = 0; i < B_min.stripe_size; i++) 
+			{
+				dB_Min[i] = (double)B_min.stripes[i];
+			}
+
+			double d_m = MeanR(B_min.stripe_size, dB_Min);
+
+			if (mode == "gauss")
+			{
+				int e = 0;
+			//	p = subpx_gauss(B_cut, B_max.stripes, B_min.stripes, d_m);
+			}
+
+			else if (mode == "parabel")
+			{
+				int t = 0;
+			//	p = subpx_parabel(B_cut, B_max.stripes, B_min.stripes, d_m);
+			}
+		}
+	}
+	
+	return p;
+}
+
 int grid_pos01::Execute(void) 
 {
 	string orientation;
+	const int h1 = 800;
+	const int h2 = 20;
+	const int stripe_width = 100;
+	const float px_size = 3.45;
+
 	if ((s32.cut_ver_s >= 2) && (s32.cut_hor_s >= 2))
 	{
 		if (s32.cut_ver.front() * 2 < 10)
