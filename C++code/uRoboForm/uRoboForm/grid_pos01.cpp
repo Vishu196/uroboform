@@ -232,6 +232,7 @@ double* grid_pos01::gradient(double* x, int x_size)
 	}
 	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
 
+	delete[] grad;
 	return grad;
 
 }
@@ -361,6 +362,8 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 				p++;
 			q = 0;
 		}
+
+		delete[] where_arg1;
 	}
 
 	else
@@ -373,6 +376,11 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 			}
 		}
 	}
+
+	delete[] grid_rot2;
+	delete[] mean_row;
+	delete[] max;
+	delete[] min;
 
 	return grid_cut;
 }
@@ -451,12 +459,204 @@ int* grid_pos01::deleteXint(int size, int* arr, int pos)
 	return arr;
 }
 
+double* grid_pos01::BlackmanWindowR(int n)
+{
+	const double a0 = 0.42;
+	const double a1 = 0.5;
+	const double a2 = 0.08;
+	int wLen = n - 1;
+	double* wFun = 0;
+	wFun = new double[n]();
+
+	for (int i = 0; i < n; ++i)
+	{
+		double wi = 0.0;
+		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
+		wFun[i] = wi;
+	}
+	return wFun;
+}
+
+double* grid_pos01::FFTR(double* image_windowR, int size)
+{
+	const int N = 256;
+	fftw_complex* y = 0;
+	y = new fftw_complex[N];
+	double in[N];
+	fftw_plan p;
+
+	for (int i = 0; i < N; i++) {
+		if (i < size) {
+			in[i] = image_windowR[i];
+		}
+		else {
+			in[i] = 0;
+		}
+	}
+	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+
+	fftw_execute(p);
+	std::complex<double>* yy;
+	yy = reinterpret_cast<std::complex<double> *>(y);
+	double* y1 = 0;
+	y1 = new double[N];
+
+	for (int i = 0; i < N; i++)
+	{
+		y1[i] = abs(yy[i]);
+	}
+
+	fftw_destroy_plan(p);
+	delete[] y;
+	return y1;
+}
+
+double grid_pos01::Spek_InterpolR(double* A) {
+
+	uint32_t A_size = 256;
+	uint32_t A2_size = A_size / 2;
+
+	double* A2 = 0;
+	A2 = new double[A2_size]();
+	for (uint32_t i = 0; i < A2_size; i++)
+	{
+		A2[i] = A[i];
+	}
+
+	int n_0 = (int)std::distance(A2, std::max_element(A2, A2 + A2_size));
+
+	double y_ln1 = log(A[n_0 + 1]);
+	double y_ln0 = log(A[n_0]);
+	double y_ln_1 = log(A[n_0 - 1]);
+	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
+	double n_g = (n_0 + tmp / 2);
+	delete[] A2;
+	return n_g;
+}
+
+struct MFreq grid_pos01::Main_FreqR(double* B0, int start, int stop)
+{
+	double f_g = 0.0;
+	const int size = stop - start;
+
+	double* B = new double[size]();
+
+	double* image_window = 0;
+	image_window = new double[size]();
+
+	for (int k = 0; k < size; k++)
+	{
+		B[k] = B0[k + start];
+	}
+
+	double Mean = MeanR(size, B);
+
+	double* B1 = new double[size]();
+
+	for (int i = 0; i < size; i++)
+	{
+		B1[i] = B[i] - Mean;
+	}
+
+	double* wFun = BlackmanWindowR(size);
+	for (int i = 0; i < size; i++)
+	{
+		image_window[i] = B1[i] * wFun[i];
+	}
+
+	double* y1 = FFTR(image_window, size);
+
+	double n_g = Spek_InterpolR(y1);
+	uint32_t size_B = size;
+	f_g = n_g / size_B;
+
+	delete[] B1;
+	delete[] B;
+	delete[] wFun;
+	delete[] y1;
+
+	struct MFreq mf;
+	mf.Image_window = image_window;
+	mf.n_g = n_g;
+	mf.f_g = f_g;
+
+	return mf;
+}
+
+struct subPX grid_pos01::subpx_phase(int** cutGrid, int x, int y)
+{
+	list<double> max_pos;
+	list<double> pres;
+	double* B0 = new double[y];
+	B0 = Mean0R(x, y, cutGrid);
+
+	double B = MeanR(y, B0);
+
+	if (y >=60)
+	{
+		struct MFreq m = Main_FreqR(B0, 0, y);
+		double d_mean = 1 / m.f_g;
+
+		double* B_arange = new double[y];
+		for (int i = 0; i < y; i++)
+		{
+			B_arange[i] = i;
+		}
+		
+		complex<double> exp_fac = (0, -(2 * M_PI)*(*B_arange)/y);
+
+		complex<double>* F_k1 = new complex<double>[y];
+		complex<double> F_k = (0,0);
+
+		for (int i = 0; i < y; i++) 
+		{
+			F_k1[i] = m.Image_window[i] * exp(exp_fac * m.n_g);
+			F_k += F_k1[i];
+		}
+
+		double Phi = std::arg(F_k);
+		double d = Phi / (2 * M_PI * m.f_g);
+
+		double A1 = pow(real(F_k),2);
+		double A2 = pow(imag(F_k), 2);
+		double A = pow((A1 + A2), 0.5);
+
+		double y = (2 * M_PI * m.f_g * (*B_arange)) - Phi;
+		double y_cos = A * cos(y);
+
+		if (d < d_mean/2)
+		{
+			d += d_mean;
+		}
+
+		for (int i_max = 0; i_max < (m.n_g-1); i_max++)
+		{
+			max_pos.push_back(d + i_max * d_mean);
+		}
+
+		delete[] F_k1;
+		delete[] B_arange;
+	}
+	else
+	{
+		max_pos.clear();
+	}
+	pres.clear();
+
+	struct subPX p;
+	p.max_pos = max_pos;
+	p.pres = pres;
+
+	
+	return p;
+}
+
 struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_width, float px_size, string mode)
 {
 	struct subPX p;
 	if (mode == "phase")
 	{
-		//p = subpx_phase(cutGrid);
+		p = subpx_phase(cutGrid,x,y);
 	}
 	else
 	{
