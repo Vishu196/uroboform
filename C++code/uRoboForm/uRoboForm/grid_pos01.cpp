@@ -130,7 +130,7 @@ double grid_pos01::MeanR(int rows, double* mean0)
 	return meanR;
 }
 
-double* grid_pos01::RFFT(double* x, int x_size)
+double* grid_pos01::RFFT(double * x, int x_size)
 {
 	int N = x_size;
 	double* y = new double[N]();
@@ -232,7 +232,6 @@ double* grid_pos01::gradient(double* x, int x_size)
 	}
 	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
 
-	delete[] grad;
 	return grad;
 
 }
@@ -243,6 +242,37 @@ int* decumulateInt(int* x, int size)
 	int* xi = new int[n]();
 	int* x1 = new int[n]();
 	int* x2 = new int[n]();
+
+	for (size_t i = 0; i < size - 1; i++)
+	{
+		if (i < n)
+		{
+			x1[i] = x[i + 1];
+		}
+
+	}
+	for (int i = 0; i < n; i++)
+	{
+		x2[i] = x[i];
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		xi[i] = x1[i] - x2[i];
+	}
+
+	delete[] x1;
+	delete[] x2;
+
+	return xi;
+}
+
+double* decumulateDouble(double* x, int size)
+{
+	const size_t n = size - 1;
+	double* xi = new double[n]();
+	double* x1 = new double[n]();
+	double* x2 = new double[n]();
 
 	for (size_t i = 0; i < size - 1; i++)
 	{
@@ -385,7 +415,7 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 	return grid_cut;
 }
 
-struct FP grid_pos01::Find_Peaks(double* arr, int n, double th_edge)
+struct FP grid_pos01::Find_Peaks(double* arr, int n, int dist)
 {
 	int* stripes = new int[n]();
 	double* s_dic = new double[n]();
@@ -396,20 +426,17 @@ struct FP grid_pos01::Find_Peaks(double* arr, int n, double th_edge)
 	{
 		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1]) 
 		{
-			if (arr[i] > th_edge) {
 				stripes[a] = i;
 				s_dic[a] = arr[i];
 				a++;
 				if (a > 0) {
-					if (stripes[a] - stripes[a - 1] < 25)
+					if (stripes[a] - stripes[a - 1] < dist)
 					{
 						stripes[a] = stripes[a + 1];
 						s_dic[a] = s_dic[a + 1];
 						count++;
 					}
 				}
-
-			}
 		}
 	}
 
@@ -583,6 +610,183 @@ struct MFreq grid_pos01::Main_FreqR(double* B0, int start, int stop)
 	return mf;
 }
 
+double* gauss_limited(double x, double k, double sigma, double mu, double offset,  int max_cut)
+{
+
+}
+struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
+{
+	list<double> max_pos;
+	list<double> pres;
+	int xmin;
+	int xmax;
+
+
+	for (int i_b = 0; i_b < B_max.stripe_size; i_b++)
+	{
+		int mid = B_max.stripes[i_b];
+
+		if (B_min.stripe_size >=2)
+		{
+			for (int i_0 = 0; i_0 < B_min.stripe_size; i_0++)
+			{
+				if (B_min.stripes[i_0] < mid)
+					xmin = i_0;
+			}
+			for (int i_1 = 0; i_1 <= B_min.stripe_size; i_1++)
+			{
+				if (B_min.stripes[B_min.stripe_size-i_1] > mid)
+					xmax = i_1;
+			}
+
+			try
+			{
+				if (xmin!=xmax)
+				{
+
+				}
+			}
+			catch (const runtime_error& error)
+			{
+				cout << "Optimal Parameters not found for image at x =' " << mid << endl;
+			}
+			catch (std::exception&)
+			{
+				continue;
+			}
+		}
+
+	}
+
+	struct subPX p;
+	return p;
+}
+
+struct subPX subpx_parabel(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
+{
+	list<double> max_pos;
+	int xmin;
+	int xmax;
+
+
+	for (int i_b = 0; i_b < B_max.stripe_size; i_b++)
+	{
+		int mid = B_max.stripes[i_b];
+
+		if (B_min.stripe_size >= 2)
+		{
+			for (int i_0 = 0; i_0 < B_min.stripe_size; i_0++)
+			{
+				if (B_min.stripes[i_0] < mid)
+					xmin = int(i_b-d_m/4)+3;
+			}
+			for (int i_1 = 0; i_1 <= B_min.stripe_size; i_1++)
+			{
+				if (B_min.stripes[B_min.stripe_size - i_1] > mid)
+					xmax = int(i_b + d_m / 4) + 3;
+			}
+
+			try
+			{
+				if (xmin != xmax)
+				{
+					int i = 0;
+					int x_size = xmax - xmin;
+					int* x = new int[x_size];
+					for (int p = xmin; p < xmax; p++)
+					{
+						x[i] = p;
+						if (i < x_size)
+						{
+							i++;
+						}
+					}
+
+					int** W0 = new int* [x_size];
+					for (int h = 0; h < x_size; h++)
+					{
+						W0[h] = new int[x_size];
+					}
+
+					for (int row = 0; row < x_size; row++)
+					{
+						for (int col = 0; col < x_size; col++)
+						{
+							if (row == col)
+								W0[row][col] = 1;
+							else
+								W0[row][col] = 0;
+						}
+					}
+
+					int** arr_x1 = new int*[x_size];
+					for (int i = 0; i < x_size; i++)
+					{
+						arr_x1[i] = new int[1];
+					}
+					
+					for (int row = 0; row < x_size; row++)
+						for (int col = 0; col < 1; col++)
+							arr_x1[row][col] = 1;
+
+					int** arr_x2 = new int* [x_size];
+					for (int i = 0; i < x_size; i++)
+					{
+						arr_x2[i] = new int[1];
+					}
+
+					for (int row = 0; row < x_size; row++)
+						for (int col = 0; col < 1; col++)
+							arr_x2[row][col] = x[row];
+
+					int** arr_x3 = new int* [x_size];
+					for (int i = 0; i < x_size; i++)
+					{
+						arr_x3[i] = new int[1];
+					}
+
+					for (int row = 0; row < x_size; row++)
+						for (int col = 0; col < 1; col++)
+							arr_x3[row][col] = x[row]*x[row];
+
+					int** Phi = new int* [x_size];
+					for (int i = 0; i < x_size; i++)
+					{
+						Phi[i] = new int[3];
+					}
+
+					for (int row = 0; row < x_size; row++)
+						for (int col = 0; col < 1; col++)
+							Phi[row][col] = arr_x1[row][col];
+
+					for (int row = 0; row < x_size; row++)
+						for (int col = 1; col < 2; col++)
+							Phi[row][col] = arr_x2[row][col-1];
+
+					for (int row = 0; row < x_size; row++)
+						for (int col = 2; col < 3; col++)
+							Phi[row][col] = arr_x3[row][col-2];
+
+				}
+
+			}
+			catch (const runtime_error& error)
+			{
+				cout << "Optimal Parameters not found for image at x =' " << mid << endl;
+			}
+			catch (std::exception&)
+			{
+				continue;
+			}
+		}
+
+	}
+
+	struct subPX p;
+	return p;
+
+}
+
 struct subPX grid_pos01::subpx_phase(int** cutGrid, int x, int y)
 {
 	list<double> max_pos;
@@ -716,7 +920,7 @@ struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_w
 			if (mode == "gauss")
 			{
 				int e = 0;
-			//	p = subpx_gauss(B_cut, B_max.stripes, B_min.stripes, d_m);
+			//	p = subpx_gauss(B_cut, struct FP B_max, struct FP B_min, d_m);
 			}
 
 			else if (mode == "parabel")
@@ -730,13 +934,14 @@ struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_w
 	return p;
 }
 
-int grid_pos01::Execute(void) 
+stage34 grid_pos01::Execute(void) 
 {
 	string orientation;
 	const int h1 = 800;
 	const int h2 = 20;
 	const int stripe_width = 100;
 	const float px_size = 3.45;
+	string mode = "gauss";
 
 	if ((s32.cut_ver_s >= 2) && (s32.cut_hor_s >= 2))
 	{
@@ -762,11 +967,11 @@ int grid_pos01::Execute(void)
 		int* cut_ver_arr = new int[s32.cut_ver.size()]();
 		std::copy(s32.cut_ver.begin(), s32.cut_ver.end(), cut_ver_arr);
 
-		int** grids = 0;
-		grids = new int* [s32.cut_hor_s];
+		Grid** grids = 0;
+		grids = new Grid* [s32.cut_hor_s];
 		for (int h = 0; h < s32.cut_hor_s; h++)
 		{
-			grids[h] = new int[s32.cut_ver_s];
+			grids[h] = new Grid[s32.cut_ver_s];
 		}
 
 		memset(grids, 0, sizeof(grids[0][0]) * s32.cut_hor_s * s32.cut_ver_s);
@@ -912,6 +1117,7 @@ int grid_pos01::Execute(void)
 					}
 				}
 
+				struct subPX p;
 				int grid_rot_size = s1 * s2;
 				if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
 				{
@@ -936,11 +1142,53 @@ int grid_pos01::Execute(void)
 						grid_cut = cutGrid(grid_rot, s1, s2);
 					}
 
+					p = subpx_max_pos(grid_cut, s1, s2, stripe_width, px_size, mode);
+
+					int r = p.max_pos.size();
+					double* max_pos_arr = new double[r]();
+					copy(p.max_pos.begin(), p.max_pos.end(), max_pos_arr);
+					
+					double* max_pos_de = decumulateDouble(max_pos_arr, r);
+					
+					if ((r>1) && (max_pos_de[r]>65))
+					{
+						p.max_pos.pop_back();
+					}
+
+					if ((r > 1) && (max_pos_de[0] > 65))
+					{
+						p.max_pos.pop_front();
+					}
+
+				}
+				else
+				{
+					p.max_pos.clear();
+					p.pres.clear();
 				}
 
-
+				list<int> coord;
+				coord.push_back(cut_hor_arr[row] * 2);
+				coord.push_back(cut_ver_arr[col] * 2);
+				grids[row][col] = Grid(grid_rot, image_size, orientation, coord, p.max_pos);
 			}
 		}
+		s34.imgCols = s32.imgCols;
+		s34.imgRows = s32.imgRows;
+
+		for (int i = 0; i < s32.imgRows; i++)
+		{
+			memcpy(s34.img[i], s32.img[i], (s32.imgCols * sizeof(int)));
+		}
+
+		s34.gridRows = s32.cut_hor_s;
+		s34.gridCols = s32.cut_ver_s;
+
+		for (int i = 0; i < s32.cut_hor_s; i++)
+		{
+			memcpy(s34.grids[i], grids[i], (s32.cut_ver_s * sizeof(Grid)));
+		}
+
 	}
-	return 0;
+		return s34;
 }

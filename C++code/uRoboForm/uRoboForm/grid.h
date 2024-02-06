@@ -6,28 +6,32 @@
 using namespace std;
 
 class Grid {
-public:
-    Grid(int** image, int imgRows, string orientation, std::pair<int, int> coord, double max_pos) {
+    public:
+    Grid(int** image, int imgRows, string orientation, list<int> coord, list<double> max_pos)
+    {
         this->image = image;
         this->px_num = imgRows;
         this->orientation = orientation;
         this->im_loc = coord;
-        if (orientation == "hor")
-        {
-            this->max_pos = coord.first + max_pos;
-        }
-        else 
-        {
-            this->max_pos = coord.second + max_pos;
-        }
+            if (orientation == "hor")
+            {
+                this->max_pos = coord.front() + max_pos;
+            }
+            else
+            {
+                this->max_pos = coord.back() + max_pos;
+            }
+        
     }
+
+    Grid() = default;
 
 
     int** image;
     int imgRows;
     int px_num;
     std::string orientation;
-    std::pair<int, int> im_loc;
-    double max_pos;
+    list<int> im_loc;
+    list<double> max_pos;
 };
 
