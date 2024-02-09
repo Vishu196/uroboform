@@ -28,17 +28,22 @@ static void buffer_s32_init()
 
 static void buffer_s34_init()
 {
+	s34.imgRows = 0;
+	s34.imgCols = 0;
 	s34.img = new int* [1080];
 	for (int h = 0; h < 1080; h++)
 	{
 		s34.img[h] = new int[1440];
 	}
 
-	/*s34.grids = new Grid*[3];
+	s34.gridRows = 0;
+	s34.gridCols = 0;
+
+	s34.grids = new Grid*[3];
 	for (int i = 0; i < 3; i++)
 	{
-		s34.grids[i] = new Grid(s32.img, s32.imgRows, orientation, im_loc, Grid::max_pos);
-	}*/
+		s34.grids[i] = new Grid[3];
+	}
 }
 
 static void buffers_init(void)
@@ -614,6 +619,7 @@ double* gauss_limited(double x, double k, double sigma, double mu, double offset
 {
 
 }
+
 struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
 {
 	list<double> max_pos;
@@ -662,7 +668,7 @@ struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B
 	return p;
 }
 
-struct subPX subpx_parabel(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
+struct subPX grid_pos01::subpx_parabel(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
 {
 	list<double> max_pos;
 	int xmin;

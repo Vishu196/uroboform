@@ -35,7 +35,7 @@ int main()
 	cout << "Stage 2 complete." << endl;
 
 	grid_pos01 grid(s23);
-	int a = grid.Execute();
+	struct stage34 s34 = grid.Execute();
 
 	auto t02 = high_resolution_clock::now();
 
