@@ -1,17 +1,22 @@
 #pragma once
 #include "grid_pos01.h"
-#include "grid.h"
 
 using namespace std;
 
 struct stage43
 {
 	int** img;
-	Grid** grids; 
+	int imgRows;
+	int imgCols;
+	int gridRows;
+	int gridCols;
+	Grid** grids;
 };
 
 struct stage45
 {
+	int gridRows;
+	int gridCols;
 	Grid** grids;
 	int index;
 	double k;
