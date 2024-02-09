@@ -1,5 +1,6 @@
 #pragma once
 #include "grid_pos01.h"
+#include <vector>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ class grid_pos02
 {
 private:
 
-	Grid** checkGrid(Grid** grids, int x, int y);
+	Grid** checkGrid(Grid** grids);
 	struct RdBinary ReadBinary(Grid** cgrids, int** img, int x, int y);
 	double get_d_k(Grid** cgrids, int grid_wid, int grid_ht);
 
