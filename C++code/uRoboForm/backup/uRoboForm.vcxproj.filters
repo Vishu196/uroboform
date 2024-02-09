@@ -18,6 +18,12 @@
     <ClCompile Include="main_app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="find_edges01.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extraFunc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="find_edges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -27,10 +33,22 @@
     <ClCompile Include="decumulate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ResultData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cnrData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grid_pos01.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grid_pos02.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grid_pos03.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="raw_edges.cpp">
@@ -47,6 +65,9 @@
     <ClInclude Include="decumulate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ResultData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -60,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="grid_pos03.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="find_edges01.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">

@@ -20,10 +20,7 @@ int main()
 
 	raw_edges edge0(image);
 	struct stage12 s12 = edge0.ExecuteR(image, freq_range);
-	cout << "main_d_0: " << s12.main_d_0 << endl;
-	cout << "main_d_1: " << s12.main_d_1 << endl;
 	cout << "Stage 1 complete." << endl;
-	cout << endl;
 
 	find_edges edge(s12);
 	struct stage23 s23 = edge.Execute();
