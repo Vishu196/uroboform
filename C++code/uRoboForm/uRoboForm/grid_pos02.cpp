@@ -66,7 +66,7 @@ grid_pos02::grid_pos02(struct stage34 s34)
 	}
 }
 
-double* decumulateDouble(double* x, int size)
+double* grid_pos02::decumulateDouble(double* x, int size)
 {
 	const size_t n = size - 1;
 	double* xi = new double[n]();
@@ -97,7 +97,7 @@ double* decumulateDouble(double* x, int size)
 	return xi;
 }
 
-double* Mean0R(int rows, int cols, int** array)
+double* grid_pos02::Mean0R(int rows, int cols, int** array)
 {
 	double* Mean0Arr = 0;
 	Mean0Arr = new double[cols]();
@@ -119,7 +119,7 @@ double* Mean0R(int rows, int cols, int** array)
 	return Mean0Arr;
 }
 
-double* Mean1R(int rows, int cols, int** array)
+double* grid_pos02::Mean1R(int rows, int cols, int** array)
 {
 	double* Mean1Arr = 0;
 	Mean1Arr = new double[rows]();
@@ -141,9 +141,22 @@ double* Mean1R(int rows, int cols, int** array)
 	return Mean1Arr;
 }
 
-double MeanR(int rows, double* mean0)
+double grid_pos02::MeanR(int rows, double* mean0)
 {
 	double sum = 0.0;
+	double meanR = 0.0;
+	for (int i = 0; i < rows; i++)
+	{
+		sum += mean0[i];
+	}
+
+	meanR = sum / rows;
+	return meanR;
+}
+
+double grid_pos02::IntMeanR(int rows, int* mean0)
+{
+	int sum = 0.0;
 	double meanR = 0.0;
 	for (int i = 0; i < rows; i++)
 	{
@@ -201,14 +214,14 @@ Grid** grid_pos02::checkGrid(Grid** grids)
 				{
 					double new_mp = MeanR(r, max_pos_arr) + (s43.grids[row][col].max_pos.front());
 					s43.grids[row][col].max_pos.push_front(new_mp);
-				}					
+				} 				
 			}
 		}
 	}
 	return s43.grids;
 }
 
-std::vector<int> linspace(double start, double end, int num)
+vector<int> grid_pos02::linspace(double start, double end, int num)
 {
 	std::vector<int> bounds;
 
@@ -339,8 +352,43 @@ struct RdBinary grid_pos02::ReadBinary(Grid** cgrids, int** img, int x, int y)
 					coded_line_p[l] = coded_line[l];
 				}
 				coded_mean[i] = MeanR(row_size, coded_line_p);
-				double th;
 
+				int* flat_img = new int[s43.imgRows * s43.imgCols]();
+				int m = 0;
+				for (int r = 0; r < s43.imgRows; r++)
+				{
+					for (int c = 0; c < s43.imgCols; c++)
+					{
+						flat_img[m] = s43.img[r][c];
+						m++;
+					}
+
+				}
+				
+				int amin = *min_element(flat_img, flat_img + (s43.imgRows*s43.imgCols));
+				int mean = IntMeanR((s43.imgRows * s43.imgCols), flat_img);
+				float th = amin + (mean - amin) * 0.85;
+
+				list<int> code_bin;
+				for (int i = 0; i < row_size; i++) {
+					if (coded_mean[i] < th) {
+						code_bin.push_back(1);
+					}
+					else {
+						code_bin.push_back(0);
+					}
+				}
+				code_bin.pop_front();
+
+				string bin_str = "";
+
+				for (int i : code_bin) 
+				{
+					string curr = to_string(i);
+					bin_str += curr;
+				}
+
+				int code = stoi(bin_str);
 
 				delete[] coded_line_p;
 			}
@@ -362,4 +410,9 @@ struct RdBinary grid_pos02::ReadBinary(Grid** cgrids, int** img, int x, int y)
 	rd.ind_ori = ori;
 
 	return rd;
+}
+
+struct stage45 grid_pos02::Execute(void)
+{
+
 }

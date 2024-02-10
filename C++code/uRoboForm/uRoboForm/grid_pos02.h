@@ -36,7 +36,13 @@ class grid_pos02
 {
 private:
 
+	double* decumulateDouble(double* x, int size);
+	double* Mean0R(int rows, int cols, int** array);
+	double* Mean1R(int rows, int cols, int** array);
+	double MeanR(int rows, double* array);
+	double IntMeanR(int rows, int* mean0);
 	Grid** checkGrid(Grid** grids);
+	vector<int> linspace(double start, double end, int num);
 	struct RdBinary ReadBinary(Grid** cgrids, int** img, int x, int y);
 	double get_d_k(Grid** cgrids, int grid_wid, int grid_ht);
 
