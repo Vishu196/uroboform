@@ -167,15 +167,15 @@ double grid_pos02::IntMeanR(int rows, int* mean0)
 	return meanR;
 }
 
-Grid** grid_pos02::checkGrid(Grid** grids)
+Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 {
-	for (int row = 0; row < s43.gridRows; row++)
+	for (int row = 0; row < gRows; row++)
 	{
-		for (int col = 0; col < s43.gridCols; col++)
+		for (int col = 0; col < gCols; col++)
 		{
-			int r = s43.grids[row][col].max_pos.size();
+			int r = grids01[row][col].max_pos.size();
 			double* max_pos_arr = new double[r]();
-			copy(s43.grids[row][col].max_pos.begin(), s43.grids[row][col].max_pos.end(), max_pos_arr);
+			copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr);
 			double* m_pos_de = decumulateDouble(max_pos_arr, r);
 			bool con = std::any_of(m_pos_de, m_pos_de+r, [](int x) { return x > 100; });
 			while (con)
@@ -190,35 +190,35 @@ Grid** grid_pos02::checkGrid(Grid** grids)
 
 			if (r >= 1)
 			{
-				bool c1 = row != s43.gridRows - 1;
-				bool c2 = s43.grids[row][col].orientation == "hor";
-				bool c3 = ((s43.grids[row+1][col].im_loc.front()) - (s43.grids[row][col].max_pos.back())) > 85;
-				bool c4 = col != s43.gridCols - 1;;
-				bool c5 = s43.grids[row][col].orientation == "ver";
-				bool c6 = ((s43.grids[row][col + 1].im_loc.back()) - (s43.grids[row][col].max_pos.back())) > 115;
+				bool c1 = row != gRows - 1;
+				bool c2 = grids01[row][col].orientation == "hor";
+				bool c3 = ((grids01[row+1][col].im_loc.front()) - (grids01[row][col].max_pos.back())) > 85;
+				bool c4 = col != gCols - 1;;
+				bool c5 = grids01[row][col].orientation == "ver";
+				bool c6 = ((grids01[row][col + 1].im_loc.back()) - (grids01[row][col].max_pos.back())) > 115;
 				
 				if ( (c1 && c2 && c3) || (c4 && c5 && c6) )
 				{
-					double new_mp = MeanR(r, max_pos_arr) + (s43.grids[row][col].max_pos.back());
-					s43.grids[row][col].max_pos.push_back(new_mp);			
+					double new_mp = MeanR(r, max_pos_arr) + (grids01[row][col].max_pos.back());
+					grids01[row][col].max_pos.push_back(new_mp);
 				}
 
 				bool c11 = row != 0;
-				bool c22 = s43.grids[row][col].orientation == "hor";
-				bool c33 = ((s43.grids[row][col].max_pos.front()) - (s43.grids[row][col].im_loc.front())) > 85;
+				bool c22 = grids01[row][col].orientation == "hor";
+				bool c33 = ((grids01[row][col].max_pos.front()) - (grids01[row][col].im_loc.front())) > 85;
 				bool c44 = col != 0;
-				bool c55 = s43.grids[row][col].orientation == "ver";
-				bool c66 = ((s43.grids[row][col].max_pos.front()) - (s43.grids[row][col].im_loc.back())) > 85;
+				bool c55 = grids01[row][col].orientation == "ver";
+				bool c66 = ((grids01[row][col].max_pos.front()) - (grids01[row][col].im_loc.back())) > 85;
 
 				else if ((c11 && c22 && c33) || (c44 && c55 && c66))
 				{
-					double new_mp = MeanR(r, max_pos_arr) + (s43.grids[row][col].max_pos.front());
-					s43.grids[row][col].max_pos.push_front(new_mp);
+					double new_mp = MeanR(r, max_pos_arr) + (grids01[row][col].max_pos.front());
+					grids01[row][col].max_pos.push_front(new_mp);
 				} 				
 			}
 		}
 	}
-	return s43.grids;
+	return grids01;
 }
 
 vector<int> grid_pos02::linspace(double start, double end, int num)
@@ -412,7 +412,60 @@ struct RdBinary grid_pos02::ReadBinary(Grid** cgrids, int** img, int x, int y)
 	return rd;
 }
 
+struct gParams grid_pos02::grid_params(void)
+{
+	const int g_ht = 1500;
+	const int g_wt = 2000;
+
+	list<int>** look_up = new list<int>*[200];
+	for (int i = 0; i < 200; i++)
+	{
+		look_up[i] = new list<int>[2];
+	}
+
+	for (int i = 0; i < 200; i++)
+	{
+		int col = i % 10;
+		int d_col = (col - 5) * 2 * g_wt;
+
+		int row = (int)(i / 10);
+		int d_row = (row - 10) * g_ht;
+
+		if (((int)(i/10)) % 2 == 0)
+		{
+			look_up[i][0] = 
+		}
+
+	}
+
+
+}
+
+
+
 struct stage45 grid_pos02::Execute(void)
 {
+	s45.grids = checkGrid(s43.grids, s43.gridRows, s43.gridCols);
 
+	struct RdBinary I = ReadBinary(s45.grids, s43.img, s43.imgRows, s43.imgCols);
+
+	for (int row = 0; row < s43.gridRows; row++)
+	{
+		for (int col = 0; col < s43.gridCols; col++)
+		{
+			Grid field = s45.grids[row][col];
+
+			bool c1 = field.orientation == "hor";
+			bool c2 = field.max_pos.size() == 7;
+			bool c3 = row == s43.gridRows - 1;
+			bool c4 = field.orientation == "ver";
+			bool c5 = field.max_pos.size() >= 9;
+			bool c6 = col == s43.gridCols - 1;
+			if ((c1 && (c2 || c3)) || (c4 && (c5 || c6)))
+			{
+				field.max_pos.pop_front();
+			}
+
+		}
+	}
 }

@@ -962,10 +962,14 @@ stage34 grid_pos01::Execute(void)
 		}
 
 		s32.cut_hor.push_front(0);
+		s32.cut_hor_s++;
 		s32.cut_ver.push_front(0);
+		s32.cut_ver_s++;
 
 		s32.cut_hor.push_back(s32.imgRows / 2);
+		s32.cut_hor_s++;
 		s32.cut_ver.push_back(s32.imgCols / 2);
+		s32.cut_ver_s++;
 
 		int* cut_hor_arr = new int[s32.cut_hor.size()]();
 		std::copy(s32.cut_hor.begin(), s32.cut_hor.end(), cut_hor_arr);
@@ -974,10 +978,10 @@ stage34 grid_pos01::Execute(void)
 		std::copy(s32.cut_ver.begin(), s32.cut_ver.end(), cut_ver_arr);
 
 		Grid** grids = 0;
-		grids = new Grid* [s32.cut_hor_s];
-		for (int h = 0; h < s32.cut_hor_s; h++)
+		grids = new Grid* [s32.cut_hor.size()];
+		for (int h = 0; h < s32.cut_hor.size(); h++)
 		{
-			grids[h] = new Grid[s32.cut_ver_s];
+			grids[h] = new Grid[s32.cut_ver.size()];
 		}
 
 		memset(grids, 0, sizeof(grids[0][0]) * s32.cut_hor_s * s32.cut_ver_s);
@@ -985,9 +989,9 @@ stage34 grid_pos01::Execute(void)
 		int image_size = s32.imgCols * s32.imgRows;
 		double five_percent = image_size * 0.05;
 
-		for (int row = 0; row < (s32.cut_hor.size()- 1); row++)
+		for (int row = 0; row < (s32.cut_hor.size()-1); row++)
 		{
-			for (int col = 0; col < (s32.cut_ver.size() - 1); col++)
+			for (int col = 0; col < (s32.cut_ver.size()-1); col++)
 			{
 				int x1 = cut_hor_arr[row] * 2;
 				int x2 = (cut_hor_arr[row + 1]) * 2;
@@ -1187,12 +1191,12 @@ stage34 grid_pos01::Execute(void)
 			memcpy(s34.img[i], s32.img[i], (s32.imgCols * sizeof(int)));
 		}
 
-		s34.gridRows = s32.cut_hor_s;
-		s34.gridCols = s32.cut_ver_s;
+		s34.gridRows = s32.cut_hor.size();
+		s34.gridCols = s32.cut_ver.size();
 
-		for (int i = 0; i < s32.cut_hor_s; i++)
+		for (int i = 0; i < s32.cut_hor.size(); i++)
 		{
-			memcpy(s34.grids[i], grids[i], (s32.cut_ver_s * sizeof(Grid)));
+			memcpy(s34.grids[i], grids[i], (s32.cut_ver.size() * sizeof(Grid)));
 		}
 
 	}
