@@ -617,7 +617,7 @@ struct MFreq grid_pos01::Main_FreqR(double* B0, int start, int stop)
 
 double* gauss_limited(double x, double k, double sigma, double mu, double offset,  int max_cut)
 {
-
+	return 0;
 }
 
 struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B_min, double d_m)

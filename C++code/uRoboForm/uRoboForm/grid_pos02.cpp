@@ -167,6 +167,31 @@ double grid_pos02::IntMeanR(int rows, int* mean0)
 	return meanR;
 }
 
+double* grid_pos02::insertXdouble(int size, double* arr, double x, int pos)
+{
+	double* temp = new double[size + 1]();
+	std::copy(arr, arr + size, temp); // Suggested by comments from Nick and Bojan
+
+	if (pos > size)
+		return NULL;
+	if (pos == size)
+	{
+		temp[size] = x;
+	}
+	else
+	{
+		// shift elements forward 
+		for (int i = size; i >= pos; i--)
+		{
+			temp[i] = temp[i - 1];
+		}
+		// insert x at pos 
+		temp[pos] = x;
+	}
+	delete[] arr;
+	return temp;
+}
+
 Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 {
 	for (int row = 0; row < gRows; row++)
@@ -180,10 +205,33 @@ Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 			bool con = std::any_of(m_pos_de, m_pos_de+r, [](int x) { return x > 100; });
 			while (con)
 			{
-
-				for (int i_fill = 0; i_fill < 10; i_fill++)
+				int* m_pos_de11 = new int[r]();
+				int f = 0;
+				for (int e = 0; e < r; e++)
 				{
+					if (m_pos_de[e] > 100)
+					{
+						m_pos_de11[f] = e;
+						f++;
+					}
+				}
+				
+				int* m_pos_de1 = new int[f];
+				std::copy(m_pos_de11, m_pos_de11 + f, m_pos_de1);
 
+				int* flip = new int[f];
+				for (int i = 0; i < f; i++)
+				{
+					flip[i] = m_pos_de1[f - i - 1];
+				}
+
+				for (int i = 0; i < f ; i++)
+				{
+					int i_fill = flip[i];
+					double* arr = new double[2];
+					//std::copy(grids01[row][col].max_pos[i_fill], grids01[row][col].max_pos[i_fill] + 2, arr);
+
+					
 				}
 
 			}
@@ -196,12 +244,6 @@ Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 				bool c4 = col != gCols - 1;;
 				bool c5 = grids01[row][col].orientation == "ver";
 				bool c6 = ((grids01[row][col + 1].im_loc.back()) - (grids01[row][col].max_pos.back())) > 115;
-				
-				if ( (c1 && c2 && c3) || (c4 && c5 && c6) )
-				{
-					double new_mp = MeanR(r, max_pos_arr) + (grids01[row][col].max_pos.back());
-					grids01[row][col].max_pos.push_back(new_mp);
-				}
 
 				bool c11 = row != 0;
 				bool c22 = grids01[row][col].orientation == "hor";
@@ -210,6 +252,11 @@ Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 				bool c55 = grids01[row][col].orientation == "ver";
 				bool c66 = ((grids01[row][col].max_pos.front()) - (grids01[row][col].im_loc.back())) > 85;
 
+				if ( (c1 && c2 && c3) || (c4 && c5 && c6) )
+				{
+					double new_mp = MeanR(r, max_pos_arr) + (grids01[row][col].max_pos.back());
+					grids01[row][col].max_pos.push_back(new_mp);
+				}
 				else if ((c11 && c22 && c33) || (c44 && c55 && c66))
 				{
 					double new_mp = MeanR(r, max_pos_arr) + (grids01[row][col].max_pos.front());
@@ -433,18 +480,140 @@ struct gParams grid_pos02::grid_params(void)
 
 		if (((int)(i/10)) % 2 == 0)
 		{
-			look_up[i][0] = 
+			look_up[i][0].push_back(d_row);
+			look_up[i][0].push_back(d_col);
+			look_up[i][1].push_back(d_row);
+			look_up[i][1].push_back(d_col + g_wt);
 		}
-
+		else
+		{
+			look_up[i][0].push_back(d_row);
+			look_up[i][0].push_back(d_col + g_wt);
+			look_up[i][1].push_back(d_row);
+			look_up[i][1].push_back(d_col);
+		}
 	}
+	struct gParams para;
+	para.grid_height = g_ht;
+	para.grid_width = g_wt;
+	para.look_up = look_up;
 
-
+	return para;
 }
 
+int grid_pos02::get_mask_pos(Grid field, int row, int col, int i_max, int grid_wid, int grid_ht)
+{
+	int s_index = 0;
+	int mask_pos = 0;
 
+	if (field.orientation == "hor")
+	{
+		if (row == 0)
+		{
+			s_index = i_max + 6 - field.max_pos.size();
+		}
+		else
+		{
+			s_index = i_max;
+		}
+		mask_pos = s_index * 200 + 350 + (row - 1) * grid_ht;
+	}
+	else
+	{
+		if (col == 0)
+		{
+			s_index = i_max + 8 - field.max_pos.size();
+		}
+		else
+		{
+			s_index = i_max;
+		}
+		mask_pos = s_index * 200 + 350 + (col - 1) * grid_wid;
+	}
+
+	return mask_pos;
+}
+
+float grid_pos02::calc_d_k(list<list <int>> lines)
+{
+	if (true)
+	{
+
+	}
+	return 0;
+}
+
+double grid_pos02::get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size)
+{
+	list<list<int>> lines_hor;
+	list<list<int>> lines_ver;
+	for (int row = 0; row < gRows; row++)
+	{
+		for (int col = 0; col < gCols; col++)
+		{
+			Grid field = cgrids[row][col];
+
+			if (field.max_pos.size() >=1)
+			{
+				if (field.orientation == "hor")
+				{
+					list<int> h1;
+					h1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
+					h1.push_back(field.max_pos.front());
+					lines_hor.push_back(h1);
+					
+					list<int> h2;
+					h2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
+					h2.push_back(field.max_pos.back());
+					lines_hor.push_back(h2);
+
+				}
+				else
+				{
+					list<int> v1;
+					v1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
+					v1.push_back(field.max_pos.front());
+					lines_ver.push_back(v1);
+
+					list<int> v2;
+					v2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
+					v2.push_back(field.max_pos.back());
+					lines_ver.push_back(v2);
+				}
+			}
+		}
+	}
+	double d_k_mean = 0;
+
+	if ((lines_ver.size() >= 3) && (lines_hor.size()>=3))
+	{
+		lines_hor.sort();
+		double** lines_hor_arr = new double* [lines_hor.size()];
+		for (int i = 0; i < lines_hor.size(); i++)
+		{
+			lines_hor_arr[i] = new double[2];
+		}
+
+		//float d_k_hor = calc_d_k(lines_hor.sort());
+
+
+	}
+	else
+	{
+		d_k_mean = 200 / px_size;
+	}
+	return d_k_mean;
+}
 
 struct stage45 grid_pos02::Execute(void)
 {
+	const float px_size = 3.45;
+
+	struct gParams P = grid_params();
+
+	int grid_width = P.grid_width;
+	int grid_height = P.grid_height;
+
 	s45.grids = checkGrid(s43.grids, s43.gridRows, s43.gridCols);
 
 	struct RdBinary I = ReadBinary(s45.grids, s43.img, s43.imgRows, s43.imgCols);
@@ -468,4 +637,17 @@ struct stage45 grid_pos02::Execute(void)
 
 		}
 	}
+	float d_k = get_d_k(s45.grids, s43.gridRows, s43.gridCols, grid_width, grid_height, px_size);
+	float k = d_k * px_size / 200;
+
+	s45.gridRows = s43.gridRows;
+	s45.gridCols = s43.gridCols;
+	s45.grid_ht = grid_height;
+	s45.grid_wid = grid_width;
+	s45.index = I.index;
+	s45.ind_ori = I.ind_ori;
+	s45.k = k;
+
+	return s45;
+
 }

@@ -15,17 +15,18 @@ class Grid {
         this->im_loc = coord;
             if (orientation == "hor")
             {
-                this->max_pos = coord.front() + max_pos;
+                this->max_pos.front() = coord.front() + max_pos.front();
+                this->max_pos.back() = coord.front() + max_pos.back();
             }
             else
             {
-                this->max_pos = coord.back() + max_pos;
+                this->max_pos.front() = coord.back() + max_pos.front();
+                this->max_pos.back() = coord.back() + max_pos.back();
             }
         
     }
 
     Grid() = default;
-
 
     int** image;
     int imgRows;
