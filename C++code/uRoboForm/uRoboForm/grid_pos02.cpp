@@ -229,6 +229,7 @@ Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 				{
 					int i_fill = flip[i];
 					double* arr = new double[2];
+					//to do
 					//std::copy(grids01[row][col].max_pos[i_fill], grids01[row][col].max_pos[i_fill] + 2, arr);
 
 					
@@ -534,6 +535,7 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, int i_max, int grid_w
 	return mask_pos;
 }
 
+//to do
 float grid_pos02::calc_d_k(list<list <int>> lines)
 {
 	if (true)
@@ -587,6 +589,7 @@ double grid_pos02::get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, in
 
 	if ((lines_ver.size() >= 3) && (lines_hor.size()>=3))
 	{
+		//to do
 		lines_hor.sort();
 		double** lines_hor_arr = new double* [lines_hor.size()];
 		for (int i = 0; i < lines_hor.size(); i++)

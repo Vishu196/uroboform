@@ -500,6 +500,7 @@ int* find_edges::deleteXint(int size, int* arr, int pos)
 	return arr;
 }
 
+//to do
 int* find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 {
 	for (int i_cut = (arr_size - 1); i_cut < (-1); i_cut--)

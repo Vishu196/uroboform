@@ -615,6 +615,7 @@ struct MFreq grid_pos01::Main_FreqR(double* B0, int start, int stop)
 	return mf;
 }
 
+//to do
 double* gauss_limited(double x, double k, double sigma, double mu, double offset,  int max_cut)
 {
 	return 0;
@@ -626,7 +627,6 @@ struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B
 	list<double> pres;
 	int xmin;
 	int xmax;
-
 
 	for (int i_b = 0; i_b < B_max.stripe_size; i_b++)
 	{
@@ -649,7 +649,8 @@ struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B
 			{
 				if (xmin!=xmax)
 				{
-
+					//to do
+					//curve fit function pending
 				}
 			}
 			catch (const runtime_error& error)
@@ -661,7 +662,6 @@ struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B
 				continue;
 			}
 		}
-
 	}
 
 	struct subPX p;
@@ -888,6 +888,7 @@ struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_w
 			B_cut_N[i] = B_cut[i] * (-1);
 		}
 
+		//to do
 		//the functiom Find_peaks needs to be chnaged as per current requirement and then called here
 		// the below func call is incorrect 
 		struct FP B_max = Find_Peaks(B_cut, y, d_min);
@@ -922,7 +923,7 @@ struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_w
 			}
 
 			double d_m = MeanR(B_min.stripe_size, dB_Min);
-
+			//to do
 			if (mode == "gauss")
 			{
 				int e = 0;
@@ -1169,7 +1170,6 @@ stage34 grid_pos01::Execute(void)
 					{
 						p.max_pos.pop_front();
 					}
-
 				}
 				else
 				{
@@ -1198,7 +1198,6 @@ stage34 grid_pos01::Execute(void)
 		{
 			memcpy(s34.grids[i], grids[i], (s32.cut_ver.size() * sizeof(Grid)));
 		}
-
 	}
 		return s34;
 }
