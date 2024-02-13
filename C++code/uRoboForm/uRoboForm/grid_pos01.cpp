@@ -1191,8 +1191,8 @@ stage34 grid_pos01::Execute(void)
 			memcpy(s34.img[i], s32.img[i], (s32.imgCols * sizeof(int)));
 		}
 
-		s34.gridRows = s32.cut_hor.size();
-		s34.gridCols = s32.cut_ver.size();
+		s34.gridRows = (int)s32.cut_hor.size();
+		s34.gridCols = (int)s32.cut_ver.size();
 
 		for (int i = 0; i < s32.cut_hor.size(); i++)
 		{

@@ -230,9 +230,10 @@ Grid** grid_pos02::checkGrid(Grid** grids01, int gRows, int gCols)
 					int i_fill = flip[i];
 					double* arr = new double[2];
 					//to do
-					//std::copy(grids01[row][col].max_pos[i_fill], grids01[row][col].max_pos[i_fill] + 2, arr);
-
-					
+					/*std::copy(max_pos_arr[i_fill], max_pos_arr[i_fill] + 2, arr);
+					double mean = MeanR(2, arr);
+					arr = insertXdouble(2, arr, mean, i_fill + 1);
+					*/
 				}
 
 			}
