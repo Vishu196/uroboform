@@ -482,6 +482,10 @@ struct gParams grid_pos02::grid_params(void)
 
 		if (((int)(i/10)) % 2 == 0)
 		{
+			//trial method
+			/*list<int>i0;
+			i0.push_back(d_row);
+			i0.push_back(d_col);*/
 			look_up[i][0].push_back(d_row);
 			look_up[i][0].push_back(d_col);
 			look_up[i][1].push_back(d_row);
@@ -548,24 +552,24 @@ float grid_pos02::calc_d_k(list<list <int>> lines)
 
 double grid_pos02::get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size)
 {
-	list<list<int>> lines_hor;
-	list<list<int>> lines_ver;
+	list<list<double>> lines_hor;
+	list<list<double>> lines_ver;
 	for (int row = 0; row < gRows; row++)
 	{
 		for (int col = 0; col < gCols; col++)
 		{
 			Grid field = cgrids[row][col];
 
-			if (field.max_pos.size() >=1)
+			if (field.max_pos.size() >= 1)
 			{
 				if (field.orientation == "hor")
 				{
-					list<int> h1;
+					list<double> h1;
 					h1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
 					h1.push_back(field.max_pos.front());
 					lines_hor.push_back(h1);
 					
-					list<int> h2;
+					list<double> h2;
 					h2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
 					h2.push_back(field.max_pos.back());
 					lines_hor.push_back(h2);
@@ -573,12 +577,12 @@ double grid_pos02::get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, in
 				}
 				else
 				{
-					list<int> v1;
+					list<double> v1;
 					v1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
 					v1.push_back(field.max_pos.front());
 					lines_ver.push_back(v1);
 
-					list<int> v2;
+					list<double> v2;
 					v2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
 					v2.push_back(field.max_pos.back());
 					lines_ver.push_back(v2);
@@ -598,7 +602,17 @@ double grid_pos02::get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, in
 			lines_hor_arr[i] = new double[2];
 		}
 
-		//float d_k_hor = calc_d_k(lines_hor.sort());
+		for (int i = 0; i < lines_hor.size(); i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				double a = lines_hor[i][j];
+				lines_hor_arr[i][j] = a;
+			}
+		}
+
+		float d_k_hor = calc_d_k(lines_hor_arr);
+		
 
 
 	}
@@ -617,6 +631,7 @@ struct stage45 grid_pos02::Execute(void)
 
 	int grid_width = P.grid_width;
 	int grid_height = P.grid_height;
+	list<int>** look_up = P.look_up;
 
 	s45.grids = checkGrid(s43.grids, s43.gridRows, s43.gridCols);
 
@@ -648,6 +663,7 @@ struct stage45 grid_pos02::Execute(void)
 	s45.gridCols = s43.gridCols;
 	s45.grid_ht = grid_height;
 	s45.grid_wid = grid_width;
+	s45.look_up = look_up;
 	s45.index = I.index;
 	s45.ind_ori = I.ind_ori;
 	s45.k = k;

@@ -671,7 +671,7 @@ struct subPX grid_pos01::subpx_gauss(double* B_cut, struct FP B_max, struct FP B
 struct subPX grid_pos01::subpx_parabel(double* B_cut, struct FP B_max, struct FP B_min, double d_m)
 {
 	list<double> max_pos;
-	int xmin;
+	int xmin{};
 	int xmax;
 
 

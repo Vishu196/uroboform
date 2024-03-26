@@ -2,6 +2,7 @@
 #include "grid_pos01.h"
 #include <vector>
 #include <algorithm>
+#include <list>
 
 using namespace std;
 
@@ -55,7 +56,7 @@ private:
 	struct RdBinary ReadBinary(Grid** cgrids, int** img, int x, int y);
 	struct gParams grid_params(void);
 	int get_mask_pos(Grid field, int row, int col, int i_max, int grid_wid, int grid_ht);
-	float calc_d_k(list<list <int>> lines);
+	float calc_d_k(double** lines);
 	double get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size);
 
 public:
