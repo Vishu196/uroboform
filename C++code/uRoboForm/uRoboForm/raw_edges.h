@@ -28,7 +28,7 @@ private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
 	int** Image2ArrayR (Mat ImageR2);
-	double* Mean0R(int rows, int cols, int** array);
+	double* Mean0R(const Mat& array);
 	double* Mean1R(int rows, int cols, int** array);
 	double MeanR(int rows, double* array);
 	double Median(int size, double* array);

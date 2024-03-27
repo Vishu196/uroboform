@@ -72,23 +72,23 @@ int** raw_edges::Image2ArrayR(Mat imageR)
 	return array2D;
 }
 
-double* raw_edges::Mean0R(int rows, int cols, int** array)
+double* raw_edges::Mean0R(const Mat& array)
 {
 	double* Mean0Arr = 0;
-	Mean0Arr = new double[cols]();
+	Mean0Arr = new double[array.cols]();
 
 	double avg = 0.0;
-	double sum = 0.0;
+	int sum = 0;
 	int x = 0;
-	for (int w = 0; w < cols; w++)
+	for (int w = 0; w < array.cols; w++)
 	{
 		sum = 0;
-		for (int h = 0; h < rows; h++)
+		for (int h = 0; h < array.rows; h++)
 		{
-			x = *(*(array + h) + w);
-			sum += (double)x;
+			x = array.at<int>(h,w);
+			sum += x;
 		}
-		avg = sum / (double)rows;
+		avg = (double)sum / (double)array.rows;
 		Mean0Arr[w] = avg;
 	}
 	return Mean0Arr;
@@ -279,7 +279,7 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	const int rows = Image2.rows;
 	const int cols = Image2.cols;
 	
-	double* Mean0 = Mean0R(rows, cols, ImgArr2);
+	double* Mean0 = Mean0R(Image2);
 	
 	double main_d_0 = 0;
 	int size_Mean0 = cols;
