@@ -147,9 +147,6 @@
     <ClCompile Include="cnrData.cpp" />
     <ClCompile Include="decumulate.cpp" />
     <ClCompile Include="find_edges.cpp" />
-    <ClCompile Include="grid_pos01.cpp" />
-    <ClCompile Include="grid_pos02.cpp" />
-    <ClCompile Include="grid_pos03.cpp" />
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="raw_edges.cpp" />
     <ClCompile Include="ResultData.cpp" />

@@ -4,56 +4,9 @@
 static struct stage21 s21;
 static struct stage23 s23;
 
-static void buffer_s21_init() {
-	s21.mean0 = 0;
-	s21.mean1 = 0;
-	s21.mean0 = new double[720];
-	s21.mean1 = new double[540];
-
-
-	s21.img = new int* [1080];;// new int[1080][1440];
-	for (int h = 0; h < 1080; h++)
-	{
-		s21.img[h] = new int[1440];
-	}
-
-	s21.img2 = new int* [540];;// new int[1080][1440];
-	for (int h = 0; h < 540; h++)
-	{
-		s21.img2[h] = new int[720];
-	}
-}
-
-static void buffer_s23_init()
-{
-	s23.cut_hor = {};
-	s23.cut_ver = {};
-
-	s23.cut_hor_s = 0;
-	s23.cut_ver_s = 0;
-
-	s23.img = new int* [1080];
-	for (int h = 0; h < 1080; h++)
-	{
-		s23.img[h] = new int[1440];
-	}
-
-	s23.img2 = new int* [540];
-	for (int h = 0; h < 540; h++)
-	{
-		s23.img2[h] = new int[720];
-	}
-}
-
-static void buffers_init(void) 
-{
-	buffer_s21_init();
-	buffer_s23_init();
-}
 
 find_edges::find_edges(struct stage12 s12)
 {
-	buffers_init();
 	s21.imgRows = s12.imgRows;
 	s21.imgCols = s12.imgCols;
 

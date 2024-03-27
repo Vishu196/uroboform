@@ -16,6 +16,31 @@ struct stage21
 	double main_d_0;
 	double main_d_1;
 	double th_edge;
+
+	stage21()
+	{
+		imgRows = 0;
+		imgCols = 0;
+		mean0 = new double[720];
+		mean1 = new double[540];
+
+
+		img = new int* [1080];;// new int[1080][1440];
+		for (int h = 0; h < 1080; h++)
+		{
+			img[h] = new int[1440];
+		}
+
+		img2 = new int* [540];;// new int[1080][1440];
+		for (int h = 0; h < 540; h++)
+		{
+			img2[h] = new int[720];
+		}
+
+		main_d_0 = 0.0;
+		main_d_1 = 0.0;
+		th_edge = 0.0;
+	}
 };
 
 struct DT
@@ -24,6 +49,12 @@ struct DT
 	int* cut_through;
 	int cut_throu_size;
 	int thro_loc_size;
+
+	DT()
+	{
+		cut_throu_size = 0;
+		thro_loc_size = 0;
+	}
 };
 
 struct FP
@@ -32,12 +63,24 @@ struct FP
 	double* s_dic;
 	int stripe_size;
 	int s_dic_size;
+
+	FP()
+	{
+		stripe_size = 0;
+		s_dic_size = 0;
+	}
 };
 
 struct LI 
 {
 	double s_max;
 	double s_min;
+
+	LI()
+	{
+		s_max = 0.0;
+		s_min = 0.0;
+	}
 };
 
 struct stage23
@@ -50,6 +93,29 @@ struct stage23
 	list<int> cut_ver;
 	int cut_hor_s;
 	int cut_ver_s;
+
+	stage23()
+	{
+		imgRows = 0;
+		imgCols = 0;
+		cut_hor = {};
+		cut_ver = {};
+
+		cut_hor_s = 0;
+		cut_ver_s = 0;
+
+		img = new int* [1080];
+		for (int h = 0; h < 1080; h++)
+		{
+			img[h] = new int[1440];
+		}
+
+		img2 = new int* [540];
+		for (int h = 0; h < 540; h++)
+		{
+			img2[h] = new int[720];
+		}
+	}
 };
 
 class find_edges

@@ -7,34 +7,6 @@ raw_edges::raw_edges(Mat ImageR)
 
 static struct stage12 s12;
 
-static void buffer_s12_init() {
-
-	s12.imgRows = 0;
-	s12.imgCols = 0;
-	s12.th_edge = 0;
-
-	s12.mean0 = 0;
-	s12.mean1 = 0;
-	s12.mean0 = new double[720];
-	s12.mean1 = new double[540];
-
-	s12.img = new int* [1080];
-	for (int h = 0; h < 1080; h++)
-	{
-		s12.img[h] = new int[1440];
-	}
-
-	s12.img2 = new int* [540];
-	for (int h = 0; h < 540; h++)
-	{
-		s12.img2[h] = new int[720];
-	}
-}
-
-static void buffers_init(void) {
-	buffer_s12_init();
-}
-
 Mat raw_edges::ImageSliceR(Mat image, int n)
 {
 	Mat imgCopy = Mat(image.rows / n, image.cols / n, CV_8U, (int)image.step / n);
@@ -72,23 +44,23 @@ int** raw_edges::Image2ArrayR(Mat imageR)
 	return array2D;
 }
 
-double* raw_edges::Mean0R(const Mat& array)
+double* raw_edges::Mean0R(int rows, int cols, int** array)
 {
 	double* Mean0Arr = 0;
-	Mean0Arr = new double[array.cols]();
+	Mean0Arr = new double[cols]();
 
 	double avg = 0.0;
 	int sum = 0;
 	int x = 0;
-	for (int w = 0; w < array.cols; w++)
+	for (int w = 0; w < cols; w++)
 	{
 		sum = 0;
-		for (int h = 0; h < array.rows; h++)
+		for (int h = 0; h < rows; h++)
 		{
-			x = array.at<int>(h,w);
+			x = *(*(array + h) + w);
 			sum += x;
 		}
-		avg = (double)sum / (double)array.rows;
+		avg = (double)sum / (double)rows;
 		Mean0Arr[w] = avg;
 	}
 	return Mean0Arr;
@@ -272,14 +244,13 @@ double raw_edges::Main_FreqR(double* B0, int start, int stop)
 
 struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 {
-	buffers_init();
 	int** ImgArr = Image2ArrayR(Image);
 	Mat Image2 = ImageSliceR(Image, 2);
 	int** ImgArr2 = Image2ArrayR(Image2);
 	const int rows = Image2.rows;
 	const int cols = Image2.cols;
 	
-	double* Mean0 = Mean0R(Image2);
+	double* Mean0 = Mean0R(rows, cols, ImgArr2);
 	
 	double main_d_0 = 0;
 	int size_Mean0 = cols;
