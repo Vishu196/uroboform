@@ -11,8 +11,12 @@ using namespace std;
 
 struct stage12
 {	
-	int** img;
-	int** img2;
+	
+	vector<vector<int>> img;
+	vector<vector<int>> img2;
+	
+	/*int** img;
+	int** img2;*/
 	int imgRows;
 	int imgCols;
 	vector<double> mean0;
@@ -23,11 +27,15 @@ struct stage12
 
 	stage12()
 	{
+		int r = 1080;
+	    int c = 1440;
+	    vector<vector<int>> img(r, vector<int>(c));
+		vector<vector<int>> img2(r/2, vector<int>(c/2));
 		imgRows = 0;
 		imgCols = 0;
 		th_edge = 0;
 
-		img = new int* [1080];
+		/*img = new int* [1080];
 		for (int h = 0; h < 1080; h++)
 		{
 			img[h] = new int[1440];
@@ -37,7 +45,7 @@ struct stage12
 		for (int h = 0; h < 540; h++)
 		{
 			img2[h] = new int[720];
-		}
+		}*/
 
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
@@ -51,13 +59,13 @@ class raw_edges
 private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
-	int** Image2ArrayR (Mat ImageR2);
-	vector<double> Mean0R(int rows, int cols, int** array);
-	vector<double> Mean1R(int rows, int cols, int** array);
-	double MeanR(int rows, vector<double> array);
-	double Median(int size, vector<double> array);
+	vector<vector<int>> Image2ArrayR (Mat ImageR2);
+	vector<double> Mean0R(vector<vector<int>> array);
+	vector<double> Mean1R(vector<vector<int>> array);
+	double MeanR(vector<double> array);
+	double Median(vector<double> array);
 	vector<double> BlackmanWindowR (int n);
-	vector<double> FFTR (vector<double> image_window, int size);
+	vector<double> FFTR (vector<double> image_window);
 	double Spek_InterpolR (vector<double> A);
 	double Main_FreqR (vector<double> B0, int start, int stop);
 	

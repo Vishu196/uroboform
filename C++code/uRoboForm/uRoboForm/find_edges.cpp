@@ -6,8 +6,8 @@ static struct stage23 s23;
 
 find_edges::find_edges(struct stage12 s12)
 {
-	s21.imgRows = s12.imgRows;
-	s21.imgCols = s12.imgCols;
+	s21.imgRows = s12.img.size();
+	s21.imgCols = s12.img[0].size();
 
 	int cols2 = s21.imgCols / 2;
 	int rows2 = s21.imgRows / 2;
@@ -22,14 +22,17 @@ find_edges::find_edges(struct stage12 s12)
 	s21.main_d_1 = s12.main_d_1;
 	s21.th_edge = s12.th_edge;
 
+	s21.img0 = s12.img;
+	s21.img20 = s12.img2;
+
 	for (int i = 0; i < s12.imgRows; i++)
 	{
-		memcpy(s21.img[i], s12.img[i], (s21.imgCols * sizeof(int)));
+		copy(s21.img0[i].begin(), s21.img0[i].end(), s21.img[i]);
 	}
 
 	for (int i = 0; i < (rows2); i++)
 	{
-		memcpy(s21.img2[i], s12.img2[i], (cols2 * sizeof(int)));
+		copy(s21.img20[i].begin(), s21.img20[i].end(), s21.img2[i]);
 	}
 }
 

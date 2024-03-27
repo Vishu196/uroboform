@@ -28,14 +28,13 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 	return imgCopy;
 }
 
-int** raw_edges::Image2ArrayR(Mat imageR)
+vector<vector<int>> raw_edges::Image2ArrayR(Mat imageR)
 {
 	uint8_t* myData = imageR.data;
-	int** array2D = 0;
-	array2D = new int* [imageR.rows];
+	vector<vector<int>>array2D(imageR.rows, vector<int>(imageR.cols));
+
 	for (int h = 0; h < imageR.rows; h++)
 	{
-		array2D[h] = new int[imageR.cols];
 		for (int w = 0; w < imageR.cols; w++)
 		{
 			array2D[h][w] = myData[h * imageR.step + w];
@@ -44,10 +43,11 @@ int** raw_edges::Image2ArrayR(Mat imageR)
 	return array2D;
 }
 
-vector<double> raw_edges::Mean0R(int rows, int cols, int** array)
+vector<double> raw_edges::Mean0R(vector<vector<int>>array)
 {
 	vector<double> Mean0Arr;
-
+	int rows = array.size();
+	int cols = array[0].size();
 	double avg = 0.0;
 	int sum = 0;
 	int x = 0;
@@ -56,7 +56,7 @@ vector<double> raw_edges::Mean0R(int rows, int cols, int** array)
 		sum = 0;
 		for (int h = 0; h < rows; h++)
 		{
-			x = *(*(array + h) + w);
+			x = array[h][w];
 			sum += x;
 		}
 		avg = (double)sum / (double)rows;
@@ -67,10 +67,11 @@ vector<double> raw_edges::Mean0R(int rows, int cols, int** array)
 	return Mean0Arr;
 }
 
-vector<double> raw_edges::Mean1R(int rows, int cols, int** array)
+vector<double> raw_edges::Mean1R(vector<vector<int>> array)
 {
 	vector<double> Mean1Arr;
-
+	int rows = array.size();
+	int cols = array[0].size();
 	double avg = 0.0;
 	double sum = 0.0;
 	int x = 0;
@@ -79,7 +80,7 @@ vector<double> raw_edges::Mean1R(int rows, int cols, int** array)
 		sum = 0;
 		for (int w = 0; w < cols; w++)
 		{
-			x = *(*(array + h) + w);
+			x = array[h][w];
 			sum += (double)x;
 		}
 		avg = sum / (double)cols;
@@ -89,21 +90,22 @@ vector<double> raw_edges::Mean1R(int rows, int cols, int** array)
 	return Mean1Arr;
 }
 
-double raw_edges::MeanR(int rows, vector<double> mean0)
+double raw_edges::MeanR(vector<double> mean0)
 {
 	double sum = 0.0;
 	double meanR = 0.0;
-	for (int i = 0; i < rows; i++) 
+	for (int i = 0; i < mean0.size(); i++) 
 	{
 		sum += mean0.at(i);
 	}
 
-	meanR = sum / rows;
+	meanR = sum / mean0.size();
 	return meanR;
 }
 
-double raw_edges::Median(int size, vector<double> array)
+double raw_edges::Median(vector<double> array)
 {
+	int size = array.size();
 	for (int i = 0; i < size; i++) 
 	{
 		for (int j = i; j < (size-1); j++) 
@@ -143,8 +145,9 @@ vector<double> raw_edges::BlackmanWindowR(int n)
 	return wFun;
 }
 
-vector<double> raw_edges::FFTR(vector<double> image_windowR, int size)
+vector<double> raw_edges::FFTR(vector<double> image_windowR)
 {
+	int size = image_windowR.size();
 	const int N = 256;
 	fftw_complex*  y = 0;
 	y = new fftw_complex[N];
@@ -217,7 +220,7 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 	
 	B.shrink_to_fit();
 
-	double Mean = MeanR(size,B);
+	double Mean = MeanR(B);
 
 	vector<double> B1;
 
@@ -237,7 +240,7 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 		image_window.push_back(iw);
 	}
 
-	vector<double> y1 = FFTR(image_window, size);
+	vector<double> y1 = FFTR(image_window);
 
 	double n_g = Spek_InterpolR(y1);
 	uint32_t size_B = size;
@@ -246,16 +249,15 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 	return f_g;
 }
 
-
 struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 {
-	int** ImgArr = Image2ArrayR(Image);
+	vector<vector<int>> ImgArr = Image2ArrayR(Image);
 	Mat Image2 = ImageSliceR(Image, 2);
-	int** ImgArr2 = Image2ArrayR(Image2);
+	vector<vector<int>> ImgArr2 = Image2ArrayR(Image2);
 	const int rows = Image2.rows;
 	const int cols = Image2.cols;
 	
-	vector<double> Mean0 = Mean0R(rows, cols, ImgArr2);
+	vector<double> Mean0 = Mean0R(ImgArr2);
 	
 	double main_d_0 = 0;
 	int size_Mean0 = cols;
@@ -267,9 +269,9 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 		double tmp = Main_FreqR(Mean0, i, i + freq_range);
 		t1.push_back(1 / tmp);
 	}
- 	main_d_0 = Median(n1,t1);
+ 	main_d_0 = Median(t1);
 
-	vector<double> Mean1 = Mean1R(rows, cols, ImgArr2);
+	vector<double> Mean1 = Mean1R(ImgArr2);
 	double main_d_1 = 0;
 	int size_Mean1 = rows;
 	const int n2 = ((size_Mean1 - freq_range) / 50) + 1;
@@ -280,14 +282,17 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 		double tmp = Main_FreqR(Mean1, i, i + freq_range);
 		t2.push_back(1 / tmp);
 	}
-	main_d_1 = Median(n2, t2);
+	main_d_1 = Median(t2);
 
 	//this value will be needed in 2nd bock which is calculated here
-	double th_edge = MeanR(cols, Mean0);
+	double th_edge = MeanR(Mean0);
 
 	//To do - add mutex protection later
 
-	for (int i = 0; i < Image.rows; i++)
+	s12.img = ImgArr;
+	s12.img2 = ImgArr2;
+
+	/*for (int i = 0; i < Image.rows; i++)
 	{
 		memcpy(s12.img[i], ImgArr[i], (Image.cols * sizeof(int)));
 	}
@@ -295,7 +300,7 @@ struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 	for (int i = 0; i < Image2.rows; i++)
 	{
 		memcpy(s12.img2[i], ImgArr2[i], (Image2.cols* sizeof(int)));
-	}
+	}*/
 	
 	s12.mean0 = Mean0;
 	s12.mean1 = Mean1;

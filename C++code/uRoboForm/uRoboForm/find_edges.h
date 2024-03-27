@@ -9,6 +9,8 @@ struct stage21
 {
 	int** img;
 	int** img2;
+	vector<vector<int>> img0;
+	vector<vector<int>> img20;
 	int imgRows;
 	int imgCols;
 	double* mean0;
