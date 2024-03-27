@@ -1,7 +1,9 @@
 #pragma once
 #include <fftw3.h>
 #include <opencv2/opencv.hpp>
+#include <vector>
 using namespace cv;
+using namespace std;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -13,8 +15,8 @@ struct stage12
 	int** img2;
 	int imgRows;
 	int imgCols;
-	double* mean0;
-	double* mean1;
+	vector<double> mean0;
+	vector<double> mean1;
 	double main_d_0;
 	double main_d_1;
 	double th_edge;
@@ -24,11 +26,6 @@ struct stage12
 		imgRows = 0;
 		imgCols = 0;
 		th_edge = 0;
-
-		mean0 = 0;
-		mean1 = 0;
-		mean0 = new double[720];
-		mean1 = new double[540];
 
 		img = new int* [1080];
 		for (int h = 0; h < 1080; h++)
@@ -55,14 +52,14 @@ private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
 	int** Image2ArrayR (Mat ImageR2);
-	double* Mean0R(int rows, int cols, int** array);
-	double* Mean1R(int rows, int cols, int** array);
-	double MeanR(int rows, double* array);
-	double Median(int size, double* array);
-	double* BlackmanWindowR (int n);
-	double* FFTR (double* image_window, int size);
-	double Spek_InterpolR (double* A);
-	double Main_FreqR (double* B0, int start, int stop);
+	vector<double> Mean0R(int rows, int cols, int** array);
+	vector<double> Mean1R(int rows, int cols, int** array);
+	double MeanR(int rows, vector<double> array);
+	double Median(int size, vector<double> array);
+	vector<double> BlackmanWindowR (int n);
+	vector<double> FFTR (vector<double> image_window, int size);
+	double Spek_InterpolR (vector<double> A);
+	double Main_FreqR (vector<double> B0, int start, int stop);
 	
 public:
 

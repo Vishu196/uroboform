@@ -4,7 +4,6 @@
 static struct stage21 s21;
 static struct stage23 s23;
 
-
 find_edges::find_edges(struct stage12 s12)
 {
 	s21.imgRows = s12.imgRows;
@@ -13,9 +12,12 @@ find_edges::find_edges(struct stage12 s12)
 	int cols2 = s21.imgCols / 2;
 	int rows2 = s21.imgRows / 2;
 
-	memcpy(s21.mean0, s12.mean0, (cols2) * sizeof(double));
-	memcpy(s21.mean1, s12.mean1, (rows2) * sizeof(double));
+	s21.mean00 = s12.mean0;
+	s21.mean11 = s12.mean1;
 	
+	copy(s21.mean00.begin(), s21.mean00.end(), s21.mean0);
+	copy(s21.mean11.begin(), s21.mean11.end(), s21.mean1);
+
 	s21.main_d_0 = s12.main_d_0;
 	s21.main_d_1 = s12.main_d_1;
 	s21.th_edge = s12.th_edge;

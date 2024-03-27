@@ -13,6 +13,8 @@ struct stage21
 	int imgCols;
 	double* mean0;
 	double* mean1;
+	vector<double> mean00;
+	vector<double> mean11;
 	double main_d_0;
 	double main_d_1;
 	double th_edge;
@@ -21,10 +23,9 @@ struct stage21
 	{
 		imgRows = 0;
 		imgCols = 0;
+
 		mean0 = new double[720];
 		mean1 = new double[540];
-
-
 		img = new int* [1080];;// new int[1080][1440];
 		for (int h = 0; h < 1080; h++)
 		{
