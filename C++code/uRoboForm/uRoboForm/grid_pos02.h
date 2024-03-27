@@ -25,7 +25,8 @@ struct stage45
 	double k;
 	string ind_ori;
 	int grid_wid;
-	int grid_ht; 
+	int grid_ht;
+	list<int>** look_up;
 };
 
 struct RdBinary

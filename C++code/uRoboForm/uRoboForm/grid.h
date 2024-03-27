@@ -10,7 +10,7 @@ class Grid {
     Grid(int** image, int imgRows, string orientation, list<int> coord, list<double> max_pos)
     {
         this->image = image;
-        this->px_num = imgRows*1440;
+        this->px_num = imgRows*720;
         this->orientation = orientation;
         this->im_loc = coord;
             if (orientation == "hor")

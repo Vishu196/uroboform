@@ -599,8 +599,8 @@ list<int> find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 			cut_arr = deleteXint(arr_size, cut_arr, close_edges[i_close]);
 			arr_size--;
 		}
-		delete[] ver01;
-		delete[] ver11;
+		//delete[] ver01;
+		//delete[] ver11;
 	}
 
 	
@@ -609,7 +609,7 @@ list<int> find_edges::Delete_Edges(int* cut_arr, int ideal_d, int arr_size)
 		cut_list.push_back(cut_arr[i]);
 	}
 	
-	delete[] close_edges1;
+	//delete[] close_edges1;
 	return cut_list;
 }
 
@@ -702,11 +702,11 @@ struct stage23 find_edges::Execute(void)
 				}
 				std::copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
 				//to do
-				cut_hor = Delete_Edges(cut_hor_arr, 300, cut_hor.size());
+				//cut_hor = Delete_Edges(cut_hor_arr, 300, cut_hor.size());
 			}
 
 		}
-		catch (const std::out_of_range &err)
+		catch (const std::out_of_range& err)
 		{
 			cut_hor.clear();
 		}
@@ -807,10 +807,10 @@ struct stage23 find_edges::Execute(void)
 				//to do
 				int* cut_ver_arr = new int[cut_ver.size()]();
 				std::copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);
-				cut_ver = Delete_Edges(cut_ver_arr, 300, cut_ver.size());
+				//cut_ver = Delete_Edges(cut_ver_arr, 300, cut_ver.size());
 
 			}
-			catch (const std::out_of_range& err)
+			catch (const std::out_of_range &err)
 			{
 				cut_ver.clear();
 			}
