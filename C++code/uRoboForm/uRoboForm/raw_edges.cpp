@@ -249,66 +249,41 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 	return f_g;
 }
 
+double raw_edges::Calc_main_d(vector<double>mean0, int freq_range)
+{
+	double main_d;
+	const int n1 = ((mean0.size() - freq_range) / 50) + 1;
+	
+	vector<double> t1;
+
+	for (int i = 0; i < (mean0.size() - freq_range); i += 50)
+	{
+		double tmp = Main_FreqR(mean0, i, i + freq_range);
+		t1.push_back(1 / tmp);
+	}
+	t1.shrink_to_fit();
+
+	main_d = Median(t1);
+
+	return main_d;
+}
+
 struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 {
 	vector<vector<int>> ImgArr = Image2ArrayR(Image);
 	Mat Image2 = ImageSliceR(Image, 2);
 	vector<vector<int>> ImgArr2 = Image2ArrayR(Image2);
-	const int rows = Image2.rows;
-	const int cols = Image2.cols;
 	
-	vector<double> Mean0 = Mean0R(ImgArr2);
+	s12.mean0 = Mean0R(ImgArr2);
+	s12.main_d_0 = Calc_main_d(s12.mean0, freq_range);
 	
-	double main_d_0 = 0;
-	int size_Mean0 = cols;
-	const int n1 = ((size_Mean0 - freq_range) / 50) + 1;
-	vector<double> t1;
+	s12.mean1 = Mean1R(ImgArr2);	
+	s12.main_d_1 = Calc_main_d(s12.mean1, freq_range);
 
-	for (int i = 0; i < (size_Mean0 - freq_range); i += 50)
-	{
-		double tmp = Main_FreqR(Mean0, i, i + freq_range);
-		t1.push_back(1 / tmp);
-	}
- 	main_d_0 = Median(t1);
-
-	vector<double> Mean1 = Mean1R(ImgArr2);
-	double main_d_1 = 0;
-	int size_Mean1 = rows;
-	const int n2 = ((size_Mean1 - freq_range) / 50) + 1;
-	vector<double> t2;
-
-	for (int i = 0; i < (size_Mean1 - freq_range); i += 50)
-	{
-		double tmp = Main_FreqR(Mean1, i, i + freq_range);
-		t2.push_back(1 / tmp);
-	}
-	main_d_1 = Median(t2);
-
-	//this value will be needed in 2nd bock which is calculated here
-	double th_edge = MeanR(Mean0);
-
-	//To do - add mutex protection later
+	s12.th_edge = MeanR(s12.mean0);
 
 	s12.img = ImgArr;
 	s12.img2 = ImgArr2;
-
-	/*for (int i = 0; i < Image.rows; i++)
-	{
-		memcpy(s12.img[i], ImgArr[i], (Image.cols * sizeof(int)));
-	}
 	
-	for (int i = 0; i < Image2.rows; i++)
-	{
-		memcpy(s12.img2[i], ImgArr2[i], (Image2.cols* sizeof(int)));
-	}*/
-	
-	s12.mean0 = Mean0;
-	s12.mean1 = Mean1;
-	s12.main_d_0 = main_d_0;
-	s12.main_d_1 = main_d_1;
-	s12.imgRows = Image.rows;
-	s12.imgCols = Image.cols;
-	s12.th_edge = th_edge;
-
 	return s12;
 }

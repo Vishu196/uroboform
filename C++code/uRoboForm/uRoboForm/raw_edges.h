@@ -10,15 +10,9 @@ using namespace std;
 #endif
 
 struct stage12
-{	
-	
+{		
 	vector<vector<int>> img;
 	vector<vector<int>> img2;
-	
-	/*int** img;
-	int** img2;*/
-	int imgRows;
-	int imgCols;
 	vector<double> mean0;
 	vector<double> mean1;
 	double main_d_0;
@@ -31,22 +25,7 @@ struct stage12
 	    int c = 1440;
 	    vector<vector<int>> img(r, vector<int>(c));
 		vector<vector<int>> img2(r/2, vector<int>(c/2));
-		imgRows = 0;
-		imgCols = 0;
 		th_edge = 0;
-
-		/*img = new int* [1080];
-		for (int h = 0; h < 1080; h++)
-		{
-			img[h] = new int[1440];
-		}
-
-		img2 = new int* [540];
-		for (int h = 0; h < 540; h++)
-		{
-			img2[h] = new int[720];
-		}*/
-
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
 	}
@@ -68,13 +47,11 @@ private:
 	vector<double> FFTR (vector<double> image_window);
 	double Spek_InterpolR (vector<double> A);
 	double Main_FreqR (vector<double> B0, int start, int stop);
-	
+	double Calc_main_d(vector<double>mean0, int freq_range);
+
 public:
 
 	raw_edges(Mat ImageR);
 	struct stage12 ExecuteR(Mat image, int freq_range);
-	
-
-	
 };
 
