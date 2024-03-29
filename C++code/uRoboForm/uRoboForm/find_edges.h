@@ -7,39 +7,39 @@ using namespace std;
 
 struct stage21
 {
-	int** img;
+	/*int** img;
 	int** img2;
-	vector<vector<int>> img0;
-	vector<vector<int>> img20;
-	int imgRows;
-	int imgCols;
 	double* mean0;
-	double* mean1;
-	vector<double> mean00;
-	vector<double> mean11;
+	double* mean1;*/
+
+	vector<vector<int>> img;
+	vector<vector<int>> img2;
+	vector<double> mean0;
+	vector<double> mean1;
 	double main_d_0;
 	double main_d_1;
 	double th_edge;
 
 	stage21()
 	{
-		imgRows = 0;
-		imgCols = 0;
+		//mean0 = new double[720];
+		//mean1 = new double[540];
+		//img = new int* [1080];;// new int[1080][1440];
+		//for (int h = 0; h < 1080; h++)
+		//{
+		//	img[h] = new int[1440];
+		//}
 
-		mean0 = new double[720];
-		mean1 = new double[540];
-		img = new int* [1080];;// new int[1080][1440];
-		for (int h = 0; h < 1080; h++)
-		{
-			img[h] = new int[1440];
-		}
+		//img2 = new int* [540];;// new int[1080][1440];
+		//for (int h = 0; h < 540; h++)
+		//{
+		//	img2[h] = new int[720];
+		//}
 
-		img2 = new int* [540];;// new int[1080][1440];
-		for (int h = 0; h < 540; h++)
-		{
-			img2[h] = new int[720];
-		}
-
+		int r = 1080;
+		int c = 1440;
+		vector<vector<int>> img(r, vector<int>(c));
+		vector<vector<int>> img2(r / 2, vector<int>(c / 2));
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
 		th_edge = 0.0;
@@ -48,30 +48,14 @@ struct stage21
 
 struct DT
 {
-	int* through_loc;
-	int* cut_through;
-	int cut_throu_size;
-	int thro_loc_size;
-
-	DT()
-	{
-		cut_throu_size = 0;
-		thro_loc_size = 0;
-	}
+	vector<int> through_loc;
+	vector<int> cut_through;
 };
 
 struct FP
 {
-	int* stripes;
-	double* s_dic;
-	int stripe_size;
-	int s_dic_size;
-
-	FP()
-	{
-		stripe_size = 0;
-		s_dic_size = 0;
-	}
+	vector<int> stripes;
+	vector<double> s_dic;
 };
 
 struct LI 
@@ -88,26 +72,22 @@ struct LI
 
 struct stage23
 {
-	int** img;
-	int** img2;
-	int imgRows;
-	int imgCols;
+	vector<vector<int>> img;
+	vector<vector<int>> img2;
 	list<int> cut_hor;
 	list<int> cut_ver;
-	int cut_hor_s;
-	int cut_ver_s;
 
 	stage23()
 	{
-		imgRows = 0;
-		imgCols = 0;
 		cut_hor = {};
 		cut_ver = {};
 
-		cut_hor_s = 0;
-		cut_ver_s = 0;
+		int r = 1080;
+		int c = 1440;
+		vector<vector<int>> img(r, vector<int>(c));
+		vector<vector<int>> img2(r / 2, vector<int>(c / 2));
 
-		img = new int* [1080];
+		/*img = new int* [1080];
 		for (int h = 0; h < 1080; h++)
 		{
 			img[h] = new int[1440];
@@ -117,7 +97,7 @@ struct stage23
 		for (int h = 0; h < 540; h++)
 		{
 			img2[h] = new int[720];
-		}
+		}*/
 	}
 };
 
@@ -126,19 +106,19 @@ class find_edges
 	friend class grid_pos01;
 private:
 	
-	double* Bandfilter(double *x,int start, int end, int x_size);
-	double* RFFT(double* x, int x_size);
-	double* IRFFT(double* x, int x_size);
-	struct FP Find_Peaks(double *arr, int n, double th_edge);
-	int* ArgSort(double* s_dic, int s_dic_size);
-	int* insertXint(int size, int* arr, int x, int pos);
-	double* insertXdouble(int size, double* arr, double x, int pos);
-	double std_dev(double* arr, int start, int stop);
-	int* decumulateInt(int* x, int size);
-	struct LI Line_Index(double* mean_range_in, int arr_size, double th_edge,int i0,int rank);
-	struct DT Detect_Through(double* im_col, double th_edge, int size);
-	list<int> Delete_Edges(int* cut_arr, int ideal_d, int arr_size);
-	int* deleteXint(int size, int* arr, int pos);
+	vector<double> Bandfilter(vector<double> x,int start, int end);
+	vector<double> RFFT(vector<double> x);
+	vector<double> IRFFT(vector<double> x);
+	struct FP Find_Peaks(vector<double> arr, double th_edge);
+	vector<int> ArgSort(vector<double> s_dic);
+	/*int* insertXint(int size, int* arr, int x, int pos);
+	double* insertXdouble(int size, double* arr, double x, int pos);*/
+	double std_dev(vector<double> arr, int start, int stop);
+	vector<int> decumulateInt(vector<int> x);
+	struct LI Line_Index(vector<double> mean_range_in, double th_edge,int i0,int rank);
+	struct DT Detect_Through(vector<double> im_col, double th_edge);
+	list<int> Delete_Edges(vector<int> cut_arr, int ideal_d);
+	vector<int> deleteXint(vector<int> arr, int pos);
 
 
 public:
