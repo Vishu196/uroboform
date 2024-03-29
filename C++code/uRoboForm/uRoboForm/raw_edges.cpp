@@ -46,8 +46,8 @@ vector<vector<int>> raw_edges::Image2ArrayR(Mat imageR)
 vector<double> raw_edges::Mean0R(vector<vector<int>>array)
 {
 	vector<double> Mean0Arr;
-	int rows = array.size();
-	int cols = array[0].size();
+	int rows = (int)array.size();
+	int cols = (int)array[0].size();
 	double avg = 0.0;
 	int sum = 0;
 	int x = 0;
@@ -70,8 +70,8 @@ vector<double> raw_edges::Mean0R(vector<vector<int>>array)
 vector<double> raw_edges::Mean1R(vector<vector<int>> array)
 {
 	vector<double> Mean1Arr;
-	int rows = array.size();
-	int cols = array[0].size();
+	int rows = (int)array.size();
+	int cols = (int)array[0].size();
 	double avg = 0.0;
 	double sum = 0.0;
 	int x = 0;
@@ -105,7 +105,7 @@ double raw_edges::MeanR(vector<double> mean0)
 
 double raw_edges::Median(vector<double> array)
 {
-	int size = array.size();
+	int size = (int)array.size();
 	for (int i = 0; i < size; i++) 
 	{
 		for (int j = i; j < (size-1); j++) 
@@ -147,7 +147,7 @@ vector<double> raw_edges::BlackmanWindowR(int n)
 
 vector<double> raw_edges::FFTR(vector<double> image_windowR)
 {
-	int size = image_windowR.size();
+	int size = (int)image_windowR.size();
 	const int N = 256;
 	fftw_complex*  y = 0;
 	y = new fftw_complex[N];
@@ -252,7 +252,7 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 double raw_edges::Calc_main_d(vector<double>mean0, int freq_range)
 {
 	double main_d;
-	const int n1 = ((mean0.size() - freq_range) / 50) + 1;
+	const int n1 = (((int)mean0.size() - freq_range) / 50) + 1;
 	
 	vector<double> t1;
 

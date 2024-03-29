@@ -15,20 +15,11 @@ find_edges::find_edges(struct stage12 s12)
 	s21.main_d_1 = s12.main_d_1;
 	s21.th_edge = s12.th_edge;
 
-	/*for (int i = 0; i < s12.img.size(); i++)
-	{
-		copy(s21.img0[i].begin(), s21.img0[i].end(), s21.img[i]);
-	}
-
-	for (int i = 0; i < (rows2); i++)
-	{
-		copy(s21.img20[i].begin(), s21.img20[i].end(), s21.img2[i]);
-	}*/
 }
 
 struct FP find_edges::Find_Peaks(vector<double> arr,double th_edge)
 {
-	int n = arr.size();
+	int n = (int)arr.size();
 	vector<int> stripes;
 	vector<double> s_dic;
 	int a = 0;
@@ -73,7 +64,7 @@ struct FP find_edges::Find_Peaks(vector<double> arr,double th_edge)
 
 vector<double> find_edges::RFFT(vector<double> x)
 {
-	int N = x.size();
+	int N = (int)x.size();
 	double* x_arr = new double[N]();
 	copy(x.begin(), x.end(), x_arr);
 	double* y = new double[N]();
@@ -110,12 +101,11 @@ vector<double> find_edges::RFFT(vector<double> x)
 
 vector<double> find_edges::IRFFT(vector<double> x)
 {
-	int N = x.size();
+	int N = (int)x.size();
 	double* y = new double[N]();
 
 	double* xx = new double[N]();
 	xx[0] = x.at(0);
-	//xx[1] = x[1];
 	for (int i = 1; i < N/2; i ++)
 	{
 		int a = (2 * i) - 1;
@@ -169,6 +159,11 @@ vector<double>  find_edges::Bandfilter(vector<double> x, int x0, int x1)
 
 	vector<double> x_cut = IRFFT(f_x_cut);
 
+	f_x.clear();
+	f_x_cut.clear();
+	f_x.shrink_to_fit();
+	f_x_cut.shrink_to_fit();
+
 	return x_cut;
 }
 
@@ -192,58 +187,10 @@ vector<int> find_edges::ArgSort(vector<double> s_dic)
 		}
 
 	}
-
+	sorted_arr.clear();
+	sorted_arr.shrink_to_fit();
 	return indice_arr;
 }
-
-//int* find_edges::insertXint(int size, int* arr,int x, int pos)
-//{
-//	int* temp = new int[size+1];
-//	std::copy(arr, arr + size, temp);
-//	
-//	if (pos > size)
-//		return NULL;
-//	if (pos == size)
-//	{
-//		temp[size] = x;
-//	}
-//	else
-//	{
-//		// shift elements forward 
-//		for (int i = size; i > pos; i--)
-//			temp[i] = temp[i - 1];
-//
-//		// insert x at pos 
-//		temp[pos] = x;
-//	} 
-//	delete[] arr;
-//	return temp;
-//}
-//
-//double* find_edges::insertXdouble(int size, double* arr, double x, int pos)
-//{
-//	double* temp = new double[size + 1]();
-//	std::copy(arr, arr + size, temp); // Suggested by comments from Nick and Bojan
-//	
-//	if (pos > size)
-//		return NULL;
-//	if (pos == size)
-//	{
-//		temp[size] = x;
-//	}
-//	else
-//	{
-//		// shift elements forward 
-//		for (int i = size; i >= pos; i--)
-//		{
-//			temp[i] = temp[i - 1];
-//		}
-//		// insert x at pos 
-//		temp[pos] = x;
-//	}
-//	delete[] arr;
-//	return temp;
-//}
 
 double find_edges::std_dev(vector<double> arr, int start, int stop)
 {
@@ -277,7 +224,7 @@ double find_edges::std_dev(vector<double> arr, int start, int stop)
 struct LI find_edges::Line_Index(vector<double> mean_range_in, double th_edge, int i0, int rank)
 {
 	double s_max, s_min;
-	int s = mean_range_in.size();
+	int s = (int)mean_range_in.size();
 	int x1 = int(s / 6);
 	vector<double> mean_range;
 	mean_range = Bandfilter(mean_range_in, 0, x1);
@@ -310,23 +257,15 @@ struct LI find_edges::Line_Index(vector<double> mean_range_in, double th_edge, i
 		{
 			peaks_min.stripes.insert(peaks_min.stripes.begin(), 0);
 			peaks_min.s_dic.insert(peaks_min.s_dic.begin(), mean_rangeN.front());
-			/*peaks_min.stripes = insertXint(peaks_min.stripe_size, peaks_min.stripes, 0, 0);
-			peaks_min.s_dic = insertXdouble(peaks_min.s_dic_size, peaks_min.s_dic, mean_rangeN[0], 0);
-			peaks_min.stripe_size++;
-			peaks_min.s_dic_size++;*/
 		}
 		if (s-peaks_min.stripes.at((peaks_min.stripes.size() - 1)) > 25)
 		{
 			int e = s - 1;
 			peaks_min.stripes.insert(peaks_min.stripes.end(), e);
 			peaks_min.s_dic.insert(peaks_min.s_dic.end(), mean_rangeN.at(e));
-			//peaks_min.stripes = insertXint(peaks_min.stripe_size, peaks_min.stripes, (s-1), (peaks_min.stripe_size));
-			//peaks_min.s_dic = insertXdouble(peaks_min.s_dic_size, peaks_min.s_dic, mean_rangeN[(s - 1)], (peaks_min.s_dic_size));
-			//peaks_min.stripe_size++;
-			//peaks_min.s_dic_size++;
 		}
 
-		const int s_dic_min_size = (peaks_min.stripes.size()) - 2;
+		const int s_dic_min_size = ((int)peaks_min.stripes.size()) - 2;
 		vector<double> s_dic_min;
 		for (int i = 0; i < s_dic_min_size; i++)
 		{
@@ -338,9 +277,12 @@ struct LI find_edges::Line_Index(vector<double> mean_range_in, double th_edge, i
 			
 		}
 
-		int n_0 = (max_element(s_dic_min.begin(), s_dic_min.begin() + s_dic_min_size) - s_dic_min.begin());
+		int n_0 = (int)(max_element(s_dic_min.begin(), s_dic_min.begin() + s_dic_min_size) - s_dic_min.begin());
 		int h = n_0 + 1;
 		s_min = peaks_min.stripes.at(h) + i0;
+
+		s_dic_min.clear();
+		s_dic_min.shrink_to_fit();
 	}
 	else
 	{
@@ -350,6 +292,11 @@ struct LI find_edges::Line_Index(vector<double> mean_range_in, double th_edge, i
 	struct LI index;
 	index.s_max = s_max;
 	index.s_min = s_min;
+	
+	mean_range.clear();
+	mean_range.shrink_to_fit();
+	mean_rangeN.clear();
+	mean_rangeN.shrink_to_fit();
 	
 	return index;
 }
@@ -390,7 +337,7 @@ vector<int> find_edges::decumulateInt(vector<int> x)
 
 struct DT find_edges::Detect_Through(vector<double> im_col, double th_edge)
 {
-	int size = im_col.size();
+	int size = (int)im_col.size();
 	vector<double> im_diff;
 	for (int i = 0; i < size; i++)
 	{
@@ -427,8 +374,6 @@ struct DT find_edges::Detect_Through(vector<double> im_col, double th_edge)
 	}
 
 	th_through.shrink_to_fit();
-	/*int* through_loc = new int[count]();
-	std::copy(through_loc1, through_loc1 + count, through_loc);*/
 	
 	through_loc.insert(through_loc.begin(), 0);
 	
@@ -449,9 +394,6 @@ struct DT find_edges::Detect_Through(vector<double> im_col, double th_edge)
 	through_loc.shrink_to_fit();
 	cut_through.shrink_to_fit();
 
-	/*int* cut_through = new int[j]();
-	std::copy(cut_through1, cut_through1 + j, cut_through);
-	*/
 	struct DT thro;
 	thro.through_loc = through_loc;
 	thro.cut_through = cut_through;
@@ -468,7 +410,7 @@ struct DT find_edges::Detect_Through(vector<double> im_col, double th_edge)
 
 vector<int> find_edges::deleteXint(vector<int> arr, int pos)
 {
-	int size = arr.size();
+	int size = (int)arr.size();
 
 	if (pos > size)
 		return arr;
@@ -496,17 +438,11 @@ double IntMeanR(vector<int> mean0)
 	return meanR;
 }
 
-int op_subtract(int x, int ideal_d) 
-{
-	x = x - ideal_d;
-	return x;
-}
-
 //to do
 list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 {
 	list<int>cut_list;
-	for (int i_cut = (cut_arr.size() - 1); i_cut >= 0; i_cut--)
+	for (int i_cut = ((int)cut_arr.size() - 1); i_cut >= 0; i_cut--)
 	{
 		for (int j = 0; j < cut_arr.size(); j++)
 		{
@@ -534,7 +470,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 
 	/*int* close_edges = new int[p];
 	std::copy(close_edges1, close_edges1 + p, close_edges);*/
-	for (int i_close = (close_edges.size() - 1); i_close >= 0; i_close--)
+	for (int i_close = ((int) close_edges.size() - 1); i_close >= 0; i_close--)
 	{
 		list<int>d_cut_ver_0; 
 		list<int> d_cut_ver_1;
@@ -552,7 +488,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			d_cut_ver_0.push_back(x0);
 			d_cut_ver_1.push_back(x1);
 		}
-		if (close_edges.at(i_close) < close_edges.size() - 2);
+		if (close_edges.at(i_close) < (close_edges.size() - 2));
 		{
 			int x0 = abs(cut_arr.at(vl) - cut_arr.at(vl3));
 			int x1 = abs(cut_arr.at(vl2) - cut_arr.at(vl3));
@@ -595,7 +531,6 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		}
 	}
 
-	
 	for (int i = 0; i < cut_arr.size(); i++)
 	{
 		cut_list.push_back(cut_arr[i]);
@@ -612,8 +547,7 @@ struct stage23 find_edges::Execute(void)
 	if ((s21.main_d_0 > 13) && (s21.main_d_1 > 13))
 	{	
 		double s_max, s_min;
-		//int size_mean0 = s21.imgCols / 2;
-		const int mid = s21.mean0.size() / 2;
+		const int mid = (int)s21.mean0.size() / 2;
 		const int search_range = 150;
 		int i0 = mid - search_range;
 		int i1 = mid + search_range;
@@ -626,7 +560,7 @@ struct stage23 find_edges::Execute(void)
 		}
 		mean_range0.shrink_to_fit();
 		int rank = 0;
-		int len = s21.img2.size();
+		int len = (int)s21.img2.size();
 		vector<double> im_col;
 		while (rank < 5)
 		{
@@ -637,7 +571,7 @@ struct stage23 find_edges::Execute(void)
 			bool res = isnan(s_max);
 			if (!res)
 			{
-				int x = s21.img2.size() / 6;
+				int x = (int)s21.img2.size() / 6;
 				vector<double> img_col;
 				for (int i = 0; i < len; i++)
 				{
@@ -694,9 +628,9 @@ struct stage23 find_edges::Execute(void)
 						cut_hor.push_back(b);
 					}
 				}
-				//std::copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
-				//to do
-				//cut_hor = Delete_Edges(cut_hor_arr, 300, cut_hor.size());
+				//copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
+				////to do
+				//cut_hor = Delete_Edges(cut_hor_arr, 300);
 			}
 
 		}
@@ -724,8 +658,8 @@ struct stage23 find_edges::Execute(void)
 
 			try
 			{
-				int y = s21.img2[0].size() / 6;
-				int wid = s21.img2[0].size();
+				int y = (int)s21.img2[0].size() / 6;
+				int wid = (int)s21.img2[0].size();
 				vector<double> img_row_l;
 				for (int i = 0; i < wid; i++)
 				{
@@ -793,12 +727,12 @@ struct stage23 find_edges::Execute(void)
 				}
 				cut_ver.sort();
 				//to do
-				/*int* cut_ver_arr = new int[cut_ver.size()]();
-				std::copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);*/
-				//cut_ver = Delete_Edges(cut_ver_arr, 300, cut_ver.size());
+				/*vector<int> cut_ver_arr;
+				copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);
+				cut_ver = Delete_Edges(cut_ver_arr, 300);*/
 
 			}
-			catch (const std::out_of_range &err)
+			catch (const std::out_of_range& err)
 			{
 				cut_ver.clear();
 			}
@@ -819,16 +753,6 @@ struct stage23 find_edges::Execute(void)
 
 	s23.img = s21.img;
 	s23.img2 = s21.img2;
-	/*for (int i = 0; i < s21.imgRows; i++)
-	{
-		memcpy(s23.img[i], s21.img[i], (s21.imgCols * sizeof(int)));
-	}
-
-	for (int i = 0; i < (rows2); i++)
-	{
-		memcpy(s23.img2[i], s21.img2[i], (cols2 * sizeof(int)));
-	}
-	*/
 	
 	return s23;
 }
