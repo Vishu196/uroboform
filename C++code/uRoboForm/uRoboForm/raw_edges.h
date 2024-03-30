@@ -38,16 +38,16 @@ class raw_edges
 private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
-	vector<vector<int>> Image2ArrayR (Mat ImageR2);
-	vector<double> Mean0R(vector<vector<int>> array);
-	vector<double> Mean1R(vector<vector<int>> array);
-	double MeanR(vector<double> array);
+	vector<vector<int>> Image2ArrayR (const Mat &ImageR2);
+	vector<double> Mean0R(const vector<vector<int>> &array);
+	vector<double> Mean1R(const vector<vector<int>> &array);
+	double MeanR(const vector<double> &array);
 	double Median(vector<double> array);
 	vector<double> BlackmanWindowR (int n);
-	vector<double> FFTR (vector<double> image_window);
-	double Spek_InterpolR (vector<double> A);
-	double Main_FreqR (vector<double> B0, int start, int stop);
-	double Calc_main_d(vector<double>mean0, int freq_range);
+	vector<double> FFTR (const vector<double> &image_window);
+	double Spek_InterpolR (const vector<double> &A);
+	double Main_FreqR (const vector<double> &B0, int start, int stop);
+	double Calc_main_d(const vector<double> &mean0, int freq_range);
 
 public:
 

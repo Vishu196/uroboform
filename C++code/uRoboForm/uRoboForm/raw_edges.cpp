@@ -28,7 +28,7 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 	return imgCopy;
 }
 
-vector<vector<int>> raw_edges::Image2ArrayR(Mat imageR)
+vector<vector<int>> raw_edges::Image2ArrayR(const Mat &imageR)
 {
 	uint8_t* myData = imageR.data;
 	vector<vector<int>>array2D(imageR.rows, vector<int>(imageR.cols));
@@ -43,11 +43,12 @@ vector<vector<int>> raw_edges::Image2ArrayR(Mat imageR)
 	return array2D;
 }
 
-vector<double> raw_edges::Mean0R(vector<vector<int>>array)
+vector<double> raw_edges::Mean0R(const vector<vector<int>> &array)
 {
-	vector<double> Mean0Arr;
 	int rows = (int)array.size();
 	int cols = (int)array[0].size();
+	vector<double> Mean0Arr(cols);
+	
 	double avg = 0.0;
 	int sum = 0;
 	int x = 0;
@@ -60,18 +61,19 @@ vector<double> raw_edges::Mean0R(vector<vector<int>>array)
 			sum += x;
 		}
 		avg = (double)sum / (double)rows;
-		Mean0Arr.push_back(avg);
+		Mean0Arr[w] = avg;
 	}
-	Mean0Arr.shrink_to_fit();
+	//Mean0Arr.shrink_to_fit();
 
 	return Mean0Arr;
 }
 
-vector<double> raw_edges::Mean1R(vector<vector<int>> array)
+vector<double> raw_edges::Mean1R(const vector<vector<int>> &array)
 {
-	vector<double> Mean1Arr;
 	int rows = (int)array.size();
 	int cols = (int)array[0].size();
+	vector<double> Mean1Arr(rows);
+	
 	double avg = 0.0;
 	double sum = 0.0;
 	int x = 0;
@@ -84,19 +86,19 @@ vector<double> raw_edges::Mean1R(vector<vector<int>> array)
 			sum += (double)x;
 		}
 		avg = sum / (double)cols;
-		Mean1Arr.push_back(avg);
+		Mean1Arr[h] = avg;
 	}
-	Mean1Arr.shrink_to_fit();
+	//Mean1Arr.shrink_to_fit();
 	return Mean1Arr;
 }
 
-double raw_edges::MeanR(vector<double> mean0)
+double raw_edges::MeanR(const vector<double> &mean0)
 {
 	double sum = 0.0;
 	double meanR = 0.0;
 	for (int i = 0; i < mean0.size(); i++) 
 	{
-		sum += mean0.at(i);
+		sum += mean0[i];
 	}
 
 	meanR = sum / mean0.size();
@@ -113,17 +115,19 @@ double raw_edges::Median(vector<double> array)
 			const int w = j + 1;
 			if (array[i] > array[w])
 			{
-				double temp = array.at(i);
-				array.at(i) = array.at(w);
-				array.at(w) = temp;
+				swap(array[i], array[w]);
+				/*double temp = array[i];
+				array[i] = array[w];
+				array[w] = temp;*/
 			}
 		}
 	}
 
+	int a = size - 1;
 	if (size % 2 != 0)
 		return (double)array[size / 2];
 	else
-		return (double)(array[(size - 1) / 2] + array[size / 2]) / 2.0;
+		return (double)(array[a / 2] + array[size / 2]) / 2.0;
 
 }
 
@@ -133,19 +137,19 @@ vector<double> raw_edges::BlackmanWindowR(int n)
 	const double a1 = 0.5;
 	const double a2 = 0.08;
 	int wLen = n - 1;
-	vector<double> wFun;
+	vector<double> wFun(n);
 
 	for (int i = 0; i < n; ++i)
 	{
 		double wi = 0.0;
 		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
-		wFun.push_back(wi);
+		wFun[i] = wi;
 	}
-	wFun.shrink_to_fit();
+	/*wFun.shrink_to_fit();*/
 	return wFun;
 }
 
-vector<double> raw_edges::FFTR(vector<double> image_windowR)
+vector<double> raw_edges::FFTR(const vector<double> &image_windowR)
 {
 	int size = (int)image_windowR.size();
 	const int N = 256;
@@ -167,77 +171,74 @@ vector<double> raw_edges::FFTR(vector<double> image_windowR)
 	fftw_execute(p);
 	std::complex<double>* yy;
 	yy = reinterpret_cast<std::complex<double> *>(y);
-	vector<double> y1;
+	vector<double> y1(N);
 
 	for (int i = 0; i < N; i++)
 	{
-		y1.push_back(abs(yy[i]));
+		y1[i] = abs(yy[i]);
 	}
 
 	fftw_destroy_plan(p);
-	delete[] y;
+	//delete[] y;
 
-	y1.shrink_to_fit();
 	return y1;
 }
 
-double raw_edges::Spek_InterpolR(vector<double> A) {
+double raw_edges::Spek_InterpolR(const vector<double> &A) {
 
 	uint32_t A_size = 256;
 	uint32_t A2_size = A_size / 2;
 
-	vector<double> A2;
+	vector<double> A2 (A2_size);
 	for (uint32_t i = 0; i < A2_size; i++)
 	{
-		A2.push_back(A[i]);
+		A2[i] = A[i];
 	}
 
 	int n_0 = (int)std::distance(A2.begin(), std::max_element(A2.begin(), A2.begin() + A2_size));
 
-	double y_ln1 = log(A[n_0 + 1]);
+	int a = n_0 + 1;
+	int b = n_0 - 1;
+	double y_ln1 = log(A[a]);
 	double y_ln0 = log(A[n_0]);
-	double y_ln_1 = log(A[n_0 - 1]);
+	double y_ln_1 = log(A[b]);
 	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
 	double n_g = (n_0 + tmp / 2);
 
 	return n_g;
 }
 
-double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
+double raw_edges::Main_FreqR(const vector<double> &B0, int start, int stop)
 {
 	double f_g = 0.0;
 	const int size = stop - start;
 
-	vector<double> B;
+	vector<double> B(size);
 
-	vector<double> image_window;
+	vector<double> image_window(size);
 	
 	for (int(k) = 0; k < size; k++) 
 	{
 		int w = k + start;
-		B.push_back(B0[w]);
+		B[k] = B0[w];
 	}
 	
-	B.shrink_to_fit();
-
 	double Mean = MeanR(B);
 
-	vector<double> B1;
+	vector<double> B1(size);
 
 	for (int i = 0; i < size; i++)
 	{
 		double x = B[i] - Mean;
-		B1.push_back(x);
+		B1[i] = x;
 	}
-
-	B1.shrink_to_fit();
 
 	vector<double> wFun = BlackmanWindowR(size);
 	
 	for (int i = 0; i < size; i++)
 	{
 		double iw = B1[i] * wFun[i];
-		image_window.push_back(iw);
+		image_window[i] = iw;
 	}
 
 	vector<double> y1 = FFTR(image_window);
@@ -249,19 +250,20 @@ double raw_edges::Main_FreqR(vector<double> B0, int start, int stop)
 	return f_g;
 }
 
-double raw_edges::Calc_main_d(vector<double>mean0, int freq_range)
+double raw_edges::Calc_main_d(const vector<double> &mean0, int freq_range)
 {
 	double main_d;
 	const int n1 = (((int)mean0.size() - freq_range) / 50) + 1;
 	
-	vector<double> t1;
+	vector<double> t1(n1);
+	int j = 0;
 
 	for (int i = 0; i < (mean0.size() - freq_range); i += 50)
 	{
 		double tmp = Main_FreqR(mean0, i, i + freq_range);
-		t1.push_back(1 / tmp);
+		t1[j] = (1 / tmp);
+		j++;
 	}
-	t1.shrink_to_fit();
 
 	main_d = Median(t1);
 
