@@ -77,15 +77,15 @@ class find_edges
 	friend class grid_pos01;
 private:
 	
-	vector<double> Bandfilter(vector<double> x,int start, int end);
-	vector<double> RFFT(vector<double> x);
-	vector<double> IRFFT(vector<double> x);
-	struct FP Find_Peaks(vector<double> arr, double th_edge);
-	vector<int> ArgSort(vector<double> s_dic);
-	double std_dev(vector<double> arr, int start, int stop);
-	vector<int> decumulateInt(vector<int> x);
-	struct LI Line_Index(vector<double> mean_range_in, double th_edge,int i0,int rank);
-	struct DT Detect_Through(vector<double> im_col, double th_edge);
+	vector<double> Bandfilter(const vector<double> &x,int start, int end);
+	vector<double> RFFT(const vector<double> &x);
+	vector<double> IRFFT(const vector<double> &x);
+	struct FP Find_Peaks(const vector<double> &arr, double th_edge);
+	vector<int> ArgSort(const vector<double> &s_dic);
+	double std_dev(const vector<double> &arr, int start, int stop);
+	vector<int> decumulateInt(const vector<int> &x);
+	struct LI Line_Index(const vector<double> &mean_range_in, double th_edge,int i0,int rank);
+	struct DT Detect_Through(const vector<double> &im_col, double th_edge);
 	list<int> Delete_Edges(vector<int> cut_arr, int ideal_d);
 	vector<int> deleteXint(vector<int> arr, int pos);
 
