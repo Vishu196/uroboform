@@ -182,8 +182,8 @@ vector<int> find_edges::ArgSort(const vector<double> &s_dic)
 		}
 
 	}
-	sorted_arr.clear();
-	sorted_arr.shrink_to_fit();
+	/*sorted_arr.clear();
+	sorted_arr.shrink_to_fit();*/
 	return indice_arr;
 }
 
@@ -239,8 +239,8 @@ struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_
 		indice_arr = ArgSort(peaks_max.s_dic);
 		int tmp = indice_arr[peaks_max.s_dic.size() - rank];
 		s_max = peaks_max.stripes[tmp] + i0;
-		indice_arr.clear();
-		indice_arr.shrink_to_fit();
+		/*indice_arr.clear();
+		indice_arr.shrink_to_fit();*/
 	}
 	else
 	{
@@ -276,8 +276,8 @@ struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_
 		int h = n_0 + 1;
 		s_min = peaks_min.stripes.at(h) + i0;
 
-		s_dic_min.clear();
-		s_dic_min.shrink_to_fit();
+		/*s_dic_min.clear();
+		s_dic_min.shrink_to_fit();*/
 	}
 	else
 	{
@@ -288,14 +288,14 @@ struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_
 	index.s_max = s_max;
 	index.s_min = s_min;
 	
-	mean_range.clear();
+	/*mean_range.clear();
 	mean_range.shrink_to_fit();
 	mean_rangeN.clear();
-	mean_rangeN.shrink_to_fit();
+	mean_rangeN.shrink_to_fit();*/
 	
 	return index;
 }
-
+ 
 vector<int> find_edges::decumulateInt(const vector<int> &x)
 {
 	const size_t n = x.size() - 1;
@@ -318,11 +318,11 @@ vector<int> find_edges::decumulateInt(const vector<int> &x)
 		xi[i] = x1[i] - x2[i];
 	}
 
-	x1.clear();
+	/*x1.clear();
 	x2.clear();
 	x1.shrink_to_fit();
 	x2.shrink_to_fit();
-	xi.shrink_to_fit();
+	xi.shrink_to_fit();*/
 	
 	return xi;
 }
@@ -383,19 +383,19 @@ struct DT find_edges::Detect_Through(const vector<double> &im_col, double th_edg
 		}
 	}
 
-	through_loc.shrink_to_fit();
-	cut_through.shrink_to_fit();
+	/*through_loc.shrink_to_fit();
+	cut_through.shrink_to_fit();*/
 
 	struct DT thro;
 	thro.through_loc = through_loc;
 	thro.cut_through = cut_through;
 
-	im_diff.clear();
+	/*im_diff.clear();
 	signbit.clear();
 	th_through.clear();
 	im_diff.shrink_to_fit();
 	signbit.shrink_to_fit();
-	th_through.shrink_to_fit();
+	th_through.shrink_to_fit();*/
 
 	return thro;
 }

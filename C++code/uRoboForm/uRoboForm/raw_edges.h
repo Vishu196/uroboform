@@ -11,8 +11,8 @@ using namespace std;
 
 struct stage12
 {		
-	vector<vector<int>> img;
-	vector<vector<int>> img2;
+	Mat img;
+	Mat img2;
 	vector<double> mean0;
 	vector<double> mean1;
 	double main_d_0;
@@ -21,10 +21,10 @@ struct stage12
 
 	stage12()
 	{
-		int r = 1080;
+		/*int r = 1080;
 	    int c = 1440;
 	    vector<vector<int>> img(r, vector<int>(c));
-		vector<vector<int>> img2(r/2, vector<int>(c/2));
+		vector<vector<int>> img2(r/2, vector<int>(c/2));*/
 		th_edge = 0;
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
@@ -39,8 +39,8 @@ private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
 	vector<vector<int>> Image2ArrayR (const Mat &ImageR2);
-	vector<double> Mean0R(const vector<vector<int>> &array);
-	vector<double> Mean1R(const vector<vector<int>> &array);
+	vector<double> Mean0R(const Mat& image2);
+	vector<double> Mean1R(const Mat& image2);
 	double MeanR(const vector<double> &array);
 	double Median(vector<double> array);
 	vector<double> BlackmanWindowR (int n);

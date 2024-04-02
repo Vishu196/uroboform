@@ -1,6 +1,6 @@
 #include "main.h"
 #include "raw_edges.h"
-#include "find_edges.h"
+//#include "find_edges.h"
 //#include "grid_pos01.h"
 
 
@@ -25,7 +25,7 @@ int main()
 	cout << "Stage 1 complete." << endl;
 	cout << endl;
 
-	find_edges edge(s12);
+	/*find_edges edge(s12);
 	struct stage23 s23 = edge.Execute();
 	
 	cout << "cut_hor: ";
@@ -35,7 +35,7 @@ int main()
 	for (auto v : s23.cut_ver)
 		cout << v << ",";
 	cout << endl;
-	cout << "Stage 2 complete." << endl;
+	cout << "Stage 2 complete." << endl;*/
 
 	/*grid_pos01 grid(s23);
 	struct stage34 s34 = grid.Execute();*/

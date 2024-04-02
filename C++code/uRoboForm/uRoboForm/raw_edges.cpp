@@ -43,52 +43,47 @@ vector<vector<int>> raw_edges::Image2ArrayR(const Mat &imageR)
 	return array2D;
 }
 
-vector<double> raw_edges::Mean0R(const vector<vector<int>> &array)
+vector<double> raw_edges::Mean0R(const Mat& image2)
 {
-	int rows = (int)array.size();
-	int cols = (int)array[0].size();
-	vector<double> Mean0Arr(cols);
-	
+	vector<double> Mean0Arr(image2.cols);
+
 	double avg = 0.0;
 	int sum = 0;
 	int x = 0;
-	for (int w = 0; w < cols; w++)
+	for (int w = 0; w < image2.cols; w++)
 	{
 		sum = 0;
-		for (int h = 0; h < rows; h++)
+		for (int h = 0; h < image2.rows; h++)
 		{
-			x = array[h][w];
+			x = image2.data[h * image2.step + w];
 			sum += x;
 		}
-		avg = (double)sum / (double)rows;
+		avg = (double)sum / (double)image2.rows;
 		Mean0Arr[w] = avg;
 	}
-	//Mean0Arr.shrink_to_fit();
 
 	return Mean0Arr;
 }
 
-vector<double> raw_edges::Mean1R(const vector<vector<int>> &array)
+vector<double> raw_edges::Mean1R(const Mat& image2)
 {
-	int rows = (int)array.size();
-	int cols = (int)array[0].size();
-	vector<double> Mean1Arr(rows);
+	vector<double> Mean1Arr(image2.rows);
 	
 	double avg = 0.0;
 	double sum = 0.0;
 	int x = 0;
-	for (int h = 0; h < rows; h++)
+	for (int h = 0; h < image2.rows; h++)
 	{
 		sum = 0;
-		for (int w = 0; w < cols; w++)
+		for (int w = 0; w < image2.cols; w++)
 		{
-			x = array[h][w];
+			x = image2.data[h * image2.step + w];
 			sum += (double)x;
 		}
-		avg = sum / (double)cols;
+		avg = sum / (double)image2.cols;
 		Mean1Arr[h] = avg;
 	}
-	//Mean1Arr.shrink_to_fit();
+	
 	return Mean1Arr;
 }
 
@@ -272,20 +267,20 @@ double raw_edges::Calc_main_d(const vector<double> &mean0, int freq_range)
 
 struct stage12 raw_edges::ExecuteR(Mat Image, int freq_range)
 {
-	vector<vector<int>> ImgArr = Image2ArrayR(Image);
+	//vector<vector<int>> ImgArr = Image2ArrayR(Image);
 	Mat Image2 = ImageSliceR(Image, 2);
-	vector<vector<int>> ImgArr2 = Image2ArrayR(Image2);
+	//vector<vector<int>> ImgArr2 = Image2ArrayR(Image2);
 	
-	s12.mean0 = Mean0R(ImgArr2);
+	s12.mean0 = Mean0R(Image2);
 	s12.main_d_0 = Calc_main_d(s12.mean0, freq_range);
 	
-	s12.mean1 = Mean1R(ImgArr2);	
+	s12.mean1 = Mean1R(Image2);
 	s12.main_d_1 = Calc_main_d(s12.mean1, freq_range);
 
 	s12.th_edge = MeanR(s12.mean0);
 
-	s12.img = ImgArr;
-	s12.img2 = ImgArr2;
+	s12.img = Image;
+	s12.img2 = Image2;
 	
 	return s12;
 }
