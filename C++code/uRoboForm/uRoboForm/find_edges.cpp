@@ -62,167 +62,13 @@ struct FP find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 	return peaks;
 }
 
-vector<double> find_edges::RFFT(const vector<double> &x)
-{
-	int N = (int)x.size();
-	double* x_arr = new double[N]();
-	copy(x.begin(), x.end(), x_arr);
-	double* y = new double[N]();
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d(N, x_arr, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-	
-	fftw_destroy_plan(p);
-
-	vector<double> yy(N);
-	yy[0] = y[0];
-	int j = 0;
-	for (int i = 1; i < N; i+=2)
-	{
-		int a = i - j;
-		yy[i] = y[a];
-		j++;
-	}
-
-	int k = 1;
-	for (int i = 2; i < N; i+=2)
-	{
-		int a = N - k;
-		yy[i] = (y[a]);
-		k++;
-	}
-	
-	//yy.shrink_to_fit();
-	delete[] y;
-	return yy;
-}
-
-vector<double> find_edges::IRFFT(const vector<double> &x)
-{
-	int N = (int)x.size();
-	double* y = new double[N]();
-
-	double* xx = new double[N]();
-	xx[0] = x[0];
-	for (int i = 1; i < N/2; i ++)
-	{
-		int a = (2 * i) - 1;
-		xx[i] = x[a];
-	}
-
-	for (int i = N; i > ((N/2)+1)  ; i--)
-	{
-		int a = (2 * (N - i)) + 2;
-		xx[i-1] = x[a];
-	}
-	int b = N - 1;
-	xx[N / 2] = x[b];
-
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-	
-	fftw_execute(p);
-	
-	fftw_destroy_plan(p);
-
-	vector<double> yy(N);
-	for (int i = 0; i < N; i++) 
-	{
-		y[i] /= N;
-		yy[i] = y[i]; 
-	}
-
-	delete[] xx;
-	/*yy.shrink_to_fit();*/
-	return yy;
-}
-
-vector<double>  find_edges::Bandfilter(const vector<double> &x, int x0, int x1)
-{
-	vector<double> f_x = RFFT(x);
-
-	vector<double> f_x_cut;
-	f_x_cut = f_x;
-
-	for (int i = 0; i < x0; i++)
-	{
-		f_x_cut[i]= 0; 
-	}
-
-	for (int i = x1; i < x.size(); i++)
-	{
-		f_x_cut[i] = 0;
-	}
-
-	vector<double> x_cut = IRFFT(f_x_cut);
-
-	return x_cut;
-}
-
-vector<int> find_edges::ArgSort(const vector<double> &s_dic)
-{
-	vector<int> indice_arr((int)s_dic.size());
-	vector<double> sorted_arr((int) s_dic.size());
-	sorted_arr = s_dic ;
-
-	sort(sorted_arr.begin(), sorted_arr.end());
-	
-	for (int i = 0; i < s_dic.size(); i++)
-	{
-		for (int j = 0; j < (s_dic.size()); j++)
-		{
-			if (sorted_arr[i] == s_dic[j])
-			{
-				indice_arr[i] = j;
-				break;
-			}
-		}
-
-	}
-	/*sorted_arr.clear();
-	sorted_arr.shrink_to_fit();*/
-	return indice_arr;
-}
-
-double find_edges::std_dev(const vector<double> &arr, int start, int stop)
-{
-	double sum = 0.0, mean, standardDeviation = 0.0;
-	int i;
-	int size = stop - start;
-
-	vector<double> B(size);
-
-	for (int k = 0; k < size; k++)
-	{
-		const int w = k + start;
-		B[k] = arr[w];
-	}
-
-	for (i = 0; i < size; ++i) 
-	{
-		sum += B[i];
-	}
-
-	mean = sum / size;
-
-	for (i = 0; i < size; ++i) 
-	{
-		standardDeviation += pow(B[i] - mean, 2);
-	}
-
-	return sqrt(standardDeviation / size);
-}
-
 struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_edge, int i0, int rank)
 {
 	double s_max, s_min;
 	int s = (int)mean_range_in.size();
 	int x1 = int(s / 6);
 	vector<double> mean_range(s);
-	mean_range = Bandfilter(mean_range_in, 0, x1);
+	mean_range = signal_evaluation::Bandfilter(mean_range_in, 0, x1);
 
 	vector<double> mean_rangeN(s);
 	for(int i = 0; i < s; i++)
@@ -236,7 +82,7 @@ struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_
 	if (peaks_max.stripes.size() >= 1 && rank <= peaks_max.s_dic.size())
 	{
 		vector<int> indice_arr(peaks_max.s_dic.size());
-		indice_arr = ArgSort(peaks_max.s_dic);
+		indice_arr = Evaluation::ArgSort(peaks_max.s_dic);
 		int tmp = indice_arr[peaks_max.s_dic.size() - rank];
 		s_max = peaks_max.stripes[tmp] + i0;
 		/*indice_arr.clear();
@@ -296,37 +142,6 @@ struct LI find_edges::Line_Index(const vector<double> &mean_range_in, double th_
 	return index;
 }
  
-vector<int> find_edges::decumulateInt(const vector<int> &x)
-{
-	const size_t n = x.size() - 1;
-	vector<int> xi(n);
-	vector<int> x1(n);
-	vector<int> x2(n);
-
-	for (size_t i = 0; i < n; i++)
-	{
-		x1[i] = x[i + 1];
-		
-	}
-	for (int i = 0; i < n; i++)
-	{
-		x2[i] = x[i];
-	}
-
-	for (int i = 0; i < n; i++)
-	{
-		xi[i] = x1[i] - x2[i];
-	}
-
-	/*x1.clear();
-	x2.clear();
-	x1.shrink_to_fit();
-	x2.shrink_to_fit();
-	xi.shrink_to_fit();*/
-	
-	return xi;
-}
-
 struct DT find_edges::Detect_Through(const vector<double> &im_col, double th_edge)
 {
 	int size = (int)im_col.size();
@@ -372,7 +187,7 @@ struct DT find_edges::Detect_Through(const vector<double> &im_col, double th_edg
 	through_loc.insert(through_loc.end(), size);
 
 	vector<int> d_through;
-	d_through = decumulateInt(through_loc);
+	d_through = Evaluation::decumulateInt(through_loc);
 
 	vector<int> cut_through;
 	for (int i = 0; i < (d_through.size()); i++)
@@ -449,7 +264,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		}
 	}
 
-	vector<int> cut_ver_de = decumulateInt(cut_arr);
+	vector<int> cut_ver_de = Evaluation::decumulateInt(cut_arr);
 	vector<int> close_edges;
 
 	for (int i = 0; i < cut_arr.size(); i++)
@@ -571,13 +386,13 @@ struct stage23 find_edges::Execute(void)
 					img_col[i] = (double)s21.img2.data[i * s21.img2.step + s_m];
 				}
 				
-				im_col = Bandfilter(img_col, 0, x);
+				im_col = signal_evaluation::Bandfilter(img_col, 0, x);
 
 				int n1 = len - 150;
 				vector<double> std_col(n1);
 				for (int i = 0; i < n1; i ++)
 				{
-					double tmp = std_dev(im_col, i, i + 150);
+					double tmp = Evaluation::std_dev(im_col, i, i + 150);
 					std_col[i] = tmp;
 				}
 				double c1 = *min_element(std_col.begin(), std_col.begin() + n1);
@@ -662,13 +477,13 @@ struct stage23 find_edges::Execute(void)
 				}
 
 				vector<double> im_row_low(wid);
-				im_row_low = Bandfilter(img_row_l, 0, y);
+				im_row_low = signal_evaluation::Bandfilter(img_row_l, 0, y);
 
 				int n2 = wid - 200;
 				vector<double> std_row(n2);
 				for (int i = 0; i < n2; i++)
 				{
-					double tmp = std_dev(im_row_low, i, i + 200);
+					double tmp = Evaluation::std_dev(im_row_low, i, i + 200);
 					std_row.push_back(tmp);
 				}
 				double cc1 = *min_element(std_row.begin(), std_row.begin() + n2);
@@ -694,13 +509,13 @@ struct stage23 find_edges::Execute(void)
 				}
 
 				vector<double> im_row;
-				im_row = Bandfilter(img_row, 0, y);
+				im_row = signal_evaluation::Bandfilter(img_row, 0, y);
 
 				int n3 = wid - 200;
 				vector<double> std_row_h;
 				for (int i = 0; i < n3; i++)
 				{
-					double tmp = std_dev(im_row, i, i + 200);
+					double tmp = Evaluation::std_dev(im_row, i, i + 200);
 					std_row_h.push_back(tmp);
 				}
 

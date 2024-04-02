@@ -1,13 +1,6 @@
 #pragma once
-#include <fftw3.h>
-#include <opencv2/opencv.hpp>
-#include <vector>
-using namespace cv;
-using namespace std;
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338327
-#endif
+#include"Evaluation.h"
+#include "signal_evaluation.h"
 
 struct stage12
 {		
@@ -36,13 +29,6 @@ class raw_edges
 private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
-	vector<vector<int>> Image2ArrayR (const Mat &ImageR2);
-	vector<double> Mean0R(const Mat& image2);
-	vector<double> Mean1R(const Mat& image2);
-	double MeanR(const vector<double> &array);
-	double Median(vector<double> array);
-	vector<double> BlackmanWindowR (int n);
-	vector<double> FFTR (const vector<double> &image_window);
 	double Spek_InterpolR (const vector<double> &A);
 	double Main_FreqR (const vector<double> &B0, int start, int stop);
 	double Calc_main_d(const vector<double> &mean0, int freq_range);
