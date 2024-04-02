@@ -6,8 +6,8 @@ static struct stage23 s23;
 
 find_edges::find_edges(struct stage12 s12)
 {
-	s21.img = s12.img;
-	s21.img2 = s12.img2;
+	s21.img = s12.img.clone();
+	s21.img2 = s12.img2.clone();
 	s21.mean0 = s12.mean0;
 	s21.mean1 = s12.mean1;
 	
@@ -553,7 +553,7 @@ struct stage23 find_edges::Execute(void)
 		}
 		
 		int rank = 0;
-		int len = (int)s21.img2.size();
+		int len = (int)s21.img2.rows;
 		vector<double> im_col(len);
 		while (rank < 5)
 		{
@@ -564,11 +564,11 @@ struct stage23 find_edges::Execute(void)
 			bool res = isnan(s_max);
 			if (!res)
 			{
-				int x = (int)s21.img2.size() / 6;
+				int x = (int)s21.img2.rows / 6;
 				vector<double> img_col(len);
 				for (int i = 0; i < len; i++)
 				{
-					img_col[i] = (double)s21.img2[i][s_m];
+					img_col[i] = (double)s21.img2.data[i * s21.img2.step + s_m];
 				}
 				
 				im_col = Bandfilter(img_col, 0, x);
@@ -606,7 +606,7 @@ struct stage23 find_edges::Execute(void)
 					int c = t.through_loc[t.cut_through[i]] + 1;
 					if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[a] > s21.th_edge))
 					{
-						cut_hor.push_back(b);
+						cut_hor.push_back(t.through_loc[b1]);
 					}
 					else if (t.cut_through[i] == (t.through_loc.size() - 2))
 					{
@@ -618,7 +618,7 @@ struct stage23 find_edges::Execute(void)
 						{
 							cut_hor.push_back(t.through_loc[t.cut_through[i]]);
 						}
-						cut_hor.push_back(b);
+						cut_hor.push_back(t.through_loc[b1]);
 					}
 				}
 				//copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
@@ -653,12 +653,12 @@ struct stage23 find_edges::Execute(void)
 
 			try
 			{
-				int y = (int)s21.img2[0].size() / 6;
-				int wid = (int)s21.img2[0].size();
+				int y = (int)s21.img2.cols / 6;
+				int wid = (int)s21.img2.cols;
 				vector<double> img_row_l(wid);
 				for (int i = 0; i < wid; i++)
 				{
-					img_row_l[i] = (double)s21.img2[s_mi][i];
+					img_row_l[i] = (double)s21.img2.data[s_mi * s21.img2.step + i];
 				}
 
 				vector<double> im_row_low(wid);
@@ -690,7 +690,7 @@ struct stage23 find_edges::Execute(void)
 				vector<double> img_row;
 				for (int i = 0; i < wid; i++)
 				{
-					img_row.push_back((double)s21.img2[s_m][i]);
+					img_row.push_back((double)s21.img2.data[s_m * s21.img2.step + i]);
 				}
 
 				vector<double> im_row;
@@ -746,8 +746,8 @@ struct stage23 find_edges::Execute(void)
 	s23.cut_hor.assign(cut_hor.begin(), cut_hor.end());
 	s23.cut_ver.assign(cut_ver.begin(), cut_ver.end());
 
-	s23.img = s21.img;
-	s23.img2 = s21.img2;
+	s23.img = s21.img.clone();
+	s23.img2 = s21.img2.clone();
 	
 	return s23;
 }

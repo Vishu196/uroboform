@@ -21,10 +21,8 @@ struct stage12
 
 	stage12()
 	{
-		/*int r = 1080;
-	    int c = 1440;
-	    vector<vector<int>> img(r, vector<int>(c));
-		vector<vector<int>> img2(r/2, vector<int>(c/2));*/
+		img;
+		img2;
 		th_edge = 0;
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;

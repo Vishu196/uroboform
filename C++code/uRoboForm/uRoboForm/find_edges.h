@@ -8,8 +8,8 @@ using namespace std;
 
 struct stage21
 {
-	vector<vector<int>> img;
-	vector<vector<int>> img2;
+	Mat img;
+	Mat img2;
 	vector<double> mean0;
 	vector<double> mean1;
 	double main_d_0;
@@ -18,10 +18,8 @@ struct stage21
 
 	stage21()
 	{
-		int r = 1080;
-		int c = 1440;
-		vector<vector<int>> img(r, vector<int>(c));
-		vector<vector<int>> img2(r / 2, vector<int>(c / 2));
+		img;
+		img2;
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
 		th_edge = 0.0;
@@ -54,8 +52,8 @@ struct LI
 
 struct stage23
 {
-	vector<vector<int>> img;
-	vector<vector<int>> img2;
+	Mat img;
+	Mat img2;
 	list<int> cut_hor;
 	list<int> cut_ver;
 
