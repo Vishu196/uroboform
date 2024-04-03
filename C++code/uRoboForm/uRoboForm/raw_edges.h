@@ -29,7 +29,6 @@ class raw_edges
 private:
 
 	Mat ImageSliceR (Mat ImageR, int n);
-	double Spek_InterpolR (const vector<double> &A);
 	double Main_FreqR (const vector<double> &B0, int start, int stop);
 	double Calc_main_d(const vector<double> &mean0, int freq_range);
 

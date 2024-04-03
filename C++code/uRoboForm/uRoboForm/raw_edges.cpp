@@ -28,30 +28,6 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 	return imgCopy;
 }
 
-double raw_edges::Spek_InterpolR(const vector<double> &A) {
-
-	uint32_t A_size = 256;
-	uint32_t A2_size = A_size / 2;
-
-	vector<double> A2 (A2_size);
-	for (uint32_t i = 0; i < A2_size; i++)
-	{
-		A2[i] = A[i];
-	}
-
-	int n_0 = (int)std::distance(A2.begin(), std::max_element(A2.begin(), A2.begin() + A2_size));
-
-	int a = n_0 + 1;
-	int b = n_0 - 1;
-	double y_ln1 = log(A[a]);
-	double y_ln0 = log(A[n_0]);
-	double y_ln_1 = log(A[b]);
-	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	double n_g = (n_0 + tmp / 2);
-
-	return n_g;
-}
-
 double raw_edges::Main_FreqR(const vector<double> &B0, int start, int stop)
 {
 	double f_g = 0.0;
@@ -87,7 +63,7 @@ double raw_edges::Main_FreqR(const vector<double> &B0, int start, int stop)
 
 	vector<double> y1 = signal_evaluation::FFTR(image_window);
 
-	double n_g = Spek_InterpolR(y1);
+	double n_g = signal_evaluation::Spek_InterpolR(y1);
 	uint32_t size_B = size;
 	f_g = n_g / size_B;
 

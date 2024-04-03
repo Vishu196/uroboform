@@ -3,304 +3,37 @@
 static struct stage32 s32;
 static struct stage34 s34;
 
-static void buffer_s32_init() 
-{
-	s32.cut_hor = {};
-	s32.cut_ver = {};
-
-	s32.imgRows = 0;
-	s32.imgCols = 0;
-	s32.cut_hor_s = 0;
-	s32.cut_ver_s = 0;
-	
-	s32.img = new int* [1080];;// new int[1080][1440];
-	for (int h = 0; h < 1080; h++)
-	{
-		s32.img[h] = new int[1440];
-	}
-
-	s32.img2 = new int* [540];;// new int[1080][1440];
-	for (int h = 0; h < 540; h++)
-	{
-		s32.img2[h] = new int[720];
-	}
-}
-
-static void buffer_s34_init()
-{
-	s34.imgRows = 0;
-	s34.imgCols = 0;
-	s34.img = new int* [1080];
-	for (int h = 0; h < 1080; h++)
-	{
-		s34.img[h] = new int[1440];
-	}
-
-	s34.gridRows = 0;
-	s34.gridCols = 0;
-
-	s34.grids = new Grid*[3];
-	for (int i = 0; i < 3; i++)
-	{
-		s34.grids[i] = new Grid[3];
-	}
-}
-
-static void buffers_init(void)
-{
-	buffer_s32_init();
-	buffer_s34_init();
-}
-
 grid_pos01::grid_pos01(struct stage23 s23)
 {
-	buffers_init();
-
-	s32.cut_hor_s = s23.cut_hor_s;
-	s32.cut_ver_s = s23.cut_ver_s;
-
 	std::copy(s23.cut_hor.begin(), s23.cut_hor.end(), std::back_inserter(s32.cut_hor));
 	std::copy(s23.cut_ver.begin(), s23.cut_ver.end(), std::back_inserter(s32.cut_ver));
 
-	s32.imgRows = s23.imgRows;
-	s32.imgCols = s23.imgCols;
-	int rows2 = s32.imgRows / 2;
-	int cols2 = s32.imgCols / 2;
+	s32.img = s23.img.clone();
+	s32.img2 = s23.img2.clone();
 
-	for (int i = 0; i < s23.imgRows; i++)
-	{
-		memcpy(s32.img[i], s23.img[i], (s23.imgCols * sizeof(int)));
-	}
-
-	for (int i = 0; i < (rows2); i++)
-	{
-		memcpy(s32.img2[i], s23.img2[i], (cols2 * sizeof(int)));
-	}
 }
 
-double* grid_pos01::Mean0R(int rows, int cols, int** array)
+vector<double> grid_pos01::gradient(const vector<double> x)
 {
-	double* Mean0Arr = 0;
-	Mean0Arr = new double[cols]();
-
-	double avg = 0.0;
-	double sum = 0.0;
-	int x = 0;
-	for (int w = 0; w < cols; w++)
-	{
-		sum = 0;
-		for (int h = 0; h < rows; h++)
-		{
-			x = *(*(array + h) + w);
-			sum += (double)x;
-		}
-		avg = sum / (double)rows;
-		Mean0Arr[w] = avg;
-	}
-	return Mean0Arr;
-}
-
-double* grid_pos01::Mean1R(int rows, int cols, int** array)
-{
-	double* Mean1Arr = 0;
-	Mean1Arr = new double[rows]();
-
-	double avg = 0.0;
-	double sum = 0.0;
-	int x = 0;
-	for (int h = 0; h < rows; h++)
-	{
-		sum = 0;
-		for (int w = 0; w < cols; w++)
-		{
-			x = *(*(array + h) + w);
-			sum += (double)x;
-		}
-		avg = sum / (double)cols;
-		Mean1Arr[h] = avg;
-	}
-	return Mean1Arr;
-}
-
-double grid_pos01::MeanR(int rows, double* mean0)
-{
-	double sum = 0.0;
-	double meanR = 0.0;
-	for (int i = 0; i < rows; i++)
-	{
-		sum += mean0[i];
-	}
-
-	meanR = sum / rows;
-	return meanR;
-}
-
-double* grid_pos01::RFFT(double * x, int x_size)
-{
-	int N = x_size;
-	double* y = new double[N]();
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d(N, x, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-
-	fftw_destroy_plan(p);
-
-	double* yy = new double[N]();
-	yy[0] = y[0];
-	int j = 0;
-	for (int i = 1; i < N; i += 2)
-	{
-		yy[i] = y[i - j];
-		j++;
-	}
-	int k = 1;
-	for (int i = 2; i < N + 1; i += 2)
-	{
-		yy[i] = y[N - k];
-		k++;
-	}
-
-	delete[] y;
-	return yy;
-}
-
-double* grid_pos01::IRFFT(double* x, int x_size)
-{
-	int N = x_size;
-	double* y = new double[N]();
-
-	double* xx = new double[N]();
-	xx[0] = x[0];
-	//xx[1] = x[1];
-	for (int i = 1; i < N / 2; i++)
-	{
-		xx[i] = x[(2 * i) - 1];
-	}
-
-	for (int i = N; i > N / 2; i--)
-	{
-		xx[i - 1] = x[2 * (N - i) + 2];
-	}
-
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-
-	fftw_destroy_plan(p);
-	for (int i = 0; i < N; i++) {
-		y[i] /= N;
-	}
-
-	delete[] xx;
-
-	return y;
-}
-
-double* grid_pos01::Bandfilter(double* x, int x0, int x1, int x_size)
-{
-	double* f_x = RFFT(x, x_size);
-
-	double* f_x_cut;
-	f_x_cut = f_x;
-
-	for (int i = 0; i < x0; i++)
-	{
-		f_x_cut[i] = 0;
-	}
-
-	for (int i = x1; i <= x_size; i++)
-	{
-		f_x_cut[i] = 0;
-	}
-
-	double* x_cut = IRFFT(f_x_cut, x_size);
-
-	return x_cut;
-}
-
-double* grid_pos01::gradient(double* x, int x_size)
-{
+	int x_size = x.size();
 	int dx = 1;
-	double* grad = 0;
-	grad = new double[x_size]();
+	vector<double> grad(x_size);
 
 	grad[0] = (x[1] - x[0]) / dx;
 
 	for (int i = 1; i <= (x_size-2); i++)
 	{
-		grad[i] = (x[i + 1] - x[i - 1]) / (2 * dx);  // for i in [1,N-2]
+		int a = i + 1;
+		int b = i - 1;
+		grad[i] = (x[a] - x[b]) / (2 * dx);  // for i in [1,N-2]
 
 	}
-	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
+	int n = x_size - 1;
+	int m = x_size - 2;
+	grad[n] = (x[n] - x[m]) / dx;
 
 	return grad;
 
-}
-
-int* decumulateInt(int* x, int size)
-{
-	const size_t n = size - 1;
-	int* xi = new int[n]();
-	int* x1 = new int[n]();
-	int* x2 = new int[n]();
-
-	for (size_t i = 0; i < size - 1; i++)
-	{
-		if (i < n)
-		{
-			x1[i] = x[i + 1];
-		}
-
-	}
-	for (int i = 0; i < n; i++)
-	{
-		x2[i] = x[i];
-	}
-
-	for (int i = 0; i < n; i++)
-	{
-		xi[i] = x1[i] - x2[i];
-	}
-
-	delete[] x1;
-	delete[] x2;
-
-	return xi;
-}
-
-double* decumulateDouble(double* x, int size)
-{
-	const size_t n = size - 1;
-	double* xi = new double[n]();
-	double* x1 = new double[n]();
-	double* x2 = new double[n]();
-
-	for (size_t i = 0; i < size - 1; i++)
-	{
-		if (i < n)
-		{
-			x1[i] = x[i + 1];
-		}
-
-	}
-	for (int i = 0; i < n; i++)
-	{
-		x2[i] = x[i];
-	}
-
-	for (int i = 0; i < n; i++)
-	{
-		xi[i] = x1[i] - x2[i];
-	}
-
-	delete[] x1;
-	delete[] x2;
-
-	return xi;
 }
 
 int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
@@ -342,8 +75,8 @@ int** grid_pos01::cutGrid(int** grid_rot, int x, int y)
 	double* mean_row = 0;
 	mean_row = new double[len];
 
-	mean_row = Mean1R(len, wid, grid_rot2);
-	double im_mean = MeanR(len, mean_row);
+	mean_row = Evaluation::Mean1R(len, wid, grid_rot2);
+	double im_mean = Evaluation::MeanR(len, mean_row);
 
 	int* max = 0;
 	max = new int[len];
@@ -448,8 +181,7 @@ struct FP grid_pos01::Find_Peaks(double* arr, int n, int dist)
 	struct FP peaks;
 	peaks.stripes = stripes;
 	peaks.s_dic = s_dic;
-	peaks.stripe_size = count;
-	peaks.s_dic_size = count;
+	
 
 	return peaks;
 }
@@ -491,121 +223,42 @@ int* grid_pos01::deleteXint(int size, int* arr, int pos)
 	return arr;
 }
 
-double* grid_pos01::BlackmanWindowR(int n)
-{
-	const double a0 = 0.42;
-	const double a1 = 0.5;
-	const double a2 = 0.08;
-	int wLen = n - 1;
-	double* wFun = 0;
-	wFun = new double[n]();
-
-	for (int i = 0; i < n; ++i)
-	{
-		double wi = 0.0;
-		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
-		wFun[i] = wi;
-	}
-	return wFun;
-}
-
-double* grid_pos01::FFTR(double* image_windowR, int size)
-{
-	const int N = 256;
-	fftw_complex* y = 0;
-	y = new fftw_complex[N];
-	double in[N];
-	fftw_plan p;
-
-	for (int i = 0; i < N; i++) {
-		if (i < size) {
-			in[i] = image_windowR[i];
-		}
-		else {
-			in[i] = 0;
-		}
-	}
-	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-	std::complex<double>* yy;
-	yy = reinterpret_cast<std::complex<double> *>(y);
-	double* y1 = 0;
-	y1 = new double[N];
-
-	for (int i = 0; i < N; i++)
-	{
-		y1[i] = abs(yy[i]);
-	}
-
-	fftw_destroy_plan(p);
-	delete[] y;
-	return y1;
-}
-
-double grid_pos01::Spek_InterpolR(double* A) {
-
-	uint32_t A_size = 256;
-	uint32_t A2_size = A_size / 2;
-
-	double* A2 = 0;
-	A2 = new double[A2_size]();
-	for (uint32_t i = 0; i < A2_size; i++)
-	{
-		A2[i] = A[i];
-	}
-
-	int n_0 = (int)std::distance(A2, std::max_element(A2, A2 + A2_size));
-
-	double y_ln1 = log(A[n_0 + 1]);
-	double y_ln0 = log(A[n_0]);
-	double y_ln_1 = log(A[n_0 - 1]);
-	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	double n_g = (n_0 + tmp / 2);
-	delete[] A2;
-	return n_g;
-}
-
-struct MFreq grid_pos01::Main_FreqR(double* B0, int start, int stop)
+struct MFreq grid_pos01::Main_FreqR(vector<double> B0, int start, int stop)
 {
 	double f_g = 0.0;
 	const int size = stop - start;
 
-	double* B = new double[size]();
+	vector<double> B (size);
 
-	double* image_window = 0;
-	image_window = new double[size]();
+	vector<double> image_window (size);
 
 	for (int k = 0; k < size; k++)
 	{
-		B[k] = B0[k + start];
+		int w = k + start;
+		B[k] = B0[w];
 	}
 
-	double Mean = MeanR(size, B);
+	double Mean = Evaluation::MeanR(B);
 
-	double* B1 = new double[size]();
+	vector<double> B1(size);
 
 	for (int i = 0; i < size; i++)
 	{
-		B1[i] = B[i] - Mean;
+		double x = B[i] - Mean;
+		B1[i] = x;
 	}
 
-	double* wFun = BlackmanWindowR(size);
+	vector<double> wFun = signal_evaluation::BlackmanWindowR(size);
 	for (int i = 0; i < size; i++)
 	{
 		image_window[i] = B1[i] * wFun[i];
 	}
 
-	double* y1 = FFTR(image_window, size);
+	vector<double> y1 = signal_evaluation::FFTR(image_window);
 
-	double n_g = Spek_InterpolR(y1);
+	double n_g = signal_evaluation::Spek_InterpolR(y1);
 	uint32_t size_B = size;
 	f_g = n_g / size_B;
-
-	delete[] B1;
-	delete[] B;
-	delete[] wFun;
-	delete[] y1;
 
 	struct MFreq mf;
 	mf.Image_window = image_window;
@@ -798,9 +451,9 @@ struct subPX grid_pos01::subpx_phase(int** cutGrid, int x, int y)
 	list<double> max_pos;
 	list<double> pres;
 	double* B0 = new double[y];
-	B0 = Mean0R(x, y, cutGrid);
+	B0 = Evaluation::Mean0R(x, y, cutGrid);
 
-	double B = MeanR(y, B0);
+	double B = Evaluation::MeanR(y, B0);
 
 	if (y >=60)
 	{
@@ -871,12 +524,12 @@ struct subPX grid_pos01::subpx_max_pos(int** cutGrid, int x, int y, int stripe_w
 	else
 	{
 		double* B = new double[y];
-		B = Mean0R(x, y, cutGrid);
+		B = Evaluation::Mean0R(x, y, cutGrid);
 
 		double filt = 64 / 640 * y;
 
 		double* B_cut = new double[y]();
-		B_cut = Bandfilter(B, 0, (int)filt, y);
+		B_cut = signal_evaluation::Bandfilter(B, 0, (int)filt, y);
 		
 		double d_min = stripe_width / (double)1000 * 2 / px_size / 2;
 
@@ -1048,16 +701,16 @@ stage34 grid_pos01::Execute(void)
 				double* mean2_1 = 0;
 				mean2_1 = new double [w1];
 				
-				mean2_0 = Mean0R(w1, w2, mean2);
-				mean2_1 = Mean1R(w1, w2, mean2);
+				mean2_0 = Evaluation::Mean0R(w1, w2, mean2);
+				mean2_1 = Evaluation::Mean1R(w1, w2, mean2);
 
 				int wid1 = w2 / 6;
 				int wid2 = w1 / 6;
 
 				double* mean_grad000 = new double[w2]();
-				mean_grad000 = Bandfilter(mean2_0, 0, wid1, w2);
+				mean_grad000 = signal_evaluation::Bandfilter(mean2_0, 0, wid1, w2);
 				double* mean_grad111 = new double[w1]();
-				mean_grad111 = Bandfilter(mean2_1, 0, wid2, w1);
+				mean_grad111 = signal_evaluation::Bandfilter(mean2_1, 0, wid2, w1);
 				
 				double* mean_grad00 = new double[w2]();
 				mean_grad00 = gradient(mean_grad000, w2);
@@ -1080,8 +733,8 @@ stage34 grid_pos01::Execute(void)
 					mean_grad1[i] = abs(mean_grad11[i]);
 				}
 
-				double mean_0grad0 = MeanR(w2, mean_grad0);
-				double mean_1grad1 = MeanR(w1, mean_grad1);
+				double mean_0grad0 = Evaluation::MeanR(w2, mean_grad0);
+				double mean_1grad1 = Evaluation::MeanR(w1, mean_grad1);
 
 				int** grid_rot = 0;
 				

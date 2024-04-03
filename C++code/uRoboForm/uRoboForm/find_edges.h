@@ -1,6 +1,7 @@
 #pragma once
 #include "raw_edges.h"
 #include"Evaluation.h"
+#include "signal_evaluation.h"
 #include <complex>
 
 struct stage21
@@ -67,7 +68,6 @@ struct stage23
 class find_edges
 {
 private:
-	
 	
 	struct FP Find_Peaks(const vector<double> &arr, double th_edge);
 	struct LI Line_Index(const vector<double> &mean_range_in, double th_edge,int i0,int rank);

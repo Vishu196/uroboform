@@ -168,3 +168,34 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 	sorted_arr.shrink_to_fit();*/
 	return indice_arr;
 }
+
+double* decumulateDouble(double* x, int size)
+{
+	const size_t n = size - 1;
+	double* xi = new double[n]();
+	double* x1 = new double[n]();
+	double* x2 = new double[n]();
+
+	for (size_t i = 0; i < size - 1; i++)
+	{
+		if (i < n)
+		{
+			x1[i] = x[i + 1];
+		}
+
+	}
+	for (int i = 0; i < n; i++)
+	{
+		x2[i] = x[i];
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		xi[i] = x1[i] - x2[i];
+	}
+
+	delete[] x1;
+	delete[] x2;
+
+	return xi;
+}
