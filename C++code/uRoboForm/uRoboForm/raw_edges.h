@@ -12,14 +12,8 @@ struct stage12
 	double main_d_1;
 	double th_edge;
 
-	stage12()
-	{
-		img;
-		img2;
-		th_edge = 0;
-		main_d_0 = 0.0;
-		main_d_1 = 0.0;
-	}
+	stage12() :main_d_0(0.0),main_d_1(0.0),th_edge(0)
+	{}
 };
 
 class raw_edges

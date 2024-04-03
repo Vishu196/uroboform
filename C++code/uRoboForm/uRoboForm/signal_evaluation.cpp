@@ -39,13 +39,13 @@ vector<double> signal_evaluation::BlackmanWindowR(int n)
 		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
 		wFun[i] = wi;
 	}
-	/*wFun.shrink_to_fit();*/
+	
 	return wFun;
 }
 
 vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 {
-	int size = (int)image_windowR.size();
+	size_t size = image_windowR.size();
 	const int N = 256;
 	fftw_complex* y = 0;
 	y = new fftw_complex[N];
@@ -73,14 +73,13 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	}
 
 	fftw_destroy_plan(p);
-	//delete[] y;
 
 	return y1;
 }
 
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
-	int N = (int)x.size();
+	size_t N = x.size();
 	double* x_arr = new double[N]();
 	copy(x.begin(), x.end(), x_arr);
 	double* y = new double[N]();
@@ -110,14 +109,13 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 		k++;
 	}
 
-	//yy.shrink_to_fit();
 	delete[] y;
 	return yy;
 }
 
 vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 {
-	int N = (int)x.size();
+	size_t N = x.size();
 	double* y = new double[N]();
 
 	double* xx = new double[N]();
@@ -152,7 +150,6 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 	}
 
 	delete[] xx;
-	/*yy.shrink_to_fit();*/
 	return yy;
 }
 

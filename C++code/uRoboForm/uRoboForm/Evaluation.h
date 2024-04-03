@@ -19,6 +19,7 @@ public:
 	vector<int> static ArgSort(const vector<double>& s_dic);
 	double static std_dev(const vector<double>& arr, int start, int stop);
 	vector<int> static decumulateInt(const vector<int>& x);
-
+	vector<double> static decumulateDouble(const vector<double>& x);
+	vector<int> static deleteXint(vector<int> &arr, int pos);
 };
 

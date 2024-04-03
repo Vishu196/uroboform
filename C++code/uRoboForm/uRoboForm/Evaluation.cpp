@@ -60,7 +60,7 @@ double Evaluation::MeanR(const vector<double>& mean0)
 
 double Evaluation::Median(vector<double> array)
 {
-	int size = (int)array.size();
+	size_t size = array.size();
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = i; j < (size - 1); j++)
@@ -69,9 +69,6 @@ double Evaluation::Median(vector<double> array)
 			if (array[i] > array[w])
 			{
 				swap(array[i], array[w]);
-				/*double temp = array[i];
-				array[i] = array[w];
-				array[w] = temp;*/
 			}
 		}
 	}
@@ -135,12 +132,6 @@ vector<int> Evaluation::decumulateInt(const vector<int>& x)
 		xi[i] = x1[i] - x2[i];
 	}
 
-	/*x1.clear();
-	x2.clear();
-	x1.shrink_to_fit();
-	x2.shrink_to_fit();
-	xi.shrink_to_fit();*/
-
 	return xi;
 }
 
@@ -164,24 +155,20 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 		}
 
 	}
-	/*sorted_arr.clear();
-	sorted_arr.shrink_to_fit();*/
+	
 	return indice_arr;
 }
 
-double* decumulateDouble(double* x, int size)
+vector<double> Evaluation::decumulateDouble(const vector<double> &x)
 {
-	const size_t n = size - 1;
-	double* xi = new double[n]();
-	double* x1 = new double[n]();
-	double* x2 = new double[n]();
+	const size_t n = x.size() - 1;
+	vector<double> xi(n);
+	vector<double> x1(n);
+	vector<double> x2(n);
 
-	for (size_t i = 0; i < size - 1; i++)
+	for (size_t i = 0; i < n; i++)
 	{
-		if (i < n)
-		{
-			x1[i] = x[i + 1];
-		}
+		x1[i] = x[i + 1];
 
 	}
 	for (int i = 0; i < n; i++)
@@ -194,8 +181,22 @@ double* decumulateDouble(double* x, int size)
 		xi[i] = x1[i] - x2[i];
 	}
 
-	delete[] x1;
-	delete[] x2;
-
 	return xi;
+}
+
+vector<int> Evaluation::deleteXint(vector<int> &arr, int pos)
+{
+	size_t size = arr.size();
+
+	if (pos > size)
+		return arr;
+
+	for (int i = size; i > pos; i--)
+	{
+		int a = i - 2;
+		int b = i - 1;
+		arr[a] = arr[b];
+	}
+
+	return arr;
 }

@@ -16,36 +16,31 @@ struct stage21
 
 	stage21()
 	{
-		img;
-		img2;
 		main_d_0 = 0.0;
 		main_d_1 = 0.0;
 		th_edge = 0.0;
 	}
 };
 
-struct DT
+struct Detect_throu
 {
 	vector<int> through_loc;
 	vector<int> cut_through;
 };
 
-struct FP
+struct peaks
 {
 	vector<int> stripes;
 	vector<double> s_dic;
 };
 
-struct LI 
+struct indexes 
 {
 	double s_max;
 	double s_min;
 
-	LI()
-	{
-		s_max = 0.0;
-		s_min = 0.0;
-	}
+	indexes(): s_max(0.0),s_min(0.0)
+	{}
 };
 
 struct stage23
@@ -69,15 +64,14 @@ class find_edges
 {
 private:
 	
-	struct FP Find_Peaks(const vector<double> &arr, double th_edge);
-	struct LI Line_Index(const vector<double> &mean_range_in, double th_edge,int i0,int rank);
-	struct DT Detect_Through(const vector<double> &im_col, double th_edge);
+	peaks Find_Peaks(const vector<double> &arr, double th_edge);
+	indexes Line_Index(const vector<double> &mean_range_in, double th_edge,int i0,int rank);
+	Detect_throu Detect_Through(const vector<double> &im_col, double th_edge);
 	list<int> Delete_Edges(vector<int> cut_arr, int ideal_d);
-	vector<int> deleteXint(vector<int> arr, int pos);
-
+	
 public:
 
-	find_edges(struct stage12 s12);
-	struct stage23 Execute(void);
+	find_edges(stage12 s12);
+	stage23 Execute(void);
 };
 
