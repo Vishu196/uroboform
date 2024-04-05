@@ -21,16 +21,7 @@
     <ClCompile Include="find_edges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bandfilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Evaluation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResultData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cnrData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="raw_edges.cpp">
@@ -39,30 +30,18 @@
     <ClCompile Include="signal_evaluation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="grid_pos01.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="find_edges.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bandfilter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Evaluation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResultData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cnrData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="grid_pos01.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="grid_pos02.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="grid_pos03.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">

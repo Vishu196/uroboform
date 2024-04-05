@@ -143,27 +143,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bandfilter.cpp" />
-    <ClCompile Include="cnrData.cpp" />
     <ClCompile Include="Evaluation.cpp" />
     <ClCompile Include="find_edges.cpp" />
+    <ClCompile Include="grid_pos01.cpp" />
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="raw_edges.cpp" />
-    <ClCompile Include="ResultData.cpp" />
     <ClCompile Include="signal_evaluation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bandfilter.h" />
-    <ClInclude Include="cnrData.h" />
     <ClInclude Include="Evaluation.h" />
     <ClInclude Include="find_edges.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="grid_pos01.h" />
-    <ClInclude Include="grid_pos02.h" />
-    <ClInclude Include="grid_pos03.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="raw_edges.h" />
-    <ClInclude Include="ResultData.h" />
     <ClInclude Include="signal_evaluation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

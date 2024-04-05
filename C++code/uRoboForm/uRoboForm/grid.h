@@ -7,32 +7,35 @@ using namespace std;
 
 class Grid {
     public:
-    Grid(int** image, int imgRows, string orientation, list<int> coord, list<double> max_pos)
+    Grid(Mat image, string orientation, vector<int> coord, vector<double> max_pos)
     {
         this->image = image;
-        this->px_num = imgRows*720;
+        this->px_num = image.rows * image.cols;
         this->orientation = orientation;
         this->im_loc = coord;
             if (orientation == "hor")
             {
-                this->max_pos.front() = coord.front() + max_pos.front();
-                this->max_pos.back() = coord.front() + max_pos.back();
+                for (double& d : max_pos)
+                    d += coord[0];
+                //transform(max_pos.begin(), max_pos.end(), max_pos.begin(), [&](double x) {x + coord[0]; });
+                this->max_pos = max_pos;
             }
             else
             {
-                this->max_pos.front() = coord.back() + max_pos.front();
-                this->max_pos.back() = coord.back() + max_pos.back();
+                for (double& d : max_pos)
+                    d += coord[1];
+                //transform(max_pos.begin(), max_pos.end(), max_pos.begin(), [&](double x) {x + coord[1]; });
+                this->max_pos = max_pos;
             }
         
     }
 
     Grid() = default;
 
-    int** image;
-    int imgRows;
-    int px_num;
+    Mat image;
+    int px_num =0;
     std::string orientation;
-    list<int> im_loc;
-    list<double> max_pos;
+    vector<int> im_loc;
+    vector<double> max_pos;
 };
 

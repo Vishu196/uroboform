@@ -1,7 +1,7 @@
 #include "main.h"
 #include "raw_edges.h"
 #include "find_edges.h"
-//#include "grid_pos01.h"
+#include "grid_pos01.h"
 
 
 //#define Debug	
@@ -22,7 +22,7 @@ int main()
 	struct stage12 s12 = edge0.ExecuteR(image, freq_range);
 	cout << "main_d_0: " << s12.main_d_0 << endl;
 	cout << "main_d_1: " << s12.main_d_1 << endl;
-	//cout << "img2rows:" << s12.img2.cols << endl;
+
 	cout << "Stage 1 complete." << endl;
 	cout << endl;
 
@@ -38,8 +38,8 @@ int main()
 	cout << endl;
 	cout << "Stage 2 complete." << endl;
 
-	/*grid_pos01 grid(s23);
-	struct stage34 s34 = grid.Execute();*/
+	grid_pos01 grid(s23);
+	int a = grid.Execute();
 
 	auto t02 = high_resolution_clock::now();
 
