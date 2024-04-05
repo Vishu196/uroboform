@@ -1,19 +1,19 @@
 #pragma once
 #include "grid_pos01.h"
-#include <vector>
-#include <algorithm>
+#include "Evaluation.h"
 #include <list>
 
 using namespace std;
 
 struct stage43
 {
-	int** img;
-	int imgRows;
-	int imgCols;
+	Mat img;
 	int gridRows;
 	int gridCols;
 	Grid** grids;
+
+	stage43() : gridRows(0), gridCols(0)
+	{};
 };
 
 struct stage45
@@ -26,7 +26,7 @@ struct stage45
 	string ind_ori;
 	int grid_wid;
 	int grid_ht;
-	list<int>** look_up;
+	vector<vector<list<int>>> look_up;
 };
 
 struct RdBinary
@@ -39,26 +39,22 @@ struct gParams
 {
 	int grid_height;
 	int grid_width;
-	list<int>** look_up;
+	vector<vector<list<int>>> look_up;
 };
 
 class grid_pos02
 {
 private:
 
-	double* decumulateDouble(double* x, int size);
-	double* Mean0R(int rows, int cols, int** array);
-	double* Mean1R(int rows, int cols, int** array);
-	double MeanR(int rows, double* array);
-	double IntMeanR(int rows, int* mean0);
+	
 	double* insertXdouble(int size, double* arr, double x, int pos);
-	Grid** checkGrid(Grid** grids01, int gRows, int gCols);
+	Grid** checkGrid(Grid** &grids01, int gRows, int gCols);
 	vector<int> linspace(double start, double end, int num);
-	struct RdBinary ReadBinary(Grid** cgrids, int** img, int x, int y);
+	struct RdBinary ReadBinary(Grid** &cgrids);
 	struct gParams grid_params(void);
-	int get_mask_pos(Grid field, int row, int col, int i_max, int grid_wid, int grid_ht);
-	float calc_d_k(double** lines);
-	double get_d_k(Grid** cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size);
+	int get_mask_pos(Grid field, int row, int col, size_t i_max, int grid_wid, int grid_ht);
+	double calc_d_k(vector<vector<double>> lines);
+	double get_d_k(Grid** &cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size);
 
 public:
 

@@ -53,7 +53,7 @@ class grid_pos01
 private:
 	
 	vector<double> gradient(const vector<double> &x);
-	struct FP Find_Peaks(const vector<double> &arr, int dist, double prom);
+	struct FP Find_Peaks(const vector<double> &arr, double dist, double prom);
 	Mat cutGrid(const Mat &grid_rot);
 	struct MFreq Main_FreqR(const vector<double> &B0, int start, int stop);
 	struct subPX subpx_max_pos(const Mat &cutGrid,int stripe_width, float px_size, string mode);

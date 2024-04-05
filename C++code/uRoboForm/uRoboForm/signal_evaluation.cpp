@@ -85,7 +85,7 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 	double* y = new double[N]();
 	fftw_plan p;
 
-	p = fftw_plan_r2r_1d(N, x_arr, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+	p = fftw_plan_r2r_1d((int)N, x_arr, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	fftw_execute(p);
 
@@ -104,7 +104,7 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 	int k = 1;
 	for (int i = 2; i < N; i += 2)
 	{
-		int a = N - k;
+		size_t a = N - k;
 		yy[i] = (y[a]);
 		k++;
 	}
@@ -126,17 +126,17 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 		xx[i] = x[a];
 	}
 
-	for (int i = N; i > ((N / 2) + 1); i--)
+	for (size_t i = N; i > ((N / 2) + 1); i--)
 	{
-		int a = (2 * (N - i)) + 2;
+		size_t a = (2 * (N - i)) + 2;
 		xx[i - 1] = x[a];
 	}
-	int b = N - 1;
+	size_t b = N - 1;
 	xx[N / 2] = x[b];
 
 	fftw_plan p;
 
-	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+	p = fftw_plan_r2r_1d((int)N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	fftw_execute(p);
 
@@ -153,7 +153,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 	return yy;
 }
 
-vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, int x1)
+vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
 	vector<double> f_x = RFFT(x);
 
@@ -165,7 +165,7 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, i
 		f_x_cut[i] = 0;
 	}
 
-	for (int i = x1; i < x.size(); i++)
+	for (size_t i = x1; i < x.size(); i++)
 	{
 		f_x_cut[i] = 0;
 	}

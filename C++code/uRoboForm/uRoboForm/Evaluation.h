@@ -21,5 +21,6 @@ public:
 	vector<int> static decumulateInt(const vector<int>& x);
 	vector<double> static decumulateDouble(const vector<double>& x);
 	vector<int> static deleteXint(vector<int> &arr, int pos);
+	double static IntMeanR(const vector<int>& mean0);
 };
 

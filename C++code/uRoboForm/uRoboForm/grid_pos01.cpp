@@ -15,7 +15,7 @@ grid_pos01::grid_pos01(struct stage23 s23)
 
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
-	int x_size = x.size();
+	size_t x_size = x.size();
 	int dx = 1;
 	vector<double> grad(x_size);
 
@@ -28,8 +28,8 @@ vector<double> grid_pos01::gradient(const vector<double> &x)
 		grad[i] = (x[a] - x[b]) / (2 * dx);  // for i in [1,N-2]
 
 	}
-	int n = x_size - 1;
-	int m = x_size - 2;
+	size_t n = x_size - 1;
+	size_t m = x_size - 2;
 	grad[n] = (x[n] - x[m]) / dx;
 
 	return grad;
@@ -56,7 +56,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 			for (int j = 0; j < (grid_rot.cols - 1); j += 2)
 			{
 				int val = grid_rot.data[i * grid_rot.step + j];
-				int idx = (s * grid_rot2.step + t );
+				size_t idx = (s * grid_rot2.step + t );
 				*(grid_rot2Data + idx) = val;
 
 				if (t < wid - 1)
@@ -75,7 +75,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 	double max_val, min_val;
 	minMaxLoc(grid_rot2, &min_val, &max_val);
 
-	int val_range = max_val - min_val;
+	int val_range = (int)(max_val - min_val);
 
 	std::vector<int> where_out;
 	for (int i = 0; i < len; i++) {
@@ -103,7 +103,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 			for (int j = 0; j < grid_rot.cols; j++)
 			{
 				int val = grid_rot.data[i * grid_rot.step + j];
-				int idx = (p * grid_cut.step + q);
+				size_t idx = (p * grid_cut.step + q);
 				*(grid_cutData + idx) = val;
 				//grid_cut.data[p* grid_cut.step + q] = grid_rot.data[i * grid_rot.step + j];
 				if (q < grid_rot.cols - 1)
@@ -124,9 +124,9 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 	return grid_cut;
 }
 
-struct FP grid_pos01::Find_Peaks(const vector<double>& arr, int dist, double prom)
+struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double prom)
 {
-	int n = arr.size();
+	size_t n = arr.size();
 	double maxVal = *max_element(arr.begin(), arr.end());
 	vector<int> stripes(n);
 	vector<double> s_dic(n);
@@ -278,7 +278,7 @@ struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_ma
 					//curve fit function pending
 				}
 			}
-			catch (const runtime_error& error)
+			catch (const runtime_error)
 			{
 				cout << "Optimal Parameters not found for image at x =' " << mid << endl;
 			}
@@ -356,7 +356,7 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 
 				}
 			}
-			catch (const exception& error)
+			catch (const exception)
 			{
 				continue;
 			}
@@ -405,7 +405,7 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 		double A2 = pow(imag(F_k), 2);
 		double A = pow((A1 + A2), 0.5);
 
-		int lenImg = m.Image_window.size();
+		size_t lenImg = m.Image_window.size();
 		vector<int> ImgWin_arange(lenImg);
 		iota(begin(ImgWin_arange), end(ImgWin_arange), 0);
 
@@ -582,7 +582,7 @@ int grid_pos01::Execute(void)
 							int p = y - y1;
 							
 							int val = s32.img.data[x * s32.img.step + y];
-							int idx = (o * grid0.step + p);
+							size_t idx = (o * grid0.step + p);
 							*(grid0Data + idx) = val;
 						}
 					}
@@ -606,7 +606,7 @@ int grid_pos01::Execute(void)
 						int p = y - y11;
 
 						int val = s32.img2.data[x * s32.img2.step + y];
-						int idx = (o * mean2.step + p);
+						size_t idx = (o * mean2.step + p);
 						*(mean2Data + idx) = val;
 						//mean2.data[o * mean2.step + p] = s32.img2.data[x * s32.img2.step + y];
 					}
@@ -702,7 +702,7 @@ int grid_pos01::Execute(void)
 
 					p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
 
-					int r = p.max_pos.size();
+					size_t r = p.max_pos.size();
 					
 					vector <double> max_pos_de = Evaluation::decumulateDouble(p.max_pos);
 					

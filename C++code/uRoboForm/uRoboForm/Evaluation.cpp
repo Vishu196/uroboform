@@ -73,7 +73,7 @@ double Evaluation::Median(vector<double> array)
 		}
 	}
 
-	int a = size - 1;
+	size_t a = size - 1;
 	if (size % 2 != 0)
 		return (double)array[size / 2];
 	else
@@ -135,30 +135,6 @@ vector<int> Evaluation::decumulateInt(const vector<int>& x)
 	return xi;
 }
 
-vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
-{
-	vector<int> indice_arr((int)s_dic.size());
-	vector<double> sorted_arr((int)s_dic.size());
-	sorted_arr = s_dic;
-
-	sort(sorted_arr.begin(), sorted_arr.end());
-
-	for (int i = 0; i < s_dic.size(); i++)
-	{
-		for (int j = 0; j < (s_dic.size()); j++)
-		{
-			if (sorted_arr[i] == s_dic[j])
-			{
-				indice_arr[i] = j;
-				break;
-			}
-		}
-
-	}
-	
-	return indice_arr;
-}
-
 vector<double> Evaluation::decumulateDouble(const vector<double> &x)
 {
 	const size_t n = x.size() - 1;
@@ -184,6 +160,30 @@ vector<double> Evaluation::decumulateDouble(const vector<double> &x)
 	return xi;
 }
 
+vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
+{
+	vector<int> indice_arr((int)s_dic.size());
+	vector<double> sorted_arr((int)s_dic.size());
+	sorted_arr = s_dic;
+
+	sort(sorted_arr.begin(), sorted_arr.end());
+
+	for (int i = 0; i < s_dic.size(); i++)
+	{
+		for (int j = 0; j < (s_dic.size()); j++)
+		{
+			if (sorted_arr[i] == s_dic[j])
+			{
+				indice_arr[i] = j;
+				break;
+			}
+		}
+
+	}
+
+	return indice_arr;
+}
+
 vector<int> Evaluation::deleteXint(vector<int> &arr, int pos)
 {
 	size_t size = arr.size();
@@ -191,12 +191,25 @@ vector<int> Evaluation::deleteXint(vector<int> &arr, int pos)
 	if (pos > size)
 		return arr;
 
-	for (int i = size; i > pos; i--)
+	for (size_t i = size; i > pos; i--)
 	{
-		int a = i - 2;
-		int b = i - 1;
+		size_t a = i - 2;
+		size_t b = i - 1;
 		arr[a] = arr[b];
 	}
 
 	return arr;
+}
+
+double Evaluation::IntMeanR(const vector<int>& mean0)
+{
+	int sum = 0;
+	double meanR = 0.0;
+	for (int i = 0; i < mean0.size(); i++)
+	{
+		sum += mean0[i];
+	}
+
+	meanR = (double)sum / mean0.size();
+	return meanR;
 }

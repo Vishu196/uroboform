@@ -16,7 +16,7 @@ public:
 	double static Spek_InterpolR(const vector<double>& A);
 	vector<double> static BlackmanWindowR(int n);
 	vector<double> static FFTR(const vector<double>& image_window);
-	vector<double> static Bandfilter(const vector<double>& x, int start, int end);
+	vector<double> static Bandfilter(const vector<double>& x, int start, size_t end);
 	vector<double> static RFFT(const vector<double>& x);
 	vector<double> static IRFFT(const vector<double>& x);
 };

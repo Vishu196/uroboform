@@ -99,8 +99,8 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 		}
 		if (s-peaks_min.stripes.at((peaks_min.stripes.size() - 1)) > 25)
 		{
-			int e = s - 1;
-			peaks_min.stripes.insert(peaks_min.stripes.end(), e);
+			size_t e = s - 1;
+			peaks_min.stripes.insert(peaks_min.stripes.end(), (int)e);
 			peaks_min.s_dic.insert(peaks_min.s_dic.end(), mean_rangeN.at(e));
 		}
 
@@ -141,7 +141,7 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 		im_diff[i] = im_col[i] - th_edge;
 	}
 	
-	int n = size - 1;
+	size_t n = size - 1;
 	vector<bool> signbit(size);
 	for(int i = 0; i < size; i++)
 	{ 
@@ -172,7 +172,7 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	
 	through_loc.insert(through_loc.begin(), 0);
 	
-	through_loc.insert(through_loc.end(), size);
+	through_loc.insert(through_loc.end(), (int)size);
 
 	vector<int> d_through;
 	d_through = Evaluation::decumulateInt(through_loc);
@@ -317,14 +317,14 @@ struct stage23 find_edges::Execute(void)
 		double s_max, s_min;
 		const size_t mid = s21.mean0.size() / 2;
 		const int search_range = 150;
-		int i0 = mid - search_range;
-		int i1 = mid + search_range;
-		int R = i1 - i0;
+		size_t i0 = mid - search_range;
+		size_t i1 = mid + search_range;
+		size_t R = i1 - i0;
 
 		vector<double> mean_range0(R);
-		for (int i = i0; i < i1; i++)
+		for (size_t i = i0; i < i1; i++)
 		{
-			int a = i - i0;
+			size_t a = i - i0;
 			mean_range0[a] = s21.mean0[i];
 		}
 		
@@ -334,7 +334,7 @@ struct stage23 find_edges::Execute(void)
 		while (rank < 5)
 		{
 			rank += 1;
-			indexes index = Line_Index(mean_range0, s21.th_edge, i0, rank);
+			indexes index = Line_Index(mean_range0, s21.th_edge, (int)i0, rank);
 			s_max = index.s_max;
 			int s_m = (int) s_max;
 			bool res = isnan(s_max);
@@ -349,7 +349,7 @@ struct stage23 find_edges::Execute(void)
 				
 				im_col = signal_evaluation::Bandfilter(img_col, 0, x);
 
-				int n1 = len - 150;
+				size_t n1 = len - 150;
 				vector<double> std_col(n1);
 				for (int i = 0; i < n1; i ++)
 				{
@@ -403,7 +403,7 @@ struct stage23 find_edges::Execute(void)
 			}
 
 		}
-		catch (const std::out_of_range& err)
+		catch (const std::out_of_range)
 		{
 			cut_hor.clear();
 		}
@@ -440,7 +440,7 @@ struct stage23 find_edges::Execute(void)
 				vector<double> im_row_low(wid);
 				im_row_low = signal_evaluation::Bandfilter(img_row_l, 0, y);
 
-				int n2 = wid - 200;
+				size_t n2 = wid - 200;
 				vector<double> std_row(n2);
 				for (int i = 0; i < n2; i++)
 				{
@@ -472,7 +472,7 @@ struct stage23 find_edges::Execute(void)
 				vector<double> im_row;
 				im_row = signal_evaluation::Bandfilter(img_row, 0, y);
 
-				int n3 = wid - 200;
+				size_t n3 = wid - 200;
 				vector<double> std_row_h;
 				for (int i = 0; i < n3; i++)
 				{
@@ -503,7 +503,7 @@ struct stage23 find_edges::Execute(void)
 				cut_ver = Delete_Edges(cut_ver_arr, 300);*/
 
 			}
-			catch (const std::out_of_range& err)
+			catch (const std::out_of_range)
 			{
 				cut_ver.clear();
 			}

@@ -75,32 +75,36 @@ grid_pos03::grid_pos03(struct stage45 s45)
 
 int grid_pos03::get_mask_pos(Grid field, int row, int col, int i_max, int grid_wid, int grid_ht)
 {
-	int s_index = 0;
+	size_t s_index = 0;
 	int mask_pos = 0;
 
 	if (field.orientation == "hor")
 	{
 		if (row == 0)
 		{
-			s_index = i_max + 6 - field.max_pos.size();
+			int i = i_max + 6;
+			s_index = i - field.max_pos.size();
 		}
 		else
 		{
 			s_index = i_max;
 		}
-		mask_pos = s_index * 200 + 350 + (row - 1) * grid_ht;
+		size_t r = row-1;
+		mask_pos = s_index * 200 + 350 + r * grid_ht;
 	}
 	else
 	{
 		if (col == 0)
 		{
-			s_index = i_max + 8 - field.max_pos.size();
+			int i = i_max + 8;
+			s_index = i - field.max_pos.size();
 		}
 		else
 		{
 			s_index = i_max;
 		}
-		mask_pos = s_index * 200 + 350 + (col - 1) * grid_wid;
+		size_t c = col - 1;
+		mask_pos = s_index * 200 + 350 + c * grid_wid;
 	}
 
 	return mask_pos;
