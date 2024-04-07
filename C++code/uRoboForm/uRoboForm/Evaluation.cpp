@@ -83,28 +83,24 @@ double Evaluation::Median(vector<double> array)
 
 double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 {
-	double sum = 0.0, mean, standardDeviation = 0.0;
+	double sum = 0.0, standardDeviation = 0.0;
 	int i;
 	int size = stop - start;
 
 	vector<double> B(size);
 
-	for (int k = 0; k < size; k++)
+	for (i = 0; i < size; ++i)
 	{
-		const int w = k + start;
-		B[k] = arr[w];
+		const int w = i + start;
+		sum += arr[w];
 	}
+
+	const double mean = sum / size;
 
 	for (i = 0; i < size; ++i)
 	{
-		sum += B[i];
-	}
-
-	mean = sum / size;
-
-	for (i = 0; i < size; ++i)
-	{
-		standardDeviation += pow(B[i] - mean, 2);
+		const double val = arr[i + start] - mean;
+		standardDeviation += val * val;
 	}
 
 	return sqrt(standardDeviation / size);

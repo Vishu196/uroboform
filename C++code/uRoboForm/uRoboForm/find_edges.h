@@ -71,8 +71,6 @@ private:
 	list<int> Delete_Edges(vector<int> cut_arr, int ideal_d);
 	
 public:
-
-	find_edges(stage12 s12);
-	stage23 Execute(void);
+	stage23 Execute(stage12 s12);
 };
 

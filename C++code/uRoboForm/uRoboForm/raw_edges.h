@@ -1,6 +1,7 @@
 #pragma once
 #include"Evaluation.h"
 #include "signal_evaluation.h"
+#include "cqueue.h"
 
 struct stage12
 {		
@@ -25,10 +26,16 @@ private:
 	Mat ImageSliceR (Mat ImageR, int n);
 	double Main_FreqR (const vector<double> &B0, int start, int stop);
 	double Calc_main_d(const vector<double> &mean0, int freq_range);
+	cqueue<stage12> fifo;
 
 public:
 
-	raw_edges(Mat ImageR);
-	struct stage12 ExecuteR(Mat image, int freq_range);
+	void ExecuteR(Mat image, int freq_range);
+	stage12 getNext() 
+	{
+		stage12 s12;
+		fifo.pop(s12);
+		return s12;
+	}
 };
 

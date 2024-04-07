@@ -1,5 +1,6 @@
 #pragma once
 
+static const int freq_range = 150;
 const int search_range = 150;
 const int h1 = 800;
 const int h2 = 20;

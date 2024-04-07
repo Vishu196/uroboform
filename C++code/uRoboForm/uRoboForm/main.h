@@ -1,13 +1,17 @@
 #pragma once
-#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <string>
-#include <numeric>
-#include <complex>
-#include <cmath>
 #include <chrono>
+
+#include "constants.h"
+#include "raw_edges.h"
+#include "find_edges.h"
+//#include "grid_pos01.h"
 
 using namespace cv;
 using namespace std;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
-static const int freq_range = 150;

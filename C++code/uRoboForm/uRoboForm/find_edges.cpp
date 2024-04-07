@@ -1,21 +1,6 @@
 #include "find_edges.h"
 #include <cmath>
 
-static struct stage21 s21;
-static struct stage23 s23;
-
-find_edges::find_edges(stage12 s12)
-{
-	s21.img = s12.img.clone();
-	s21.img2 = s12.img2.clone();
-	s21.mean0 = s12.mean0;
-	s21.mean1 = s12.mean1;
-	
-	s21.main_d_0 = s12.main_d_0;
-	s21.main_d_1 = s12.main_d_1;
-	s21.th_edge = s12.th_edge;
-
-}
 
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
@@ -193,19 +178,6 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	return thro;
 }
 
-double IntMeanR(const vector<int> &mean0)
-{
-	int sum = 0;
-	double meanR = 0.0;
-	for (int i = 0; i < mean0.size(); i++)
-	{
-		sum += mean0[i];
-	}
-
-	meanR = (double)sum / (double)mean0.size();
-	return meanR;
-}
-
 //to do
 list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 {
@@ -272,7 +244,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		{
 			ver0[i] = ver01[i] - ideal_d;
 		}
-		double d_m_0 = abs(IntMeanR(ver0));
+		double d_m_0 = abs(Evaluation::IntMeanR(ver0));
 
 		/*int* ver11 = new int[d_cut_ver_1.size()];
 		int* ver1 = new int[d_cut_ver_1.size()];
@@ -287,7 +259,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			ver1[i] = ver11[i] - ideal_d;
 		}
 		//transform(ver11.begin(), ver11.end(), ver1.begin(), op_subtract);
-		double d_m_1 = abs(IntMeanR(ver1));
+		double d_m_1 = abs(Evaluation::IntMeanR(ver1));
 
 		if (d_m_0 > d_m_1)
 		{
@@ -308,14 +280,14 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 	return cut_list;
 }
 
-struct stage23 find_edges::Execute(void)
+struct stage23 find_edges::Execute(stage12 s12)
 {
-	list<int> cut_hor;
-	list<int> cut_ver;
-	if ((s21.main_d_0 > 13) && (s21.main_d_1 > 13))
+	stage23 s23;
+	
+	if ((s12.main_d_0 > 13) && (s12.main_d_1 > 13))
 	{	
 		double s_max, s_min;
-		const size_t mid = s21.mean0.size() / 2;
+		const size_t mid = s12.mean0.size() / 2;
 		size_t i0 = mid - search_range;
 		size_t i1 = mid + search_range;
 		size_t R = i1 - i0;
@@ -324,26 +296,26 @@ struct stage23 find_edges::Execute(void)
 		for (size_t i = i0; i < i1; i++)
 		{
 			size_t a = i - i0;
-			mean_range0[a] = s21.mean0[i];
+			mean_range0[a] = s12.mean0[i];
 		}
 		
 		int rank = 0;
-		size_t len = s21.img2.rows;
+		size_t len = s12.img2.rows;
 		vector<double> im_col(len);
 		while (rank < 5)
 		{
 			rank += 1;
-			indexes index = Line_Index(mean_range0, s21.th_edge, (int)i0, rank);
+			indexes index = Line_Index(mean_range0, s12.th_edge, (int)i0, rank);
 			s_max = index.s_max;
 			int s_m = (int) s_max;
 			bool res = isnan(s_max);
 			if (!res)
 			{
-				size_t x = s21.img2.rows / 6;
+				size_t x = s12.img2.rows / 6;
 				vector<double> img_col(len);
 				for (int i = 0; i < len; i++)
 				{
-					img_col[i] = (double)s21.img2.data[i * s21.img2.step + s_m];
+					img_col[i] = (double)s12.img2.data[i * s12.img2.step + s_m];
 				}
 				
 				im_col = signal_evaluation::Bandfilter(img_col, 0, x);
@@ -367,11 +339,11 @@ struct stage23 find_edges::Execute(void)
 		}
 		try
 		{
-			cut_hor.clear();
+			s23.cut_hor.clear();
 			vector<int> cut_hor_arr;
 			if (rank != 5)
 			{
-				Detect_throu t = Detect_Through(im_col, s21.th_edge);
+				Detect_throu t = Detect_Through(im_col, s12.th_edge);
 
 				for (int i = 0; i < t.cut_through.size(); i++)
 				{
@@ -379,21 +351,21 @@ struct stage23 find_edges::Execute(void)
 					int b1 = t.cut_through[i] + 1;
 					int b = t.through_loc[i];
 					int c = t.through_loc[t.cut_through[i]] + 1;
-					if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[a] > s21.th_edge))
+					if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[a] > s12.th_edge))
 					{
-						cut_hor.push_back(t.through_loc[b1]);
+						s23.cut_hor.push_back(t.through_loc[b1]);
 					}
 					else if (t.cut_through[i] == (t.through_loc.size() - 2))
 					{
-						cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+						s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
 					}
-					else if (im_col[c] > s21.th_edge)
+					else if (im_col[c] > s12.th_edge)
 					{
 						if (t.through_loc[t.cut_through[i]] > 10)
 						{
-							cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+							s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
 						}
-						cut_hor.push_back(t.through_loc[b1]);
+						s23.cut_hor.push_back(t.through_loc[b1]);
 					}
 				}
 				//copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
@@ -404,23 +376,23 @@ struct stage23 find_edges::Execute(void)
 		}
 		catch (const std::out_of_range)
 		{
-			cut_hor.clear();
+			s23.cut_hor.clear();
 		}
-		if (cut_hor.size() >= 2)
+		if (s23.cut_hor.size() >= 2)
 		{
-			list<int>::iterator it = cut_hor.begin();
+			list<int>::iterator it = s23.cut_hor.begin();
 			advance(it, 1);
-			int j0 = cut_hor.front();
+			int j0 = s23.cut_hor.front();
 			int j1 = *it;
 			int s1 = j1 - j0;
 			int k = 0;
 			vector<double> mean_range1(s1);
 			for (int i = j0; i < j1; i++)
 			{
-				mean_range1[k] = s21.mean1[i];
+				mean_range1[k] = s12.mean1[i];
 				k++;
 			}
-			indexes index = Line_Index(mean_range1,s21.th_edge, j0, rank=1);
+			indexes index = Line_Index(mean_range1,s12.th_edge, j0, rank=1);
 			s_max = index.s_max;
 			s_min = index.s_min;
 			int s_m = (int)s_max;
@@ -428,12 +400,12 @@ struct stage23 find_edges::Execute(void)
 
 			try
 			{
-				size_t y = s21.img2.cols / 6;
-				size_t wid = s21.img2.cols;
+				size_t y = s12.img2.cols / 6;
+				size_t wid = s12.img2.cols;
 				vector<double> img_row_l(wid);
 				for (int i = 0; i < wid; i++)
 				{
-					img_row_l[i] = (double)s21.img2.data[s_mi * s21.img2.step + i];
+					img_row_l[i] = (double)s12.img2.data[s_mi * s12.img2.step + i];
 				}
 
 				vector<double> im_row_low(wid);
@@ -451,13 +423,13 @@ struct stage23 find_edges::Execute(void)
 				double condition2 = cc1 / cc2;
 				if (condition2 <= 0.085)
 				{
-					Detect_throu t = Detect_Through(im_row_low, s21.th_edge);
+					Detect_throu t = Detect_Through(im_row_low, s12.th_edge);
 
 					for (int i_row_l = 0; i_row_l < t.cut_through.size(); i_row_l++)
 					{
 						if (t.through_loc.at(t.cut_through.at(i_row_l))  != 0)
 						{
-							cut_ver.push_back(t.through_loc.at(t.cut_through.at(i_row_l)));
+							s23.cut_ver.push_back(t.through_loc.at(t.cut_through.at(i_row_l)));
 						}
 					}
 				}
@@ -465,7 +437,7 @@ struct stage23 find_edges::Execute(void)
 				vector<double> img_row;
 				for (int i = 0; i < wid; i++)
 				{
-					img_row.push_back((double)s21.img2.data[s_m * s21.img2.step + i]);
+					img_row.push_back((double)s12.img2.data[s_m * s12.img2.step + i]);
 				}
 
 				vector<double> im_row;
@@ -484,18 +456,18 @@ struct stage23 find_edges::Execute(void)
 				double condition3 = c11 / c22;
 				if (condition3 <= 0.088)
 				{
-					Detect_throu t1 = Detect_Through(im_row, s21.th_edge);
+					Detect_throu t1 = Detect_Through(im_row, s12.th_edge);
 
 					for (int i_row_h = 0; i_row_h < t1.cut_through.size(); i_row_h++)
 					{
 						if (t1.through_loc.at(t1.cut_through.at(i_row_h)) != 0)
 						{
 							int m = t1.cut_through.at(i_row_h) + 1;
-							cut_ver.push_back(t1.through_loc.at(m));
+							s23.cut_ver.push_back(t1.through_loc.at(m));
 						}
 					}
 				}
-				cut_ver.sort();
+				s23.cut_ver.sort();
 				//to do
 				/*vector<int> cut_ver_arr;
 				copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);
@@ -504,25 +476,31 @@ struct stage23 find_edges::Execute(void)
 			}
 			catch (const std::out_of_range)
 			{
-				cut_ver.clear();
+				s23.cut_ver.clear();
 			}
 		}
 		else
 		{
-			cut_ver.clear();
+			s23.cut_ver.clear();
 		}
 	}
 	else
 	{
-		cut_hor.clear();
-		cut_ver.clear();
+		s23.cut_hor.clear();
+		s23.cut_ver.clear();
 	}
 
-	s23.cut_hor.assign(cut_hor.begin(), cut_hor.end());
-	s23.cut_ver.assign(cut_ver.begin(), cut_ver.end());
+	s23.img = s12.img.clone();
+	s23.img2 = s12.img2.clone();
 
-	s23.img = s21.img.clone();
-	s23.img2 = s21.img2.clone();
+	cout << "cut_hor: ";
+	for (auto v : s23.cut_hor)
+		cout << v << ",";
+	cout << endl << "cut_ver: ";
+	for (auto v : s23.cut_ver)
+		cout << v << ",";
+	cout << endl;
+	cout << "Stage 2 complete." << endl;
 	
 	return s23;
 }
