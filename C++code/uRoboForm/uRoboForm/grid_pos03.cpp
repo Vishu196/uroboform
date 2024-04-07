@@ -3,56 +3,8 @@
 static struct stage54 s54;
 static struct stage56 s56;
 
-static void buffer_s54_init()
-{
-	s54.gridRows = 0;
-	s54.gridCols = 0;
-	s54.grids = new Grid * [3];
-	for (int h = 0; h < 3; h++)
-	{
-		s54.grids[h] = new Grid[3];
-	}
-
-	s54.index = 0;
-	s54.k = 0.0;
-	s54.ind_ori = "";
-	s54.grid_wid = 0;
-	s54.grid_ht = 0;
-
-	s54.look_up = new list<int>*[200];
-	for (int i = 0; i < 200; i++)
-	{
-		s54.look_up[i] = new list<int>[2];
-	}
-}
-
-static void buffer_s56_init()
-{
-	s56.gridRows = 0;
-	s56.gridCols = 0;
-	s56.grids = new Grid * [3];
-	for (int h = 0; h < 3; h++)
-	{
-		s56.grids[h] = new Grid[3];
-	}
-
-	s56.index = 0;
-	s56.k = 0.0;
-	s56.ind_ori = "";
-	s56.xi = 0.0;
-	s56.zi = 0.0;
-}
-
-static void buffers_init(void)
-{
-	buffer_s54_init();
-	buffer_s56_init();
-}
-
 grid_pos03::grid_pos03(struct stage45 s45)
 {
-	buffers_init();
-
 	s54.gridRows = s45.gridRows;
 	s54.gridCols = s45.gridCols;
 
@@ -64,16 +16,10 @@ grid_pos03::grid_pos03(struct stage45 s45)
 	s54.index = s45.index;
 	s54.k = s45.k;
 	s54.ind_ori = s45.ind_ori;
-	s54.grid_wid = s45.grid_wid;
-	s54.grid_ht = s45.grid_ht;
-
-	for (int i = 0; i < 200; i++)
-	{
-		memcpy(s54.look_up[i], s45.look_up[i], (2 * sizeof(int)));
-	}
+	
 }
 
-int grid_pos03::get_mask_pos(Grid field, int row, int col, int i_max, int grid_wid, int grid_ht)
+int grid_pos03::get_mask_pos(Grid field, int row, int col, size_t i_max)
 {
 	size_t s_index = 0;
 	int mask_pos = 0;
@@ -82,21 +28,21 @@ int grid_pos03::get_mask_pos(Grid field, int row, int col, int i_max, int grid_w
 	{
 		if (row == 0)
 		{
-			int i = i_max + 6;
+			size_t i = i_max + 6;
 			s_index = i - field.max_pos.size();
 		}
 		else
 		{
 			s_index = i_max;
 		}
-		size_t r = row-1;
-		mask_pos = s_index * 200 + 350 + r * grid_ht;
+		size_t r = row - 1;
+		mask_pos = s_index * 200 + 350 + r * grid_height;
 	}
 	else
 	{
 		if (col == 0)
 		{
-			int i = i_max + 8;
+			size_t i = i_max + 8;
 			s_index = i - field.max_pos.size();
 		}
 		else
@@ -104,44 +50,109 @@ int grid_pos03::get_mask_pos(Grid field, int row, int col, int i_max, int grid_w
 			s_index = i_max;
 		}
 		size_t c = col - 1;
-		mask_pos = s_index * 200 + 350 + c * grid_wid;
+		mask_pos = s_index * 200 + 350 + c * grid_width;
 	}
 
 	return mask_pos;
 }
 
-double grid_pos03::MeanR(int rows, double* mean0)
+vector<vector<list<int>>> grid_pos03::grid_params(void)
 {
-	double sum = 0.0;
-	double meanR = 0.0;
-	for (int i = 0; i < rows; i++)
+	vector<vector<list<int>>> look_up(200, vector<list<int>>(2));
+
+	for (int i = 0; i < 200; i++)
 	{
-		sum += mean0[i];
+		int col = i % 10;
+		int d_col = (col - 5) * 2 * grid_width;
+
+		int row = (int)(i / 10);
+		int d_row = (row - 10) * grid_height;
+
+		if (((int)(i / 10)) % 2 == 0)
+		{
+			//trial method
+			list<int>i0;
+			i0.push_back(d_row);
+			i0.push_back(d_col);
+			look_up[i][0] = i0;
+
+			list<int>i1;
+			i0.push_back(d_row);
+			i0.push_back(d_col + grid_width);
+			look_up[i][1] = i1;
+		}
+		else
+		{
+			list<int>i0;
+			i0.push_back(d_row);
+			i0.push_back(d_col + grid_width);
+			look_up[i][0] = i0;
+
+			list<int>i1;
+			i1.push_back(d_row);
+			i1.push_back(d_col);
+			look_up[i][1] = i1;
+		}
 	}
 
-	meanR = sum / rows;
-	return meanR;
+	return look_up;
+}
+
+double grid_pos03::weighted_avg(const vector<vector<double>> &center)
+{
+	vector<vector<double>> valid_vals;
+	double av_val = 0.0;
+
+	for (size_t i = 0; i < center.size(); i++)
+	{
+		if (!(any_of(center.begin()[i], center.end()[i], [](double x) { return x == nan(""); })));
+		{
+			valid_vals.push_back(center[i]);
+		}
+
+		try
+		{
+			vector<double> vv_0((int)valid_vals.size());
+			vector<double> vv_1((int)valid_vals.size());
+			vector<double> vv_01((int)valid_vals.size());
+
+			for (size_t i = 0; i < valid_vals.size(); i++)
+			{
+				vv_0[i] = valid_vals[i][0];
+				vv_1[i] = valid_vals[i][1];
+				vv_01[i] = vv_0[i] * vv_1[i];
+			}
+
+			av_val = reduce(vv_01.begin(), vv_01.end()) / reduce(vv_1.begin(), vv_1.end());
+		}
+		catch (const std::out_of_range&)
+		{
+			av_val = nan("");
+		}
+	}
+	return av_val;
 }
 
 struct stage56 grid_pos03::Execute(void)
 {
-	const float px_size = 3.45;
-	list<list<double>> center_hor;
-	list<list<double>> center_ver;
+	vector<vector<double>> center_hor;
+	vector<vector<double>> center_ver;
 	list<int> look_el;
 	int P;
+
+	vector<vector<list<int>>> look_up = grid_params();
 
 	if ((s54.index >= 0) && (s54.index < 200))
 	{
 		if (s54.grids[1][1].orientation == "hor")
 		{
-			look_el.push_back(s54.look_up[s54.index][0].front());
-			look_el.push_back(s54.look_up[s54.index][0].back());
+			look_el.push_back(look_up[s54.index][0].front());
+			look_el.push_back(look_up[s54.index][0].back());
 		}
 		else
 		{
-			look_el.push_back(s54.look_up[s54.index][1].front());
-			look_el.push_back(s54.look_up[s54.index][1].back());
+			look_el.push_back(look_up[s54.index][1].front());
+			look_el.push_back(look_up[s54.index][1].back());
 		}
 	}
 	else
@@ -154,12 +165,12 @@ struct stage56 grid_pos03::Execute(void)
 	{
 		for (int col = 0; col < s54.gridCols; col++)
 		{
-			list<double> center;
+			vector<double> center;
 			Grid field = s54.grids[row][col];
 
 			for (int i_max = 0; i_max < 8; i_max++)
 			{
-				int mask_pos = get_mask_pos(field, row, col, i_max, s54.grid_wid, s54.grid_ht);
+				int mask_pos = get_mask_pos(field, row, col, i_max);
 				if (field.orientation == "hor")
 				{
 					P = mask_pos + look_el.front();
@@ -168,16 +179,12 @@ struct stage56 grid_pos03::Execute(void)
 				{
 					P = mask_pos + look_el.back();
 				}
-				// to do - access i_maxth element from the max_pos list
-				center.push_back((-P * s54.k) + field.max_pos[i_max]() * px_size);
+				center.push_back((-P * s54.k) + field.max_pos.at(i_max) * px_size);
 			}
 
-			double* center_arr = new double[center.size()]();
-			std::copy(center.begin(), center.end(), center_arr);
+			double cen_mean = Evaluation::MeanR(center);
 
-			double cen_mean = MeanR(center.size(), center_arr);
-
-			list<double> t1;
+			vector<double> t1;
 			t1.push_back(cen_mean);
 			t1.push_back(field.px_num);
 
@@ -192,8 +199,8 @@ struct stage56 grid_pos03::Execute(void)
 		}
 	}
 
-	double xi;
-	double zi;
+	s56.xi = weighted_avg(center_ver);
+	s56.zi = weighted_avg(center_hor);
 
 	s56.gridRows = s54.gridRows;
 	s56.gridCols = s54.gridCols;
@@ -201,6 +208,4 @@ struct stage56 grid_pos03::Execute(void)
 	s56.index = s54.index;
 	s56.k = s54.k;
 	s56.ind_ori = s54.ind_ori;
-	s56.xi = xi;
-	s56.zi = zi;
 }

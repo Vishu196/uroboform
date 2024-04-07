@@ -2,6 +2,7 @@
 #include "raw_edges.h"
 #include"Evaluation.h"
 #include "signal_evaluation.h"
+#include "constants.h"
 #include <complex>
 
 struct stage21

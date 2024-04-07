@@ -3,6 +3,7 @@
 #include "grid.h"
 #include"Evaluation.h"
 #include "signal_evaluation.h"
+#include "constants.h"
 #include <numeric>
 
 using namespace std;

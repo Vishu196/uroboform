@@ -17,31 +17,6 @@ grid_pos02::grid_pos02(struct stage34 s34)
 	}
 }
 
-double* grid_pos02::insertXdouble(int size, double* arr, double x, int pos)
-{
-	double* temp = new double[size + 1]();
-	std::copy(arr, arr + size, temp); // Suggested by comments from Nick and Bojan
-
-	if (pos > size)
-		return NULL;
-	if (pos == size)
-	{
-		temp[size] = x;
-	}
-	else
-	{
-		// shift elements forward 
-		for (int i = size; i >= pos; i--)
-		{
-			temp[i] = temp[i - 1];
-		}
-		// insert x at pos 
-		temp[pos] = x;
-	}
-	delete[] arr;
-	return temp;
-}
-
 Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 {
 	for (int row = 0; row < gRows; row++)
@@ -52,7 +27,7 @@ Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 			vector<double> max_pos_arr(r);
 			copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr);
 			vector<double> m_pos_de = Evaluation::decumulateDouble(max_pos_arr);
-			bool con = std::any_of(m_pos_de.begin(), m_pos_de.end(), [](int x) { return x > 100; });
+			bool con = any_of(m_pos_de.begin(), m_pos_de.end(), [](int x) { return x > 100; });
 			while (con)
 			{
 				vector<int> m_pos_de1(r);
@@ -293,56 +268,7 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids)
 	return rd;
 }
 
-struct gParams grid_pos02::grid_params(void)
-{
-	const int g_ht = 1500;
-	const int g_wt = 2000;
-
-	vector<vector<list<int>>> look_up(200, vector<list<int>>(2));
-
-	for (int i = 0; i < 200; i++)
-	{
-		int col = i % 10;
-		int d_col = (col - 5) * 2 * g_wt;
-
-		int row = (int)(i / 10);
-		int d_row = (row - 10) * g_ht;
-
-		if (((int)(i/10)) % 2 == 0)
-		{
-			//trial method
-			list<int>i0;
-			i0.push_back(d_row);
-			i0.push_back(d_col);
-			look_up[i][0] = i0;
-			
-			list<int>i1;
-			i0.push_back(d_row);
-			i0.push_back(d_col + g_wt);
-			look_up[i][1] = i1;
-		}
-		else
-		{
-			list<int>i0;
-			i0.push_back(d_row);
-			i0.push_back(d_col + g_wt);
-			look_up[i][0] = i0;
-
-			list<int>i1;
-			i1.push_back(d_row);
-			i1.push_back(d_col);
-			look_up[i][1] = i1;
-		}
-	}
-	struct gParams para;
-	para.grid_height = g_ht;
-	para.grid_width = g_wt;
-	para.look_up = look_up;
-
-	return para;
-}
-
-int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max, int grid_wid, int grid_ht)
+int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 {
 	size_t s_index = 0;
 	int mask_pos = 0;
@@ -359,7 +285,7 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max, int gri
 			s_index = i_max;
 		}
 		size_t r = row - 1;
-		mask_pos = s_index * 200 + 350 + r * grid_ht;
+		mask_pos = s_index * 200 + 350 + r * grid_height;
 	}
 	else
 	{
@@ -373,13 +299,12 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max, int gri
 			s_index = i_max;
 		}
 		size_t c = col - 1;
-		mask_pos = s_index * 200 + 350 + c * grid_wid;
+		mask_pos = s_index * 200 + 350 + c * grid_width;
 	}
 
 	return mask_pos;
 }
 
-//to do
 double grid_pos02::calc_d_k(vector<vector <double>> lines)
 {
 	double line_0, line_n;
@@ -409,7 +334,7 @@ double grid_pos02::calc_d_k(vector<vector <double>> lines)
 	return (line_n - line_0) / ((lines[-1][0] - lines[0][0]) / 200);
 }
 
-double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size)
+double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols)
 {
 	vector<vector<double>>lines_hor;
 	vector<vector<double>> lines_ver;
@@ -424,24 +349,24 @@ double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols, int grid_wid, i
 				if (field.orientation == "hor")
 				{
 					vector<double> h1;
-					h1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
+					h1.push_back(get_mask_pos(field, row, col, 0));
 					h1.push_back(field.max_pos.front());
 					lines_hor.push_back(h1);
 					
 					vector<double> h2;
-					h2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
+					h2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1));
 					h2.push_back(field.max_pos.back());
 					lines_hor.push_back(h2);
 				}
 				else
 				{
 					vector<double> v1;
-					v1.push_back(get_mask_pos(field, row, col, 0, grid_wid, grid_ht));
+					v1.push_back(get_mask_pos(field, row, col, 0));
 					v1.push_back(field.max_pos.front());
 					lines_ver.push_back(v1);
 
 					vector<double> v2;
-					v2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1, grid_wid, grid_ht));
+					v2.push_back(get_mask_pos(field, row, col, field.max_pos.size() - 1));
 					v2.push_back(field.max_pos.back());
 					lines_ver.push_back(v2);
 				}
@@ -467,14 +392,6 @@ double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols, int grid_wid, i
 
 struct stage45 grid_pos02::Execute(void)
 {
-	const float px_size = 3.45;
-
-	struct gParams P = grid_params();
-
-	int grid_width = P.grid_width;
-	int grid_height = P.grid_height;
-	s45.look_up = P.look_up;
-
 	s45.grids = checkGrid(s43.grids, s43.gridRows, s43.gridCols);
 
 	struct RdBinary I = ReadBinary(s45.grids);
@@ -497,13 +414,11 @@ struct stage45 grid_pos02::Execute(void)
 			}
 		}
 	}
-	double d_k = get_d_k(s45.grids, s43.gridRows, s43.gridCols, grid_width, grid_height, px_size);
+	double d_k = get_d_k(s45.grids, s43.gridRows, s43.gridCols);
 	s45.k = d_k * px_size / 200;
 
 	s45.gridRows = s43.gridRows;
 	s45.gridCols = s43.gridCols;
-	s45.grid_ht = grid_height;
-	s45.grid_wid = grid_width;
 	s45.index = I.index;
 	s45.ind_ori = I.ind_ori;
 

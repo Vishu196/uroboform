@@ -159,6 +159,7 @@
     <ClInclude Include="grid_pos01.h" />
     <ClInclude Include="grid_pos02.h" />
     <ClInclude Include="grid_pos03.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="raw_edges.h" />
     <ClInclude Include="signal_evaluation.h" />

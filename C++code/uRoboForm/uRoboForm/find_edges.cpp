@@ -316,7 +316,6 @@ struct stage23 find_edges::Execute(void)
 	{	
 		double s_max, s_min;
 		const size_t mid = s21.mean0.size() / 2;
-		const int search_range = 150;
 		size_t i0 = mid - search_range;
 		size_t i1 = mid + search_range;
 		size_t R = i1 - i0;

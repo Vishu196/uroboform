@@ -24,40 +24,32 @@ struct stage45
 	int index;
 	double k;
 	string ind_ori;
-	int grid_wid;
-	int grid_ht;
-	vector<vector<list<int>>> look_up;
+
+	stage45() :gridRows(0), gridCols(0), index(0), k(0.0)
+	{};
 };
 
 struct RdBinary
 {
 	int index;
 	string ind_ori;
-};
 
-struct gParams
-{
-	int grid_height;
-	int grid_width;
-	vector<vector<list<int>>> look_up;
+	RdBinary() : index(0), ind_ori()
+	{};
 };
 
 class grid_pos02
 {
 private:
 
-	
-	double* insertXdouble(int size, double* arr, double x, int pos);
 	Grid** checkGrid(Grid** &grids01, int gRows, int gCols);
 	vector<int> linspace(double start, double end, int num);
 	struct RdBinary ReadBinary(Grid** &cgrids);
-	struct gParams grid_params(void);
-	int get_mask_pos(Grid field, int row, int col, size_t i_max, int grid_wid, int grid_ht);
+	int get_mask_pos(Grid field, int row, int col, size_t i_max);
 	double calc_d_k(vector<vector<double>> lines);
-	double get_d_k(Grid** &cgrids, int gRows, int gCols, int grid_wid, int grid_ht, double px_size);
+	double get_d_k(Grid** &cgrids, int gRows, int gCols);
 
 public:
-
 	grid_pos02(struct stage34 s34);
 	struct stage45 Execute(void);
 };

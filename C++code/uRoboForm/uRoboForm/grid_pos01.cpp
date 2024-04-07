@@ -514,10 +514,6 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, flo
 
 int grid_pos01::Execute(void) 
 {
-	const int h1 = 800;
-	const int h2 = 20;
-	const int stripe_width = 100;
-	const float px_size = 3.45;
 	string mode = "gauss";
 	string orientation;
 	Grid** grids = 0;
