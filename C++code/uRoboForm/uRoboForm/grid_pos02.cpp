@@ -223,7 +223,7 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 			double th = amin + ((mean - amin) * 0.85);
 
 			vector<int>code_bin(9);
-			for (size_t i : code_mean)
+			for (size_t i = 0; i < code_mean.size(); i++)
 			{
 				code_bin[i] = code_mean[i] < th ? 1 : 0;
 			}
@@ -295,7 +295,7 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 
 double grid_pos02::calc_d_k(vector<vector <double>> lines)
 {
-	int n = lines.size();
+	size_t n = lines.size();
 	const int n1 = n - 1;
 	const int n2 = n - 3;
 	double line_0, line_n;

@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	find_edges edge{};
 	grid_pos01 grid0{};
 	grid_pos02 index{};
-
+	grid_pos03 center{};
 
 	auto t01 = high_resolution_clock::now();
 
@@ -90,6 +90,8 @@ int main(int argc, char* argv[])
 	grid0.Execute(edge.getNext());
 
 	index.Execute(grid0.getNext());
+
+	stage56 s56 = center.Execute(index.getNext());
 	
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());

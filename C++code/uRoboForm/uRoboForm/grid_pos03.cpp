@@ -79,37 +79,40 @@ vector<vector<list<int>>> grid_pos03::grid_params(void)
 	return look_up;
 }
 
+bool is_x_nan(double x)
+{
+	return x == nan("");
+}
 double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 {
 	vector<vector<double>> valid_vals;
 	double av_val = 0.0;
 
-	for (size_t i = 0; i < center.size(); i++)
+	for (int i = 0; i < center.size(); i++)
 	{
-		if (!(any_of(center.begin()[i], center.end()[i], [](double x) { return x == nan(""); })));
+		if (!(any_of(center[i].begin(), center[i].end(), is_x_nan)));
 		{
 			valid_vals.push_back(center[i]);
 		}
+	}
+	try
+	{
+		vector<double> vv_0((int)valid_vals.size());
+		vector<double> vv_1((int)valid_vals.size());
+		vector<double> vv_01((int)valid_vals.size());
 
-		try
+		for (size_t i = 0; i < valid_vals.size(); i++)
 		{
-			vector<double> vv_0((int)valid_vals.size());
-			vector<double> vv_1((int)valid_vals.size());
-			vector<double> vv_01((int)valid_vals.size());
-
-			for (size_t i = 0; i < valid_vals.size(); i++)
-			{
-				vv_0[i] = valid_vals[i][0];
-				vv_1[i] = valid_vals[i][1];
-				vv_01[i] = vv_0[i] * vv_1[i];
-			}
-
-			av_val = reduce(vv_01.begin(), vv_01.end()) / reduce(vv_1.begin(), vv_1.end());
+			vv_0[i] = valid_vals[i][0];
+			vv_1[i] = valid_vals[i][1];
+			vv_01[i] = vv_0[i] * vv_1[i];
 		}
-		catch (const std::out_of_range&)
-		{
-			av_val = nan("");
-		}
+
+		av_val = reduce(vv_01.begin(), vv_01.end()) / reduce(vv_1.begin(), vv_1.end());
+	}
+	catch (const std::out_of_range&)
+	{
+		av_val = nan("");
 	}
 	return av_val;
 }
