@@ -83,6 +83,16 @@ double raw_edges::Calc_main_d(const vector<double> &mean0, int freq_range)
 	return main_d;
 }
 
+void raw_edges::DisplayResult(const stage12 &s12)
+{
+	fifo.push(s12);
+
+	cout << "main_d_0: " << s12.main_d_0 << endl;
+	cout << "main_d_1: " << s12.main_d_1 << endl;
+	cout << "Stage 1 complete." << endl;
+
+}
+
 void raw_edges::ExecuteR(Mat Image, int freq_range)
 {
 	stage12 s12;
@@ -100,9 +110,5 @@ void raw_edges::ExecuteR(Mat Image, int freq_range)
 	s12.img = Image;
 	s12.img2 = Image2;
 
-	fifo.push(s12);
-
-	cout << "main_d_0: " << s12.main_d_0 << endl;
-	cout << "main_d_1: " << s12.main_d_1 << endl;
-	cout << "Stage 1 complete." << endl;
+	DisplayResult(s12);
 }

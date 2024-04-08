@@ -26,6 +26,7 @@ private:
 	Mat ImageSliceR (Mat ImageR, int n);
 	double Main_FreqR (const vector<double> &B0, int start, int stop);
 	double Calc_main_d(const vector<double> &mean0, int freq_range);
+	void DisplayResult(const stage12& s12);
 	cqueue<stage12> fifo;
 
 public:

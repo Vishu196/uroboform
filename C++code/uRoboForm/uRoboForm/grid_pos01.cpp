@@ -1,18 +1,5 @@
 #include "grid_pos01.h"
 
-static struct stage32 s32;
-static struct stage34 s34;
-
-grid_pos01::grid_pos01(struct stage23 s23)
-{
-	std::copy(s23.cut_hor.begin(), s23.cut_hor.end(), std::back_inserter(s32.cut_hor));
-	std::copy(s23.cut_ver.begin(), s23.cut_ver.end(), std::back_inserter(s32.cut_ver));
-
-	s32.img = s23.img.clone();
-	s32.img2 = s23.img2.clone();
-
-}
-
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
 	size_t x_size = x.size();
@@ -437,7 +424,7 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 	return p;
 }
 
-struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, float px_size, string mode)
+struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, double px_size, string mode)
 {
 	int y = cutGrid.cols;
 	struct subPX p;
@@ -512,60 +499,63 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, flo
 	return p;
 }
 
-int grid_pos01::Execute(void) 
+void grid_pos01::Execute(stage23 s23) 
 {
+	stage34 s34;
 	string mode = "gauss";
 	string orientation;
-	Grid** grids = 0;
+	s34.grids = 0;
 
-	if ((s32.cut_ver.size() >= 2) && (s32.cut_hor.size() >= 2))
+	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
 	{
-		if (s32.cut_ver.front() * 2 < 10)
+		if (s23.cut_ver.front() * 2 < 10)
 		{
-			s32.cut_ver.pop_front();
+			s23.cut_ver.pop_front();
 		}
 
-		if (s32.cut_hor.front() * 2 < 10)
+		if (s23.cut_hor.front() * 2 < 10)
 		{
-			s32.cut_hor.pop_front();
+			s23.cut_hor.pop_front();
 		}
 
-		s32.cut_hor.push_front(0);
-		s32.cut_ver.push_front(0);
+		s23.cut_hor.push_front(0);
+		s23.cut_ver.push_front(0);
 
-		s32.cut_hor.push_back(s32.img.rows / 2);
-		s32.cut_ver.push_back(s32.img.cols / 2);
+		s23.cut_hor.push_back(s23.img.rows / 2);
+		s23.cut_ver.push_back(s23.img.cols / 2);
 
-		int* cut_hor_arr = new int[s32.cut_hor.size()]();
-		std::copy(s32.cut_hor.begin(), s32.cut_hor.end(), cut_hor_arr);
+		int* cut_hor_arr = new int[s23.cut_hor.size()]();
+		std::copy(s23.cut_hor.begin(), s23.cut_hor.end(), cut_hor_arr);
 
-		int* cut_ver_arr = new int[s32.cut_ver.size()]();
-		std::copy(s32.cut_ver.begin(), s32.cut_ver.end(), cut_ver_arr);
+		int* cut_ver_arr = new int[s23.cut_ver.size()]();
+		std::copy(s23.cut_ver.begin(), s23.cut_ver.end(), cut_ver_arr);
 
-		//Mat grids(s32.cut_hor.size(), s32.cut_ver.size(), Grid);
-		grids = new Grid* [s32.cut_hor.size()];
-		for (int h = 0; h < s32.cut_hor.size(); h++)
+		//Mat grids(s23.cut_hor.size(), s23.cut_ver.size(), Grid);
+		s34.grids = new Grid* [s23.cut_hor.size()];
+		for (int h = 0; h < s23.cut_hor.size(); h++)
 		{
-			grids[h] = new Grid[s32.cut_ver.size()];
+			s34.grids[h] = new Grid[s23.cut_ver.size()];
 		}
 
-		//memset(grids, 0, sizeof(grids[0][0]) * s32.cut_hor.size() * s32.cut_ver.size());
+		//memset(grids, 0, sizeof(grids[0][0]) * s23.cut_hor.size() * s23.cut_ver.size());
 
-		int image_size = s32.img.cols * s32.img.rows;
+		int image_size = s23.img.cols * s23.img.rows;
 		double five_percent = image_size * 0.05;
 
-		for (int row = 0; row < (s32.cut_hor.size()-1); row++)
+		for (int row = 0; row < (s23.cut_hor.size()-1); row++)
 		{
-			for (int col = 0; col < (s32.cut_ver.size()-1); col++)
+			for (int col = 0; col < (s23.cut_ver.size()-1); col++)
 			{
+				int a = row + 1;
+				int b = col + 1;
 				int x1 = cut_hor_arr[row] * 2;
-				int x2 = (cut_hor_arr[row + 1]) * 2;
+				int x2 = cut_hor_arr[a] * 2;
 				int y1 = cut_ver_arr[col] * 2;
-				int y2 = (cut_ver_arr[col + 1]) * 2;
+				int y2 = cut_ver_arr[b] * 2;
 				int s1 = x2 - x1;
 				int s2 = y2 - y1;
 
-				Mat grid0(s1, s2, CV_8U, (int)s32.img.step);
+				Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
 				uint8_t* grid0Data = grid0.data;
 
 				if (x2>x1 && y2>y1)
@@ -577,7 +567,7 @@ int grid_pos01::Execute(void)
 							int o = x - x1;
 							int p = y - y1;
 							
-							int val = s32.img.data[x * s32.img.step + y];
+							int val = s23.img.data[x * s23.img.step + y];
 							size_t idx = (o * grid0.step + p);
 							*(grid0Data + idx) = val;
 						}
@@ -591,7 +581,7 @@ int grid_pos01::Execute(void)
 				int w1 = x22 - x11;
 				int w2 = y22 - y11;
 
-				Mat mean2(w1, w2, CV_8U, (int)s32.img2.step);
+				Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
 				uint8_t* mean2Data = mean2.data;
 
 				for (int x = x11; x < x22; x++)
@@ -601,10 +591,9 @@ int grid_pos01::Execute(void)
 						int o = x - x11;
 						int p = y - y11;
 
-						int val = s32.img2.data[x * s32.img2.step + y];
+						int val = s23.img2.data[x * s23.img2.step + y];
 						size_t idx = (o * mean2.step + p);
 						*(mean2Data + idx) = val;
-						//mean2.data[o * mean2.step + p] = s32.img2.data[x * s32.img2.step + y];
 					}
 				}
 
@@ -721,25 +710,19 @@ int grid_pos01::Execute(void)
 				vector<int> coord(2);
 				coord[0]=(cut_hor_arr[row] * 2);
 				coord[1]=(cut_ver_arr[col] * 2);
-				grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
+				s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
 			}
 		}
 		
-		s34.img = s32.img;
-
-		s34.gridRows = (int)s32.cut_hor.size();
-		s34.gridCols = (int)s32.cut_ver.size();
-
-		for (int i = 0; i < s32.cut_hor.size(); i++)
-		{
-			memcpy(s34.grids[i], grids[i], (s32.cut_ver.size() * sizeof(Grid)));
-		}
+		s34.img = s23.img;
+		s34.gridRows = (int)s23.cut_hor.size();
+		s34.gridCols = (int)s23.cut_ver.size();
 	}
 	
 	else
 	{
-		grids = {};
+		s34.grids = {};
 	}
 
-	return 0;
+	//return 0;
 }

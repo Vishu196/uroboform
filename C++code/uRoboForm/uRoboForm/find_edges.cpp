@@ -1,7 +1,6 @@
 #include "find_edges.h"
 #include <cmath>
 
-
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
 	size_t n = arr.size();
@@ -280,7 +279,21 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 	return cut_list;
 }
 
-struct stage23 find_edges::Execute(stage12 s12)
+void find_edges::DisplayResult(const stage23 &s23)
+{
+	fifo.push(s23);
+
+	cout << "cut_hor: ";
+	for (auto v : s23.cut_hor)
+		cout << v << ",";
+	cout << endl << "cut_ver: ";
+	for (auto v : s23.cut_ver)
+		cout << v << ",";
+	cout << endl;
+	cout << "Stage 2 complete." << endl;
+}
+
+void find_edges::Execute(stage12 s12)
 {
 	stage23 s23;
 	
@@ -493,14 +506,6 @@ struct stage23 find_edges::Execute(stage12 s12)
 	s23.img = s12.img.clone();
 	s23.img2 = s12.img2.clone();
 
-	cout << "cut_hor: ";
-	for (auto v : s23.cut_hor)
-		cout << v << ",";
-	cout << endl << "cut_ver: ";
-	for (auto v : s23.cut_ver)
-		cout << v << ",";
-	cout << endl;
-	cout << "Stage 2 complete." << endl;
+	DisplayResult(s23);
 	
-	return s23;
 }

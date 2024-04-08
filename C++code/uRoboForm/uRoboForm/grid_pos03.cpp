@@ -1,24 +1,5 @@
 #include "grid_pos03.h"
 
-static struct stage54 s54;
-static struct stage56 s56;
-
-grid_pos03::grid_pos03(struct stage45 s45)
-{
-	s54.gridRows = s45.gridRows;
-	s54.gridCols = s45.gridCols;
-
-	for (int i = 0; i < s45.gridRows; i++)
-	{
-		memcpy(s54.grids[i], s45.grids[i], (s45.gridCols * sizeof(Grid)));
-	}
-
-	s54.index = s45.index;
-	s54.k = s45.k;
-	s54.ind_ori = s45.ind_ori;
-	
-}
-
 int grid_pos03::get_mask_pos(Grid field, int row, int col, size_t i_max)
 {
 	size_t s_index = 0;
@@ -133,8 +114,18 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	return av_val;
 }
 
-struct stage56 grid_pos03::Execute(void)
+void grid_pos03::DisplayResult(const stage56& s56)
 {
+	fifo.push(s56);
+
+	cout << "xi: " << s56.xi << endl;
+	cout << "zi: " << s56.zi << endl;
+	cout << "grid_pos03 complete." << endl;
+}
+
+stage56 grid_pos03::Execute(stage45 s45)
+{
+	stage56 s56;
 	vector<vector<double>> center_hor;
 	vector<vector<double>> center_ver;
 	list<int> look_el;
@@ -142,17 +133,17 @@ struct stage56 grid_pos03::Execute(void)
 
 	vector<vector<list<int>>> look_up = grid_params();
 
-	if ((s54.index >= 0) && (s54.index < 200))
+	if ((s45.index >= 0) && (s45.index < 200))
 	{
-		if (s54.grids[1][1].orientation == "hor")
+		if (s45.grids[1][1].orientation == "hor")
 		{
-			look_el.push_back(look_up[s54.index][0].front());
-			look_el.push_back(look_up[s54.index][0].back());
+			look_el.push_back(look_up[s45.index][0].front());
+			look_el.push_back(look_up[s45.index][0].back());
 		}
 		else
 		{
-			look_el.push_back(look_up[s54.index][1].front());
-			look_el.push_back(look_up[s54.index][1].back());
+			look_el.push_back(look_up[s45.index][1].front());
+			look_el.push_back(look_up[s45.index][1].back());
 		}
 	}
 	else
@@ -161,12 +152,12 @@ struct stage56 grid_pos03::Execute(void)
 		look_el.push_back(0);
 	}
 
-	for (int row = 0; row < s54.gridRows; row++)
+	for (int row = 0; row < s45.gridRows; row++)
 	{
-		for (int col = 0; col < s54.gridCols; col++)
+		for (int col = 0; col < s45.gridCols; col++)
 		{
 			vector<double> center;
-			Grid field = s54.grids[row][col];
+			Grid field = s45.grids[row][col];
 
 			for (int i_max = 0; i_max < 8; i_max++)
 			{
@@ -179,7 +170,7 @@ struct stage56 grid_pos03::Execute(void)
 				{
 					P = mask_pos + look_el.back();
 				}
-				center.push_back((-P * s54.k) + field.max_pos.at(i_max) * px_size);
+				center.push_back((-P * s45.k) + field.max_pos.at(i_max) * px_size);
 			}
 
 			double cen_mean = Evaluation::MeanR(center);
@@ -202,10 +193,13 @@ struct stage56 grid_pos03::Execute(void)
 	s56.xi = weighted_avg(center_ver);
 	s56.zi = weighted_avg(center_hor);
 
-	s56.gridRows = s54.gridRows;
-	s56.gridCols = s54.gridCols;
-	s56.grids = s54.grids;
-	s56.index = s54.index;
-	s56.k = s54.k;
-	s56.ind_ori = s54.ind_ori;
+	s56.gridRows = s45.gridRows;
+	s56.gridCols = s45.gridCols;
+	s56.grids = s45.grids;
+	s56.index = s45.index;
+	s56.k = s45.k;
+	s56.ind_ori = s45.ind_ori;
+
+	DisplayResult(s56);
+	return s56;
 }

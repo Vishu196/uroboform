@@ -2,11 +2,11 @@
 #include <iostream>
 #include <string>
 #include <chrono>
-
+#include <fstream>
 #include "constants.h"
 #include "raw_edges.h"
 #include "find_edges.h"
-//#include "grid_pos01.h"
+#include "grid_pos.h"
 
 using namespace cv;
 using namespace std;
