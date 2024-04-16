@@ -3,11 +3,11 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
 
-class Grid {
+class Grid
+{
     public:
-    Grid(Mat image, string orientation, vector<int> coord, vector<double> max_pos)
+    Grid(cv::Mat image, std::string orientation, std::vector<int> coord, std::vector<double> max_posi)
     {
         this->image = image;
         this->px_num = image.rows * image.cols;
@@ -15,27 +15,29 @@ class Grid {
         this->im_loc = coord;
             if (orientation == "hor")
             {
-                for (double& d : max_pos)
-                    d += coord[0];
-                //transform(max_pos.begin(), max_pos.end(), max_pos.begin(), [&](double x) {x + coord[0]; });
-                this->max_pos = max_pos;
+                for (int i = 0; i < max_posi.size(); i++)
+                {
+                    this->max_pos.push_back(max_posi[i] + coord[0]);
+                }
+                max_pos.resize(max_posi.size());
             }
             else
             {
-                for (double& d : max_pos)
-                    d += coord[1];
-                //transform(max_pos.begin(), max_pos.end(), max_pos.begin(), [&](double x) {x + coord[1]; });
-                this->max_pos = max_pos;
+                for (int i = 0; i < max_posi.size(); i++)
+                {
+                    this->max_pos.push_back(max_posi[i] + coord[1]);
+                }
+                max_pos.resize(max_posi.size());            
             }
         
     }
 
     Grid() = default;
 
-    Mat image;
+    cv::Mat image;
     int px_num =0;
     std::string orientation;
-    vector<int> im_loc;
-    vector<double> max_pos;
+    std::vector<int> im_loc;
+    std::vector<double> max_pos;
 };
 

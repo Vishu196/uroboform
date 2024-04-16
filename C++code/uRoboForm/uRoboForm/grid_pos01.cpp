@@ -1,5 +1,8 @@
 #include "grid_pos01.h"
 
+using namespace std;
+using namespace cv;
+
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
 	size_t x_size = x.size();
@@ -114,9 +117,9 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double prom)
 {
 	size_t n = arr.size();
-	double maxVal = *max_element(arr.begin(), arr.end());
-	vector<int> stripes(n);
-	vector<double> s_dic(n);
+	vector<int> peaksIndices(50);
+	vector<double> peaksValues(50);
+	vector<double> peaksProminence(50);
 	int a = 0;
 	int count = 0;
 
@@ -126,17 +129,17 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 		int f = i + 1;
 		if (arr[i] >= arr[e] && arr[i] >= arr[f])
 		{
-				stripes[a] = i;
-				s_dic[a] = arr[i];
+			peaksIndices[a] = i;
+			peaksValues[a] = arr[i];
 				a++;
 				if (a > 0)
 				{
 					int a1 = a - 1;
 					int a2 = a + 1;
-					if (stripes[a] - stripes[a1] < dist)
+					if (peaksIndices[a] - peaksIndices[a1] < dist)
 					{
-						stripes[a] = stripes[a2];
-						s_dic[a] = s_dic[a2];
+						peaksIndices[a] = peaksIndices[a2];
+						peaksValues[a] = peaksValues[a2];
 						count++;						
 					}
 				}
@@ -144,86 +147,45 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 		}
 	}
 	
-	if (prom > 0.0)
-	{
-		for (int i = 0; i < count; i++)
-		{
-			if ((maxVal - s_dic[i]) > prom)
-			{
-				stripes.erase(stripes.begin() + i);
-				s_dic.erase(s_dic.begin() + i);
-				count--;
-			}
+	for (int i = 0; i < count; ++i) {
+		int peakIndex = peaksIndices[i];
 
+		// Find left and right bases
+		int leftBaseIndex = peakIndex;
+		while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex]) 
+		{
+			--leftBaseIndex;
+		}
+
+		int rightBaseIndex = peakIndex;
+		while (rightBaseIndex < arr.size() - 1 && arr[rightBaseIndex + 1] < arr[rightBaseIndex]) 
+		{
+			++rightBaseIndex;
+		}
+
+		double leftBaseValue = arr[leftBaseIndex];
+		double rightBaseValue = arr[rightBaseIndex];
+
+		//double peakValue = arr[peakIndex];
+
+		// Calculate prominence as the difference between peak value and the maximum of left and right bases
+		peaksProminence[i] = peaksValues[i] - std::max(leftBaseValue, rightBaseValue);
+		if (peaksProminence[i] < prom)
+		{
+			peaksValues.erase(peaksValues.begin() + i);
+			peaksIndices.erase(peaksIndices.begin() + i);
+			count--;
 		}
 	}
-
-	else
-	{
-		for (int i = 0; i < count; i++)
-		{
-			if ((maxVal - s_dic[i]) < prom)
-			{
-				stripes.erase(stripes.begin() + i);
-				s_dic.erase(s_dic.begin() + i);
-				count--;
-			}
-
-		}
-	}
-	stripes.resize(count);
-	s_dic.resize(count);
+	
+	peaksIndices.resize(count);
+	peaksValues.resize(count);
 
 	struct FP peaks;
-	peaks.stripes = stripes;
-	peaks.s_dic = s_dic;
-	
+	peaks.stripes = peaksIndices;
+	peaks.s_dic = peaksValues;
+
 	return peaks;
-}
-
-struct MFreq grid_pos01::Main_FreqR(const vector<double> &B0, int start, int stop)
-{
-	double f_g = 0.0;
-	const int size = stop - start;
-
-	vector<double> B (size);
-
-	vector<double> image_window (size);
-
-	for (int k = 0; k < size; k++)
-	{
-		int w = k + start;
-		B[k] = B0[w];
-	}
-
-	double Mean = Evaluation::MeanR(B);
-
-	vector<double> B1(size);
-
-	for (int i = 0; i < size; i++)
-	{
-		double x = B[i] - Mean;
-		B1[i] = x;
-	}
-
-	vector<double> wFun = signal_evaluation::BlackmanWindowR(size);
-	for (int i = 0; i < size; i++)
-	{
-		image_window[i] = B1[i] * wFun[i];
-	}
-
-	vector<double> y1 = signal_evaluation::FFTR(image_window);
-
-	double n_g = signal_evaluation::Spek_InterpolR(y1);
-	uint32_t size_B = size;
-	f_g = n_g / size_B;
-
-	struct MFreq mf;
-	mf.Image_window = image_window;
-	mf.n_g = n_g;
-	mf.f_g = f_g;
-
-	return mf;
 }
 
 //to do
@@ -237,8 +199,8 @@ struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_ma
 	struct subPX p;
 	p.max_pos;
 	p.pres;
-	int xmin;
-	int xmax;
+	int xmin = 0;
+	int xmax = 0;
 
 	for (int i_b = 0; i_b < B_max.stripes.size(); i_b++)
 	{
@@ -267,7 +229,7 @@ struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_ma
 			}
 			catch (const runtime_error)
 			{
-				cout << "Optimal Parameters not found for image at x =' " << mid << endl;
+				//cout << "Optimal Parameters not found for image at x =' " << mid << endl;
 			}
 			catch (std::exception&)
 			{
@@ -284,62 +246,69 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 {
 	subPX p;
 	p.max_pos;
-	int xmin{};
-	int xmax{};
-
-	for (int i_b = 0; i_b < B_max.stripes.size(); i_b++)
+	
+	for (int va = 0; va < B_max.stripes.size(); va++)
 	{
-		int mid = B_max.stripes[i_b];
+		int i_b = B_max.stripes[va];
+		int mid = i_b;
 
 		if (B_min.stripes.size() >= 2)
 		{
-			for (int i_0 = 0; i_0 < B_min.stripes.size(); i_0++)
+			int xmin{};
+			int xmax{};
+
+			for (int vb = 0; vb < B_min.stripes.size(); vb++)
 			{
-				if (B_min.stripes[i_0] < mid)
-					xmin = int(i_b-d_m/4)+3;
+				int i_0 = B_min.stripes[vb];
+				if (i_0 < mid)
+					xmin = int(i_b - d_m/4)+3;
 			}
-			for (int i_1 = 0; i_1 <= B_min.stripes.size(); i_1++)
+			for (int c = B_min.stripes.size()-1; c>=0 ; c--)
 			{
-				if (B_min.stripes[B_min.stripes.size() - i_1] > mid)
-					xmax = int(i_b + d_m / 4) + 3;
+				int i_1 = B_min.stripes[c];
+				if (i_1 > mid)
+					xmax = int(i_b + d_m / 4);
 			}
 
 			try
 			{
-				if (xmin != xmax)
+				if ((xmin != xmax) && (xmin != 0) && (xmax != 0))
 				{
-					int i = 0;
+					int l = 0;
 					int x_size = xmax - xmin;
 					vector<int> x (x_size);
-					for (int p = xmin; p < xmax; p++)
+					for (int k = xmin; k < xmax; k++)
 					{
-						x[i] = p;
-						i++;
+						x[l] = k;
+						l++;
 					}
 
-					Mat W0 = Mat::eye(x_size,x_size,CV_8U);
+					
+					Mat W0 = Mat::eye(x_size,x_size, CV_64F);
+					Mat Phi(x_size, 3, CV_64F);
 
-					Mat col_x3(x_size,1, CV_8U);
-					for (int i = 0; i < x_size; i++)
+					for (int i = 0; i < Phi.rows; i++)
 					{
-						col_x3.data[i*col_x3.step+1] = x[i] * x[i];
+						Phi.at<double>(i, 0) = 1;
+						Phi.at<double>(i, 1) = x[i];
+						Phi.at<double>(i, 2) = x[i] * x[i];
 					}
-
-					Mat Phi(x_size, 3, CV_8U);
-					Phi.col(0).setTo(1);
-					Phi.col(1).copyTo(x);
-					Phi.col(2).copyTo(col_x3);
-
+					/*cout << "Phi:" << Phi << endl;
+					cout << "W0:" << W0 << endl;*/
 					Mat PhiT = Phi.t();
-				
-					Mat B_cut01(x_size, 1, CV_8U);
-					for (int i = xmin; i < xmax; i++)
+					
+					int u = 0;
+					Mat B_cut01(x_size, 1, CV_64F);
+					for (int t = xmin; t < xmax; t++)
 					{
-						B_cut01.data[i * B_cut01.step + 1] = B_cut[i];
+						B_cut01.at<double>(u, 0) = B_cut[t];
+						u++;
 					}
 
-					Mat a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
-					p.max_pos.push_back(-a_dach0.at<double>(1) / a_dach0.at<double>(2) / 2);
+					Mat a_dach0(3, 1, CV_64F);
+					a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
+					//cout << "a_dach0:" << a_dach0 << endl;
+					p.max_pos.push_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
 
 				}
 			}
@@ -368,7 +337,7 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 	int y = cutGrid.cols;
 	if (y >=60)
 	{
-		struct MFreq m = Main_FreqR(B0, 0, y);
+		struct MFreq m = signal_evaluation::Main_FreqR(B0, 0, y);
 		double d_mean = 1 / m.f_g;
 
 		vector<int> B_arange(y);
@@ -485,7 +454,7 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 			if (mode == "gauss")
 			{
 				int e = 0;
-			  p = subpx_gauss(B_cut, B_max,B_min, d_m);
+			  //p = subpx_gauss(B_cut, B_max,B_min, d_m);
 			}
 
 			else if (mode == "parabel")
@@ -502,9 +471,9 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 void grid_pos01::Execute(stage23 s23) 
 {
 	stage34 s34;
-	string mode = "gauss";
+	string mode = "parabel";
 	string orientation;
-	s34.grids = 0;
+	s34.grids = {};
 
 	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
 	{
@@ -524,30 +493,30 @@ void grid_pos01::Execute(stage23 s23)
 		s23.cut_hor.push_back(s23.img.rows / 2);
 		s23.cut_ver.push_back(s23.img.cols / 2);
 
-		int* cut_hor_arr = new int[s23.cut_hor.size()]();
+		int* cut_hor_arr = new int[(int)s23.cut_hor.size()];
 		std::copy(s23.cut_hor.begin(), s23.cut_hor.end(), cut_hor_arr);
 
-		int* cut_ver_arr = new int[s23.cut_ver.size()]();
+		int* cut_ver_arr = new int[(int)s23.cut_ver.size()];
 		std::copy(s23.cut_ver.begin(), s23.cut_ver.end(), cut_ver_arr);
 
-		//Mat grids(s23.cut_hor.size(), s23.cut_ver.size(), Grid);
 		s34.grids = new Grid* [s23.cut_hor.size()];
 		for (int h = 0; h < s23.cut_hor.size(); h++)
 		{
 			s34.grids[h] = new Grid[s23.cut_ver.size()];
 		}
 
-		//memset(grids, 0, sizeof(grids[0][0]) * s23.cut_hor.size() * s23.cut_ver.size());
+		//memset(s34.grids, 0, sizeof(s34.grids[0][0]) * s23.cut_hor.size() * s23.cut_ver.size());
 
 		int image_size = s23.img.cols * s23.img.rows;
 		double five_percent = image_size * 0.05;
 
 		for (int row = 0; row < (s23.cut_hor.size()-1); row++)
 		{
+			int b = 0;
 			for (int col = 0; col < (s23.cut_ver.size()-1); col++)
 			{
 				int a = row + 1;
-				int b = col + 1;
+				b = col + 1;
 				int x1 = cut_hor_arr[row] * 2;
 				int x2 = cut_hor_arr[a] * 2;
 				int y1 = cut_ver_arr[col] * 2;
@@ -691,7 +660,7 @@ void grid_pos01::Execute(stage23 s23)
 					
 					vector <double> max_pos_de = Evaluation::decumulateDouble(p.max_pos);
 					
-					if ((r>1) && (max_pos_de[r]>65))
+					if ((r>1) && (max_pos_de.back()>65))
 					{
 						p.max_pos.pop_back();
 					}
@@ -703,20 +672,23 @@ void grid_pos01::Execute(stage23 s23)
 				}
 				else
 				{
-					p.max_pos.clear();
+					p.max_pos = {};
 					p.pres.clear();
 				}
 
-				vector<int> coord(2);
+				vector<int>coord(2);
 				coord[0]=(cut_hor_arr[row] * 2);
 				coord[1]=(cut_ver_arr[col] * 2);
 				s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
+				/*vector<double> max_p = s34.grids[row][col].max_pos;
+				for(auto vi:max_p)
+					cout << vi << endl;*/
 			}
 		}
 		
 		s34.img = s23.img;
-		s34.gridRows = (int)s23.cut_hor.size();
-		s34.gridCols = (int)s23.cut_ver.size();
+		s34.gridRows = (int)s23.cut_hor.size()-1;
+		s34.gridCols = (int)s23.cut_ver.size()-1;
 	}
 	
 	else
@@ -724,5 +696,11 @@ void grid_pos01::Execute(stage23 s23)
 		s34.grids = {};
 	}
 
-	//return 0;
+	fifo.push(s34);
+	cout << "Stage 3 complete" << endl;
+	cout << "GridRows: " << s34.gridRows << endl;
+	cout << "GridCols: " << s34.gridCols << endl;
+
+	
+	//return s34;
 }

@@ -6,12 +6,11 @@
 #include "constants.h"
 #include "cqueue.h"
 #include <numeric>
-
-using namespace std;
+#include <iostream>
 
 struct stage34
 {
-	Mat img;
+	cv::Mat img;
 	int gridRows;
 	int gridCols;
 	Grid** grids; 
@@ -22,35 +21,27 @@ struct stage34
 
 struct subPX
 {
-	vector<double> max_pos;
-	vector<double> pres;
+	std::vector<double> max_pos;
+	std::vector<double> pres;
 };
 
 struct FP
 {
-	vector<int> stripes;
-	vector<double> s_dic;
-};
-
-struct MFreq
-{
-	vector<double> Image_window;
-	double f_g;
-	double n_g;
+	std::vector<int> stripes;
+	std::vector<double> s_dic;
 };
 
 class grid_pos01
 {
 private:
 	
-	vector<double> gradient(const vector<double> &x);
-	struct FP Find_Peaks(const vector<double> &arr, double dist, double prom);
-	Mat cutGrid(const Mat &grid_rot);
-	struct MFreq Main_FreqR(const vector<double> &B0, int start, int stop);
-	struct subPX subpx_max_pos(const Mat &cutGrid,int stripe_width, double px_size, string mode);
-	struct subPX subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
-	struct subPX subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
-	struct subPX subpx_phase(const Mat &cutGrid);
+	std::vector<double> gradient(const std::vector<double> &x);
+	struct FP Find_Peaks(const std::vector<double> &arr, double dist, double prom);
+	cv::Mat cutGrid(const cv::Mat &grid_rot);
+	struct subPX subpx_max_pos(const cv::Mat &cutGrid,int stripe_width, double px_size, string mode);
+	struct subPX subpx_gauss(const std::vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
+	struct subPX subpx_parabel(const std::vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
+	struct subPX subpx_phase(const cv::Mat &cutGrid);
 	cqueue<stage34> fifo;
 
 public:
