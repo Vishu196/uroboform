@@ -1,5 +1,7 @@
 #include "signal_evaluation.h"
 
+using namespace std;
+
 double signal_evaluation::Spek_InterpolR(const vector<double>& A) 
 {
 
@@ -173,4 +175,46 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, s
 	vector<double> x_cut = IRFFT(f_x_cut);
 
 	return x_cut;
+}
+
+struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, int stop)
+{
+	struct MFreq mf;
+	double f_g = 0.0;
+	const int size = stop - start;
+
+	vector<double> B(size);
+
+	mf.Image_window.reserve(size);
+
+
+	for (int k = 0; k < size; k++)
+	{
+		int w = k + start;
+		B[k] = B0[w];
+	}
+
+	double Mean = Evaluation::MeanR(B);
+
+	vector<double> B1(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		double x = B[i] - Mean;
+		B1[i] = x;
+	}
+
+	vector<double> wFun = BlackmanWindowR(size);
+	for (int i = 0; i < size; i++)
+	{
+		mf.Image_window.push_back(B1[i] * wFun[i]);
+	}
+
+	vector<double> y1 = FFTR(mf.Image_window);
+
+	mf.n_g = Spek_InterpolR(y1);
+	uint32_t size_B = size;
+	mf.f_g = mf.n_g / size_B;
+
+	return mf;
 }
