@@ -8,14 +8,14 @@
 
 struct Detect_throu
 {
-	vector<int> through_loc;
-	vector<int> cut_through;
+	std::vector<int> through_loc;
+	std::vector<int> cut_through;
 };
 
 struct peaks
 {
-	vector<int> stripes;
-	vector<double> s_dic;
+	std::vector<int> stripes;
+	std::vector<double> s_dic;
 };
 
 struct indexes 
@@ -29,10 +29,10 @@ struct indexes
 
 struct stage23
 {
-	Mat img;
-	Mat img2;
-	list<int> cut_hor;
-	list<int> cut_ver;
+	cv::Mat img;
+	cv::Mat img2;
+	std::list<int> cut_hor;
+	std::list<int> cut_ver;
 
 	stage23()
 	{
@@ -45,10 +45,10 @@ class find_edges
 {
 private:
 	
-	peaks Find_Peaks(const vector<double> &arr, double th_edge);
-	indexes Line_Index(const vector<double> &mean_range_in, double th_edge,int i0,int rank);
-	Detect_throu Detect_Through(const vector<double> &im_col, double th_edge);
-	list<int> Delete_Edges(vector<int> cut_arr, int ideal_d);
+	peaks Find_Peaks(const std::vector<double> &arr, double th_edge);
+	indexes Line_Index(const std::vector<double> &mean_range_in, double th_edge,int i0,int rank);
+	Detect_throu Detect_Through(const std::vector<double> &im_col, double th_edge);
+	std::list<int> Delete_Edges(std::vector<int> cut_arr, int ideal_d);
 	void DisplayResult(const stage23 &s23);
 	cqueue<stage23> fifo;
 

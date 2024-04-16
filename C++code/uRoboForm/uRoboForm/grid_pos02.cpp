@@ -1,5 +1,8 @@
 #include "grid_pos02.h"
 
+using namespace std;
+using namespace cv;
+
 bool isGreater(double n)
 {
 	return n > 100;
@@ -103,7 +106,7 @@ vector<int> grid_pos02::linspace(double start, double end, int num)
 struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 {
 	string ori;
-	int code;
+	int code = 0;
 	vector<double> max_mean;
 	int x = img.rows;
 	int y = img.cols;
@@ -266,11 +269,11 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 		if (row == 0)
 		{
 			size_t i = i_max + 6;
-			s_index = i - field.max_pos.size();
+			s_index = (int)(i - field.max_pos.size());
 		}
 		else
 		{
-			s_index = i_max;
+			s_index = (int)i_max;
 		}
 		int r = row - 1;
 		mask_pos = (s_index * 200) + 350 + (r * grid_height);
@@ -280,11 +283,11 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 		if (col == 0)
 		{
 			size_t i = i_max + 8;
-			s_index = i - field.max_pos.size();
+			s_index = (int)(i - field.max_pos.size());
 		}
 		else
 		{
-			s_index = i_max;
+			s_index = (int)i_max;
 		}
 		int c = col - 1;
 		mask_pos = (s_index * 200) + 350 + (c * grid_width);
@@ -295,7 +298,7 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 
 double grid_pos02::calc_d_k(vector<vector <double>> lines)
 {
-	size_t n = lines.size();
+	int n = (int)lines.size();
 	const int n1 = n - 1;
 	const int n2 = n - 3;
 	double line_0, line_n;
@@ -383,8 +386,6 @@ double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols)
 
 void grid_pos02::DisplayResult(const stage45& s45)
 {
-	fifo.push(s45);
-
 	cout << "index: " << s45.index << endl;
 	cout << "ori: " << s45.ind_ori << endl;
 	cout << "k: " << s45.k << endl;
@@ -426,5 +427,6 @@ void grid_pos02::Execute(stage34 s34)
 	s45.index = I.index;
 	s45.ind_ori = I.ind_ori;
 
+	fifo.push(s45);
 	DisplayResult(s45);
 }

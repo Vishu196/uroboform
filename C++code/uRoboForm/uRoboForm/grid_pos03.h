@@ -5,8 +5,6 @@
 #include"Evaluation.h"
 #include "cqueue.h"
 
-using namespace std;
-
 struct stage56
 {
 	int gridRows;
@@ -14,7 +12,7 @@ struct stage56
 	Grid** grids;
 	int index;
 	double k;
-	string ind_ori;
+	std::string ind_ori;
 	double xi;
 	double zi;
 
@@ -26,9 +24,9 @@ class grid_pos03
 {
 private:
 
-	vector<vector<list<int>>> grid_params(void);
+	std::vector<vector<list<int>>> grid_params(void);
 	int get_mask_pos(Grid field, int row, int col, size_t i_max);
-	double weighted_avg(const vector<vector<double>> &center);
+	double weighted_avg(const std::vector<vector<double>> &center);
 	void DisplayResult(const stage56& s56);
 	cqueue<stage56> fifo;
 

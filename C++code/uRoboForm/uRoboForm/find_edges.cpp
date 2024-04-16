@@ -1,6 +1,8 @@
 #include "find_edges.h"
 #include <cmath>
 
+using namespace std;
+
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
 	size_t n = arr.size();
@@ -48,7 +50,9 @@ peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 
 indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_edge, int i0, int rank)
 {
-	double s_max, s_min;
+	indexes index;
+
+	index.s_max, index.s_min;
 	size_t s = mean_range_in.size();
 	int x1 = int(s / 6);
 	vector<double> mean_range(s);
@@ -68,11 +72,11 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 		vector<int> indice_arr(peaks_max.s_dic.size());
 		indice_arr = Evaluation::ArgSort(peaks_max.s_dic);
 		int tmp = indice_arr[peaks_max.s_dic.size() - rank];
-		s_max = peaks_max.stripes[tmp] + i0;
+		index.s_max = peaks_max.stripes[tmp] + i0;
 	}
 	else
 	{
-		s_max = nan("");
+		index.s_max = nan("");
 	}
 	if ((peaks_max.stripes.size() >= 3 && peaks_min.stripes.size() >= 3))
 	{
@@ -102,22 +106,21 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 
 		int n_0 = (int)(max_element(s_dic_min.begin(), s_dic_min.begin() + s_dic_min_size) - s_dic_min.begin());
 		int h = n_0 + 1;
-		s_min = peaks_min.stripes.at(h) + i0;
+		index.s_min = peaks_min.stripes.at(h) + i0;
 	}
 	else
 	{
-		s_min = nan("");
+		index.s_min = nan("");
 	}
 
-	indexes index;
-	index.s_max = s_max;
-	index.s_min = s_min;
-	
 	return index;
 }
  
 Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_edge)
 {
+	Detect_throu thro;
+
+	const int conditionValue = 33;
 	size_t size = im_col.size();
 	vector<double> im_diff(size);
 	for (int i = 0; i < size; i++)
@@ -133,7 +136,7 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	}
 	
 	vector<bool> th_through(size);
-	vector<int> through_loc;
+	thro.through_loc;
 	int count = 0;
 	for (int i = 0; i < n; i++)
 	{
@@ -149,30 +152,26 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 
 		if (th_through[i] == true)
 		{
-			through_loc.push_back(i);
+			thro.through_loc.push_back(i);
 			count++  ;
 		}
 	}
 	
-	through_loc.insert(through_loc.begin(), 0);
+	thro.through_loc.insert(thro.through_loc.begin(), 0);
 	
-	through_loc.insert(through_loc.end(), (int)size);
+	thro.through_loc.insert(thro.through_loc.end(), (int)size);
 
 	vector<int> d_through;
-	d_through = Evaluation::decumulateInt(through_loc);
+	d_through = Evaluation::decumulateInt(thro.through_loc);
 
-	vector<int> cut_through;
+	thro.cut_through;
 	for (int i = 0; i < (d_through.size()); i++)
 	{
-		if (d_through[i] > 33)
+		if (d_through[i] > conditionValue)
 		{
-			cut_through.push_back(i); 
+			thro.cut_through.push_back(i);
 		}
 	}
-
-	Detect_throu thro;
-	thro.through_loc = through_loc;
-	thro.cut_through = cut_through;
 
 	return thro;
 }
@@ -227,7 +226,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			d_cut_ver_0.push_back(x0);
 			d_cut_ver_1.push_back(x1);
 		}
-		if (close_edges.at(i_close) < (close_edges.size() - 2));
+		if (close_edges.at(i_close) < (close_edges.size() - 2))
 		{
 			int x0 = abs(cut_arr.at(vl) - cut_arr.at(vl3));
 			int x1 = abs(cut_arr.at(vl2) - cut_arr.at(vl3));
@@ -281,8 +280,6 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 
 void find_edges::DisplayResult(const stage23 &s23)
 {
-	fifo.push(s23);
-
 	cout << "cut_hor: ";
 	for (auto v : s23.cut_hor)
 		cout << v << ",";
@@ -506,6 +503,7 @@ void find_edges::Execute(stage12 s12)
 	s23.img = s12.img.clone();
 	s23.img2 = s12.img2.clone();
 
+	fifo.push(s23);
 	DisplayResult(s23);
 	
 }

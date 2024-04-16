@@ -1,5 +1,7 @@
 #include "grid_pos03.h"
 
+using namespace std;
+
 int grid_pos03::get_mask_pos(Grid field, int row, int col, size_t i_max)
 {
 	size_t s_index = 0;
@@ -83,6 +85,7 @@ bool is_x_nan(double x)
 {
 	return x == nan("");
 }
+
 double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 {
 	vector<vector<double>> valid_vals;
@@ -90,7 +93,7 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 
 	for (int i = 0; i < center.size(); i++)
 	{
-		if (!(any_of(center[i].begin(), center[i].end(), is_x_nan)));
+		if (!(any_of(center[i].begin(), center[i].end(), is_x_nan)))
 		{
 			valid_vals.push_back(center[i]);
 		}
@@ -119,8 +122,6 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 
 void grid_pos03::DisplayResult(const stage56& s56)
 {
-	fifo.push(s56);
-
 	cout << "xi: " << s56.xi << endl;
 	cout << "zi: " << s56.zi << endl;
 	cout << "grid_pos03 complete." << endl;
@@ -202,7 +203,8 @@ stage56 grid_pos03::Execute(stage45 s45)
 	s56.index = s45.index;
 	s56.k = s45.k;
 	s56.ind_ori = s45.ind_ori;
-
+	
+	fifo.push(s56);
 	DisplayResult(s56);
 	return s56;
 }

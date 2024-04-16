@@ -1,5 +1,8 @@
 #include "Evaluation.h"
 
+using namespace std;
+using namespace cv;
+
 vector<double> Evaluation::Mean0R(const Mat &image2)
 {
 	vector<double> Mean0Arr(image2.cols);

@@ -1,5 +1,13 @@
 #include "main.h"
 
+using namespace cv;
+using namespace std;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
+
+
 void display_time(const chrono::steady_clock::time_point& t01,
 	const chrono::steady_clock::time_point& t02)
 {
@@ -75,7 +83,7 @@ int main(int argc, char* argv[])
 
 	auto t01 = high_resolution_clock::now();
 
-	edge0.ExecuteR(image, freq_range);
+	edge0.ExecuteR(image);
 
 	display_time(t01, high_resolution_clock::now());
 
@@ -89,6 +97,8 @@ int main(int argc, char* argv[])
 
 	grid0.Execute(edge.getNext());
 
+	display_time(t03, high_resolution_clock::now());
+
 	index.Execute(grid0.getNext());
 
 	stage56 s56 = center.Execute(index.getNext());
@@ -96,12 +106,12 @@ int main(int argc, char* argv[])
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());
 
-	//xi_i.push_back(s56.xi);
-	//zi_i.push_back(s56.zi);
-	//k_i.push_back(s56.k);
-	//index_i.push_back(s56.index);
-	//ori_i.push_back(s56.ind_ori);
-	//
+	xi_i.push_back(s56.xi);
+	zi_i.push_back(s56.zi);
+	k_i.push_back(s56.k);
+	index_i.push_back(s56.index);
+	ori_i.push_back(s56.ind_ori);
+	
 	////for loop ends
 
 	//vector<vector<double>> data1;

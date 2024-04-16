@@ -139,7 +139,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;cblas.lib;gsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
