@@ -470,7 +470,7 @@ void find_edges::Execute(stage12 s12)
 
 					for (int i_row_h = 0; i_row_h < t1.cut_through.size(); i_row_h++)
 					{
-						if (t1.through_loc.at(t1.cut_through.at(i_row_h)) != 0)
+						if (t1.through_loc.at(t1.cut_through.at(i_row_h)+1) != im_row.size())
 						{
 							int m = t1.cut_through.at(i_row_h) + 1;
 							s23.cut_ver.push_back(t1.through_loc.at(m));

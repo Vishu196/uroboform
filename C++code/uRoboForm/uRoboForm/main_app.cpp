@@ -32,11 +32,10 @@ void write_to_csv(string filename, vector<string>colname, vector<vector<double>>
 	myFile << "\n";
 
 	// Send data to the stream
-	for (int j = 0; j < colname.size(); ++j)
+	for (int j = 0; j < data1.size(); ++j) 
 	{
-		myFile << data1[j][0] << ";" << data1[j][1] << ";" << data1[j][2] << ";" << index[j] << ";" << ori[j] << "\n";
-			
-		if (j != colname.size() - 1) myFile << ","; // No comma at end of line
+			myFile << data1[j][0] << " ; " << data1[j][1] << " ; " << data1[j][2] << " ;   " << index[j] << "   ;    " << ori[j] << "\n";
+			if (j != data1.size() - 1) myFile << ","; // No comma at end of line	
 	}
 		myFile << "\n";
 	
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
 	string csvname = "Result";
 	string foldername = "D:/Vaishnavi/C++Trial/Images";
 	
-	string filename = "D:/Vaishnavi/C++Trial/Images/001.bmp";
+	string filename = "D:/Vaishnavi/C++Trial/Images/005.bmp";
 	if (argc > 1)
 		filename = argv[1];
 
@@ -114,25 +113,25 @@ int main(int argc, char* argv[])
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());
 
-	/*xi_i.push_back(s56.xi);
+	xi_i.push_back(s56.xi);
 	zi_i.push_back(s56.zi);
 	k_i.push_back(s56.k);
 	index_i.push_back(s56.index);
-	ori_i.push_back(s56.ind_ori);*/
+	ori_i.push_back(s56.ind_ori);
 	
 	////for loop ends
 
-	//vector<vector<double>> data1;
-	//for (size_t i = 0; i < xi_i.size(); i++)
-	//{
-	//	data1[i][0] = xi_i[i];
-	//	data1[i][1] = zi_i[i];
-	//	data1[i][2] = k_i[i];
-	//}
-	//
-	//vector<string> colname = { "xi","zi","k","index","orientation"};
-	//
-	//write_to_csv(csvname, colname, data1, index_i, ori_i);
+	vector<vector<double>> data1(1, vector<double>(3));
+	for (size_t i = 0; i < xi_i.size(); i++)
+	{
+		data1[i][0] = xi_i[i];
+		data1[i][1] = zi_i[i];
+		data1[i][2] = k_i[i];
+	}
+	 
+	vector<string> colname = { "  xi    ","   zi    ","    k    ","  index  ","  orientation "};
+	
+	write_to_csv(csvname, colname, data1, index_i, ori_i);
 
 	return 0;
 

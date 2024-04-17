@@ -60,8 +60,8 @@ vector<vector<list<int>>> grid_pos03::grid_params(void)
 			look_up[i][0] = i0;
 
 			list<int>i1;
-			i0.push_back(d_row);
-			i0.push_back(d_col + grid_width);
+			i1.push_back(d_row);
+			i1.push_back(d_col + grid_width);
 			look_up[i][1] = i1;
 		}
 		else

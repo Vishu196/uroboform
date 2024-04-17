@@ -175,15 +175,17 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 				int coded_areaRows = x;
 				int coded_areaCols = l11-l22;
 				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
-				int b = 0;
+				
 				for (int i = 0; i < x; i++)
 				{
+					int b = 0;
 					for (int j = l22; j < l11; j++)
 					{
 						int val = img.data[i * img.step + j];
 						coded_area.at<uint8_t>(i, b) = val;
+						b++;
 					}
-					b++;
+					
 
 				}
 				coded_line = Evaluation::Mean1R(coded_area);
@@ -400,11 +402,13 @@ void grid_pos02::Execute(stage34 s34)
 		{
 			Grid field = s45.grids[row][col];
 
-			if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || ((row == s34.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || ((col == s34.gridCols - 1)))))
+			if (field.max_pos.size() > 0)
 			{
-				field.max_pos.erase(field.max_pos.begin());
+				if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || (row == (s34.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || (col == (s34.gridCols - 1)))))
+				{
+					field.max_pos.erase(field.max_pos.begin());
+				}
 			}
-
 			s45.grids[row][col] = field;
 		}
 	}
