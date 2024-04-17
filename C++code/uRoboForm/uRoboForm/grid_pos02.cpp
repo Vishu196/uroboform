@@ -14,64 +14,53 @@ Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 	{
 		for (int col = 0; col < gCols; col++)
 		{
-			size_t r = grids01[row][col].max_pos.size();
-			vector<double> max_pos_arr(r);
-			copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr.begin());
-			vector<double> m_pos_de = Evaluation::decumulateDouble(max_pos_arr);
-			bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
-			while (con)
+			size_t r = grids01[row][col].max_pos.size();	
+			if (r > 0)
 			{
-				vector<int> m_pos_de1(r);
-				int f = 0;
-				for (int e = 0; e < r; e++)
+				vector<double> max_pos_arr(r);
+				copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr.begin());
+				vector<double> m_pos_de = Evaluation::decumulateDouble(max_pos_arr);
+				bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
+				while (con)
 				{
-					if (m_pos_de[e] > 100)
+					vector<int> m_pos_de1(r);
+					int f = 0;
+					for (int e = 0; e < r; e++)
 					{
-						m_pos_de1[f] = e;
-						f++;
+						if (m_pos_de[e] > 100)
+						{
+							m_pos_de1[f] = e;
+							f++;
+						}
+					}
+
+					m_pos_de1.resize(f);
+
+					reverse(m_pos_de1.begin(), m_pos_de1.end());
+
+					for (int i = 0; i < f; i++)
+					{
+						int i_fill = m_pos_de1[i];
+						int fill1 = i_fill + 1;
+
+						double mean_maxPos = (grids01[row][col].max_pos[i_fill] + grids01[row][col].max_pos[fill1]) / 2;
+						grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin() + fill1, mean_maxPos);
 					}
 				}
-				
-				m_pos_de1.resize(f);
 
-				reverse(m_pos_de1.begin(), m_pos_de1.end());
-
-				for (int i = 0; i < f ; i++)
+				if (r >= 1)
 				{
-					int i_fill = m_pos_de1[i];
-					int fill1 = i_fill + 1;
-					
-					double mean_maxPos = (grids01[row][col].max_pos[i_fill] + grids01[row][col].max_pos[fill1]) / 2;
-					grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin() + fill1, mean_maxPos);
+					if (((row != (gRows - 1)) && (grids01[row][col].orientation == "hor") && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (gCols - 1)) && (grids01[row][col].orientation == "ver") && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
+					{
+						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.back());
+						grids01[row][col].max_pos.push_back(new_mp);
+					}
+					else if (((row != 0) && (grids01[row][col].orientation == "hor") && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].orientation == "ver") && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[1])) > 85)))
+					{
+						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.front());
+						grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin(), new_mp);
+					}
 				}
-			}
-
-			if (r >= 1)
-			{
-				bool c1 = row != gRows - 1;
-				bool c2 = grids01[row][col].orientation == "hor";
-				bool c3 = ((grids01[row+1][col].im_loc.front()) - (grids01[row][col].max_pos.back())) > 85;
-				bool c4 = col != gCols - 1;;
-				bool c5 = grids01[row][col].orientation == "ver";
-				bool c6 = ((grids01[row][col + 1].im_loc.back()) - (grids01[row][col].max_pos.back())) > 115;
-
-				bool c11 = row != 0;
-				bool c22 = grids01[row][col].orientation == "hor";
-				bool c33 = ((grids01[row][col].max_pos.front()) - (grids01[row][col].im_loc.front())) > 85;
-				bool c44 = col != 0;
-				bool c55 = grids01[row][col].orientation == "ver";
-				bool c66 = ((grids01[row][col].max_pos.front()) - (grids01[row][col].im_loc.back())) > 85;
-
-				if ( (c1 && c2 && c3) || (c4 && c5 && c6) )
-				{
-					double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.back());
-					grids01[row][col].max_pos.push_back(new_mp);
-				}
-				else if ((c11 && c22 && c33) || (c44 && c55 && c66))
-				{
-					double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.front());
-					grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin(),new_mp);
-				} 				
 			}
 		}
 	}
@@ -146,7 +135,8 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 			}
 		}
 		
-		double d_mean = Evaluation::MeanR(max_mean);
+		vector<double> max_mean_de = Evaluation::decumulateDouble(max_mean);
+		double d_mean = Evaluation::MeanR(max_mean_de);
 
 		if ((max_mean.size() >= 4) && (d_mean >= 50) && (d_mean <= 70))
 		{
@@ -154,44 +144,46 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 			double end = max_mean[3] + (d_mean * 3 / 4);
 			vector<int> bounds = linspace(start, end, 10);
 
-			int coded_areaRows = 0;
-			int coded_areaCols = 0;
-			Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
-			uint8_t* coded_areaData = coded_area.data;
+			
 			
 			vector<double> coded_line;
 			if (ori == "hor")
 			{
-				int w1 = int(cgrids[1][1].max_pos[0] + d_mean / 4) - int(cgrids[1][1].max_pos[0] - d_mean / 4);
-				coded_areaRows = w1;
-				coded_areaCols = y;
-				
-				for (int i = 0; i < w1; i++)
+				int w11 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
+				int w22 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
+				int coded_areaRows = w22-w11;
+				int coded_areaCols = y;
+				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
+
+				int v = 0;
+				for (int i = w11; i < w22; i++)
 				{
 					for (int j = 0; j < y; j++)
 					{
 						int val = img.data[i * img.step + j];
-						size_t idx = ((i * coded_area.step) + j);
-						*(coded_areaData + idx) = val;
+						coded_area.at<uint8_t>(v, j) = val;
 					}
-				}				
+					v++;
+				}	
 				coded_line = Evaluation::Mean0R(coded_area);
 			}
 			else
 			{
-				int l1 = int(cgrids[1][1].max_pos[0] + d_mean / 4) - int(cgrids[1][1].max_pos[0] - d_mean / 4);
+				int l11 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
+				int l22= int(cgrids[1][1].max_pos[0] - d_mean / 4);
 				
-				coded_areaRows = x;
-				coded_areaCols = l1;
-
+				int coded_areaRows = x;
+				int coded_areaCols = l11-l22;
+				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
+				int b = 0;
 				for (int i = 0; i < x; i++)
 				{
-					for (int j = 0; j < l1; j++)
+					for (int j = l22; j < l11; j++)
 					{
 						int val = img.data[i * img.step + j];
-						size_t idx = ((i * coded_area.step) + j);
-						*(coded_areaData + idx) = val;
+						coded_area.at<uint8_t>(i, b) = val;
 					}
+					b++;
 
 				}
 				coded_line = Evaluation::Mean1R(coded_area);
@@ -203,9 +195,11 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 				int u = i + 1;
 				int row_size = bounds[u] - bounds[i];
 				vector<double> coded_line_p (row_size);
+				int l0 = 0;
 				for (int l = bounds[i]; l < bounds[u]; l++)
 				{
-					coded_line_p[l] = coded_line[l];
+					coded_line_p[l0] = coded_line[l];
+					l0++;
 				}
 				code_mean[i] = Evaluation::MeanR(coded_line_p);
 			}
@@ -241,7 +235,7 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 					bin_str += curr;
 			}
 
-			int code = stoi(bin_str);				
+			code = stoi(bin_str, nullptr,2);
 		}
 		else
 			code = 300;
@@ -406,16 +400,12 @@ void grid_pos02::Execute(stage34 s34)
 		{
 			Grid field = s45.grids[row][col];
 
-			bool c1 = field.orientation == "hor";
-			bool c2 = field.max_pos.size() == 7;
-			bool c3 = row == s34.gridRows - 1;
-			bool c4 = field.orientation == "ver";
-			bool c5 = field.max_pos.size() >= 9;
-			bool c6 = col == s34.gridCols - 1;
-			if ((c1 && (c2 || c3)) || (c4 && (c5 || c6)))
+			if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || ((row == s34.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || ((col == s34.gridCols - 1)))))
 			{
 				field.max_pos.erase(field.max_pos.begin());
 			}
+
+			s45.grids[row][col] = field;
 		}
 	}
 
