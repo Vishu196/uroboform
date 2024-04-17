@@ -99,18 +99,26 @@ int main(int argc, char* argv[])
 
 	display_time(t03, high_resolution_clock::now());
 
+	auto t04 = high_resolution_clock::now();
+
 	index.Execute(grid0.getNext());
+
+	display_time(t04, high_resolution_clock::now());
+
+	auto t05 = high_resolution_clock::now();
 
 	stage56 s56 = center.Execute(index.getNext());
 	
+	display_time(t05, high_resolution_clock::now());
+
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());
 
-	xi_i.push_back(s56.xi);
+	/*xi_i.push_back(s56.xi);
 	zi_i.push_back(s56.zi);
 	k_i.push_back(s56.k);
 	index_i.push_back(s56.index);
-	ori_i.push_back(s56.ind_ori);
+	ori_i.push_back(s56.ind_ori);*/
 	
 	////for loop ends
 

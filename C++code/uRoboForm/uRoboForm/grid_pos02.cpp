@@ -294,7 +294,7 @@ double grid_pos02::calc_d_k(vector<vector <double>> lines)
 {
 	int n = (int)lines.size();
 	const int n1 = n - 1;
-	const int n2 = n - 3;
+	const int n2 = n - 2;
 	double line_0, line_n;
 	if (lines[1][0] == lines[0][0])
 	{

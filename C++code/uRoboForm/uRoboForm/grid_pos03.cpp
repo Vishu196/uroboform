@@ -83,7 +83,7 @@ vector<vector<list<int>>> grid_pos03::grid_params(void)
 
 bool is_x_nan(double x)
 {
-	return x == nan("");
+	return isnan(x);
 }
 
 double grid_pos03::weighted_avg(const vector<vector<double>> &center)
@@ -163,18 +163,24 @@ stage56 grid_pos03::Execute(stage45 s45)
 			vector<double> center;
 			Grid field = s45.grids[row][col];
 
-			for (int i_max = 0; i_max < 8; i_max++)
+			for (int i_max = 0; i_max < field.max_pos.size(); i_max++)
 			{
-				int mask_pos = get_mask_pos(field, row, col, i_max);
-				if (field.orientation == "hor")
+				if (i_max < 8)
 				{
-					P = mask_pos + look_el.front();
+					int mask_pos = get_mask_pos(field, row, col, i_max);
+					if (field.orientation == "hor")
+					{
+						P = mask_pos + look_el.front();
+					}
+					else
+					{
+						P = mask_pos + look_el.back();
+					}
+					double pa = (-P * s45.k);
+					double va = (field.max_pos[i_max] * px_size);
+					center.push_back((-P * s45.k) + (field.max_pos[i_max] * px_size));
+
 				}
-				else
-				{
-					P = mask_pos + look_el.back();
-				}
-				center.push_back((-P * s45.k) + field.max_pos.at(i_max) * px_size);
 			}
 
 			double cen_mean = Evaluation::MeanR(center);
@@ -191,6 +197,7 @@ stage56 grid_pos03::Execute(stage45 s45)
 			{
 				center_ver.push_back(t1);
 			}
+			s45.grids[row][col] = field;
 		}
 	}
 
