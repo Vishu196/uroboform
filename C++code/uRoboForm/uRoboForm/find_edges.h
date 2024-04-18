@@ -31,8 +31,8 @@ struct stage23
 {
 	cv::Mat img;
 	cv::Mat img2;
-	std::list<int> cut_hor;
-	std::list<int> cut_ver;
+	std::vector<int> cut_hor;
+	std::vector<int> cut_ver;
 
 	stage23()
 	{

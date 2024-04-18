@@ -364,14 +364,15 @@ void find_edges::Execute(const stage12 &s12)
 		}
 		if (s23.cut_hor.size() >= 2)
 		{
-			list<int>::iterator it = s23.cut_hor.begin();
+			/*list<int>::iterator it = s23.cut_hor.begin();
 			advance(it, 1);
 			int j0 = s23.cut_hor.front();
-			int j1 = *it;
-			int s1 = j1 - j0;
+			int j1 = *it;*/
+			int j0 = s23.cut_hor.front();
+			int s1 = s23.cut_hor[1] - s23.cut_hor[0];
 			int k = 0;
 			vector<double> mean_range1(s1);
-			for (int i = j0; i < j1; i++)
+			for (int i = j0; i < s23.cut_hor[1]; i++)
 			{
 				mean_range1[k] = s12.mean1[i];
 				k++;
@@ -451,7 +452,8 @@ void find_edges::Execute(const stage12 &s12)
 						}
 					}
 				}
-				s23.cut_ver.sort();
+				sort(s23.cut_ver.begin(), s23.cut_ver.end());
+				//s23.cut_ver.sort();
 				//to do
 				/*vector<int> cut_ver_arr;
 				copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);
