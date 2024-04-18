@@ -3,11 +3,24 @@
 
 using namespace std;
 
+std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
+{
+	ostr << "cut_hor: ";
+	for (auto v : s23.cut_hor)
+		ostr << v << ",";
+	ostr << endl << "cut_ver: ";
+	for (auto v : s23.cut_ver)
+		ostr << v << ",";
+	ostr << endl;
+	ostr << "Stage 2 complete." << endl;
+	return ostr;
+}
+
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
 	size_t n = arr.size();
-	vector<int> stripes(n);
-	vector<double> s_dic(n);
+	vector<int> stripes(50);
+	vector<double> s_dic(80);
 	int a = 0;
 	int count = 0;
 
@@ -48,7 +61,7 @@ peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 	return peaks;
 }
 
-indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_edge, int i0, int rank)
+indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_edge, int i0, int rank)
 {
 	indexes index;
 
@@ -59,18 +72,18 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 	mean_range = signal_evaluation::Bandfilter(mean_range_in, 0, x1);
 
 	vector<double> mean_rangeN(s);
-	for(int i = 0; i < s; i++)
+	
+	for (int i = 0; i < s; i++)
 	{
 		mean_rangeN[i] = mean_range[i] * (-1);
 	}
 
-	 peaks peaks_max = Find_Peaks(mean_range, th_edge);
-	 peaks peaks_min = Find_Peaks(mean_rangeN, -th_edge);
+	peaks peaks_max = Find_Peaks(mean_range, th_edge);
+	peaks peaks_min = Find_Peaks(mean_rangeN, -th_edge);
 
 	if (peaks_max.stripes.size() >= 1 && rank <= peaks_max.s_dic.size())
 	{
-		vector<int> indice_arr(peaks_max.s_dic.size());
-		indice_arr = Evaluation::ArgSort(peaks_max.s_dic);
+		vector<int> indice_arr = Evaluation::ArgSort(peaks_max.s_dic);
 		int tmp = indice_arr[peaks_max.s_dic.size() - rank];
 		index.s_max = peaks_max.stripes[tmp] + i0;
 	}
@@ -85,7 +98,7 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 			peaks_min.stripes.insert(peaks_min.stripes.begin(), 0);
 			peaks_min.s_dic.insert(peaks_min.s_dic.begin(), mean_rangeN.front());
 		}
-		if (s-peaks_min.stripes.at((peaks_min.stripes.size() - 1)) > 25)
+		if (s - peaks_min.stripes.at((peaks_min.stripes.size() - 1)) > 25)
 		{
 			size_t e = s - 1;
 			peaks_min.stripes.insert(peaks_min.stripes.end(), (int)e);
@@ -94,19 +107,14 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 
 		const int s_dic_min_size = ((int)peaks_min.stripes.size()) - 2;
 		vector<double> s_dic_min(s_dic_min_size);
-		for (int i = 0; i < s_dic_min_size; i++)
+		for (auto i = 0; i < s_dic_min_size; i++)
 		{
-			if (i < s_dic_min_size)
-			{
-				int e = i + 1;
-				s_dic_min[i] = peaks_min.s_dic.at(e);
-			}
-			
+			s_dic_min[i] = peaks_min.s_dic[i + 1]; 
 		}
 
-		int n_0 = (int)(max_element(s_dic_min.begin(), s_dic_min.begin() + s_dic_min_size) - s_dic_min.begin());
+		int n_0 = (int)(max_element(s_dic_min.begin(), s_dic_min.end()) - s_dic_min.begin());
 		int h = n_0 + 1;
-		index.s_min = peaks_min.stripes.at(h) + i0;
+		index.s_min = peaks_min.stripes[h] + i0;
 	}
 	else
 	{
@@ -115,54 +123,35 @@ indexes find_edges::Line_Index(const vector<double> &mean_range_in, double th_ed
 
 	return index;
 }
- 
+
 Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_edge)
 {
 	Detect_throu thro;
 
 	const int conditionValue = 33;
 	size_t size = im_col.size();
-	vector<double> im_diff(size);
-	for (int i = 0; i < size; i++)
-	{
-		im_diff[i] = im_col[i] - th_edge;
-	}
-	
-	size_t n = size - 1;
+
 	vector<bool> signbit(size);
 	for(int i = 0; i < size; i++)
 	{ 
-		signbit[i] = !(std::signbit(im_diff[i]));
+		signbit[i] = !(std::signbit(im_col[i] - th_edge));
 	}
 	
-	vector<bool> th_through(size);
-	thro.through_loc;
-	int count = 0;
+	thro.through_loc.push_back(0);
+	const size_t n = size - 1;
 	for (int i = 0; i < n; i++)
 	{
 		int h = i + 1;
-		if (signbit[i] == signbit[h])
-		{
-			th_through[i] = false;
-		}
-		else 
-		{
-			th_through[i] = true;
-		}
-
-		if (th_through[i] == true)
+		if (signbit[i] != signbit[h])
 		{
 			thro.through_loc.push_back(i);
-			count++  ;
 		}
 	}
-	
-	thro.through_loc.insert(thro.through_loc.begin(), 0);
-	
-	thro.through_loc.insert(thro.through_loc.end(), (int)size);
+
+	thro.through_loc.push_back(size);
 
 	vector<int> d_through;
-	d_through = Evaluation::decumulateInt(thro.through_loc);
+	d_through = Evaluation::decumulate(thro.through_loc);
 
 	thro.cut_through;
 	for (int i = 0; i < (d_through.size()); i++)
@@ -190,12 +179,12 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 
 			if (c)
 			{
-				cut_arr = Evaluation::deleteXint( cut_arr,i_cut);
+				cut_arr.erase(cut_arr.begin() + i_cut);
 			}
 		}
 	}
 
-	vector<int> cut_ver_de = Evaluation::decumulateInt(cut_arr);
+	vector<int> cut_ver_de = Evaluation::decumulate(cut_arr);
 	vector<int> close_edges;
 
 	for (int i = 0; i < cut_arr.size(); i++)
@@ -242,7 +231,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		{
 			ver0[i] = ver01[i] - ideal_d;
 		}
-		double d_m_0 = abs(Evaluation::IntMeanR(ver0));
+		double d_m_0 = abs(Evaluation::MeanR(ver0));
 
 		/*int* ver11 = new int[d_cut_ver_1.size()];
 		int* ver1 = new int[d_cut_ver_1.size()];
@@ -257,15 +246,15 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			ver1[i] = ver11[i] - ideal_d;
 		}
 		//transform(ver11.begin(), ver11.end(), ver1.begin(), op_subtract);
-		double d_m_1 = abs(Evaluation::IntMeanR(ver1));
+		double d_m_1 = abs(Evaluation::MeanR(ver1));
 
 		if (d_m_0 > d_m_1)
 		{
-			cut_arr = Evaluation::deleteXint(cut_arr, close_edges[i_close]);
+			cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
 		}
 		else
 		{
-			cut_arr = Evaluation::deleteXint(cut_arr, close_edges[i_close+1]);
+			cut_arr.erase(cut_arr.begin() + close_edges[i_close+1]);
 		}
 	}
 
@@ -276,18 +265,6 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 
 	//delete[] close_edges1;
 	return cut_list;
-}
-
-void find_edges::DisplayResult(const stage23 &s23)
-{
-	cout << "cut_hor: ";
-	for (auto v : s23.cut_hor)
-		cout << v << ",";
-	cout << endl << "cut_ver: ";
-	for (auto v : s23.cut_ver)
-		cout << v << ",";
-	cout << endl;
-	cout << "Stage 2 complete." << endl;
 }
 
 void find_edges::Execute(stage12 s12)
@@ -504,6 +481,5 @@ void find_edges::Execute(stage12 s12)
 	s23.img2 = s12.img2.clone();
 
 	fifo.push(s23);
-	DisplayResult(s23);
-	
+	cout << s23;	
 }

@@ -3,6 +3,14 @@
 using namespace cv;
 using namespace std;
 
+std::ostream& operator<<(std::ostream& ostr, const stage12& s12)
+{
+	ostr << "main_d_0: " << s12.main_d_0 << endl;
+	ostr << "main_d_1: " << s12.main_d_1 << endl;
+	ostr << "Stage 1 complete." << endl;
+	return ostr;
+}
+
 Mat raw_edges::ImageSliceR(Mat image, int n)
 {
 	Mat newImg;
@@ -13,30 +21,19 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 double raw_edges::Calc_main_d(const vector<double> &mean0)
 {
 	int interval = 50;
-	double main_d;
-	const int n1 = (((int)mean0.size() - freq_range) / interval) + 1;
+	const auto last_index = (int)mean0.size() - freq_range;
+	const int n1 = (last_index / interval) + 1;
 	
-	vector<double> t1(n1);
-	int j = 0;
+	vector<double> t1;
+	t1.reserve(n1);
 
-	for (int i = 0; i < (mean0.size() - freq_range); i += interval)
+	for (int i = 0; i < last_index; i += interval)
 	{
-		struct MFreq m = signal_evaluation::Main_FreqR(mean0, i, i + freq_range);
-		t1[j] = (1 / m.f_g);
-		j++;
+		struct MFreq m = signal_evaluation::Main_FreqR(mean0, i, freq_range);
+		t1.push_back(1 / m.f_g);
 	}
 
-	main_d = Evaluation::Median(t1);
-
-	return main_d;
-}
-
-void raw_edges::DisplayResult(const stage12 &s12)
-{
-	cout << "main_d_0: " << s12.main_d_0 << endl;
-	cout << "main_d_1: " << s12.main_d_1 << endl;
-	cout << "Stage 1 complete." << endl;
-
+	return Evaluation::Median(t1);;
 }
 
 void raw_edges::ExecuteR(Mat Image)
@@ -57,5 +54,5 @@ void raw_edges::ExecuteR(Mat Image)
 	s12.img2 = Image2;
 
 	fifo.push(s12);
-	DisplayResult(s12);
+	cout << s12;
 }

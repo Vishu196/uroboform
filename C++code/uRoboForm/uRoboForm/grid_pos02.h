@@ -29,15 +29,15 @@ struct RdBinary
 
 class grid_pos02
 {
+	friend class grid_pos03;
 private:
 
 	Grid** checkGrid(Grid** &grids01, int gRows, int gCols);
 	std::vector<int> linspace(double start, double end, int num);
 	struct RdBinary ReadBinary(Grid** &cgrids, const cv::Mat &img);
-	int get_mask_pos(Grid field, int row, int col, size_t i_max);
+	int static get_mask_pos(Grid field, int row, int col, size_t i_max);
 	double calc_d_k(std::vector<vector<double>> lines);
 	double get_d_k(Grid** &cgrids, int gRows, int gCols);
-	void DisplayResult(const stage45& s45);
 	cqueue<stage45> fifo;
 
 public:

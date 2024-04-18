@@ -49,7 +49,6 @@ private:
 	indexes Line_Index(const std::vector<double> &mean_range_in, double th_edge,int i0,int rank);
 	Detect_throu Detect_Through(const std::vector<double> &im_col, double th_edge);
 	std::list<int> Delete_Edges(std::vector<int> cut_arr, int ideal_d);
-	void DisplayResult(const stage23 &s23);
 	cqueue<stage23> fifo;
 
 public:

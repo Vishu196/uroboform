@@ -3,6 +3,14 @@
 using namespace std;
 using namespace cv;
 
+std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
+{
+	cout << "GridRows: " << s34.gridRows << endl;
+	cout << "GridCols: " << s34.gridCols << endl;
+	cout << "Stage 3 complete" << endl;
+	return ostr;
+}
+
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
 	size_t x_size = x.size();
@@ -80,7 +88,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 		where_out.insert(where_out.begin(), 0);
 		where_out.push_back(len - 1);
 
-		vector <int> where_arg1 = Evaluation::decumulateInt(where_out);
+		vector <int> where_arg1 = Evaluation::decumulate(where_out);
 		int where_arg = max_element(where_arg1.begin(), where_arg1.end()) - where_arg1.begin();
 		int x11 = where_out[where_arg] * 2;
 		int x20 = where_arg + 1;
@@ -440,7 +448,7 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 			}
 
 			vector<int> d00(B_max.stripes.size());
-			d00 = Evaluation::decumulateInt(B_max.stripes);
+			d00 = Evaluation::decumulate(B_max.stripes);
 
 			vector<double> d0 (d00.size());
 						
@@ -658,7 +666,7 @@ void grid_pos01::Execute(stage23 s23)
 
 					size_t r = p.max_pos.size();
 					
-					vector <double> max_pos_de = Evaluation::decumulateDouble(p.max_pos);
+					vector <double> max_pos_de = Evaluation:: decumulate(p.max_pos);
 					
 					if ((r>1) && (max_pos_de.back()>65))
 					{
@@ -697,10 +705,6 @@ void grid_pos01::Execute(stage23 s23)
 	}
 
 	fifo.push(s34);
-	cout << "Stage 3 complete" << endl;
-	cout << "GridRows: " << s34.gridRows << endl;
-	cout << "GridCols: " << s34.gridCols << endl;
+	cout << s34;
 
-	
-	//return s34;
 }

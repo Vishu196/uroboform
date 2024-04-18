@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	string csvname = "Result";
 	string foldername = "D:/Vaishnavi/C++Trial/Images";
 	
-	string filename = "D:/Vaishnavi/C++Trial/Images/005.bmp";
+	string filename = "D:/Vaishnavi/C++Trial/Images/001.bmp";
 	if (argc > 1)
 		filename = argv[1];
 

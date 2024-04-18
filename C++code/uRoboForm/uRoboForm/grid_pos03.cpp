@@ -2,41 +2,12 @@
 
 using namespace std;
 
-int grid_pos03::get_mask_pos(Grid field, int row, int col, size_t i_max)
+std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 {
-	size_t s_index = 0;
-	int mask_pos = 0;
-
-	if (field.orientation == "hor")
-	{
-		if (row == 0)
-		{
-			size_t i = i_max + 6;
-			s_index = i - field.max_pos.size();
-		}
-		else
-		{
-			s_index = i_max;
-		}
-		size_t r = row - 1;
-		mask_pos = s_index * 200 + 350 + r * grid_height;
-	}
-	else
-	{
-		if (col == 0)
-		{
-			size_t i = i_max + 8;
-			s_index = i - field.max_pos.size();
-		}
-		else
-		{
-			s_index = i_max;
-		}
-		size_t c = col - 1;
-		mask_pos = s_index * 200 + 350 + c * grid_width;
-	}
-
-	return mask_pos;
+	cout << "xi: " << s56.xi << endl;
+	cout << "zi: " << s56.zi << endl;
+	cout << "grid_pos03 complete." << endl;
+	return ostr;
 }
 
 vector<vector<list<int>>> grid_pos03::grid_params(void)
@@ -120,13 +91,6 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	return av_val;
 }
 
-void grid_pos03::DisplayResult(const stage56& s56)
-{
-	cout << "xi: " << s56.xi << endl;
-	cout << "zi: " << s56.zi << endl;
-	cout << "grid_pos03 complete." << endl;
-}
-
 stage56 grid_pos03::Execute(stage45 s45)
 {
 	stage56 s56;
@@ -167,7 +131,7 @@ stage56 grid_pos03::Execute(stage45 s45)
 			{
 				if (i_max < 8)
 				{
-					int mask_pos = get_mask_pos(field, row, col, i_max);
+					int mask_pos = grid_pos02::get_mask_pos(field, row, col, i_max);
 					if (field.orientation == "hor")
 					{
 						P = mask_pos + look_el.front();
@@ -212,6 +176,6 @@ stage56 grid_pos03::Execute(stage45 s45)
 	s56.ind_ori = s45.ind_ori;
 	
 	fifo.push(s56);
-	DisplayResult(s56);
+	cout << s56;
 	return s56;
 }

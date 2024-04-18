@@ -24,7 +24,6 @@ private:
 
 	cv::Mat ImageSliceR (cv::Mat ImageR, int n);
 	double Calc_main_d(const std::vector<double> &mean0);
-	void DisplayResult(const stage12& s12);
 	cqueue<stage12> fifo;
 
 public:

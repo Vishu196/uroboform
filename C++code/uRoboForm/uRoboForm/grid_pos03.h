@@ -25,9 +25,7 @@ class grid_pos03
 private:
 
 	std::vector<vector<list<int>>> grid_params(void);
-	int get_mask_pos(Grid field, int row, int col, size_t i_max);
 	double weighted_avg(const std::vector<vector<double>> &center);
-	void DisplayResult(const stage56& s56);
 	cqueue<stage56> fifo;
 
 public:

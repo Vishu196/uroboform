@@ -3,6 +3,15 @@
 using namespace std;
 using namespace cv;
 
+std::ostream& operator<<(std::ostream& ostr, const stage45& s45)
+{
+	cout << "index: " << s45.index << endl;
+	cout << "ori: " << s45.ind_ori << endl;
+	cout << "k: " << s45.k << endl;
+	cout << "grid_pos02 complete." << endl;
+	return ostr;
+}
+
 bool isGreater(double n)
 {
 	return n > 100;
@@ -19,7 +28,7 @@ Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 			{
 				vector<double> max_pos_arr(r);
 				copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr.begin());
-				vector<double> m_pos_de = Evaluation::decumulateDouble(max_pos_arr);
+				vector<double> m_pos_de = Evaluation::decumulate(max_pos_arr);
 				bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
 				while (con)
 				{
@@ -135,7 +144,7 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 			}
 		}
 		
-		vector<double> max_mean_de = Evaluation::decumulateDouble(max_mean);
+		vector<double> max_mean_de = Evaluation::decumulate(max_mean);
 		double d_mean = Evaluation::MeanR(max_mean_de);
 
 		if ((max_mean.size() >= 4) && (d_mean >= 50) && (d_mean <= 70))
@@ -218,7 +227,7 @@ struct RdBinary grid_pos02::ReadBinary(Grid** &cgrids, const Mat &img)
 			}
 				
 			int amin = *min_element(flat_img.begin(), flat_img.end());
-			double mean = Evaluation::IntMeanR(flat_img);
+			double mean = Evaluation::MeanR(flat_img);
 			double th = amin + ((mean - amin) * 0.85);
 
 			vector<int>code_bin(9);
@@ -380,14 +389,6 @@ double grid_pos02::get_d_k(Grid** &cgrids, int gRows, int gCols)
 	return d_k_mean;
 }
 
-void grid_pos02::DisplayResult(const stage45& s45)
-{
-	cout << "index: " << s45.index << endl;
-	cout << "ori: " << s45.ind_ori << endl;
-	cout << "k: " << s45.k << endl;
-	cout << "grid_pos02 complete." << endl;
-}
-
 void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;
@@ -422,5 +423,5 @@ void grid_pos02::Execute(stage34 s34)
 	s45.ind_ori = I.ind_ori;
 
 	fifo.push(s45);
-	DisplayResult(s45);
+	cout << s45;
 }
