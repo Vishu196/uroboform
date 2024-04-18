@@ -1,4 +1,5 @@
 #include "Evaluation.h"
+#include <algorithm>
 
 using namespace std;
 using namespace cv;
@@ -47,17 +48,10 @@ vector<double> Evaluation::Mean1R(const Mat& image2)
 	return Mean1Arr;
 }
 
-double Evaluation::MeanR(const vector<double>& mean0)
+double Evaluation::Mean(vector<double>::const_iterator start, vector<double>::const_iterator end)
 {
-	double sum = 0.0;
-	double meanR = 0.0;
-	for (int i = 0; i < mean0.size(); i++)
-	{
-		sum += mean0[i];
-	}
-
-	meanR = sum / mean0.size();
-	return meanR;
+	const double sum = std::accumulate(start, end, 0.0);
+	return sum / (end - start);
 }
 
 double Evaluation::Median(vector<double> array)
@@ -91,7 +85,7 @@ double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 
 	vector<double> B(size);
 
-	for (i = 0; i < size; ++i)
+	for (auto i = 0; i < size; ++i)
 	{
 		const int w = i + start;
 		sum += arr[w];
@@ -99,63 +93,13 @@ double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 
 	const double mean = sum / size;
 
-	for (i = 0; i < size; ++i)
+	for (auto i = 0; i < size; ++i)
 	{
 		const double val = arr[i + start] - mean;
 		standardDeviation += val * val;
 	}
 
 	return sqrt(standardDeviation / size);
-}
-
-vector<int> Evaluation::decumulateInt(const vector<int>& x)
-{
-	const size_t n = x.size() - 1;
-	vector<int> xi(n);
-	vector<int> x1(n);
-	vector<int> x2(n);
-
-	for (size_t i = 0; i < n; i++)
-	{
-		x1[i] = x[i + 1];
-
-	}
-	for (int i = 0; i < n; i++)
-	{
-		x2[i] = x[i];
-	}
-
-	for (int i = 0; i < n; i++)
-	{
-		xi[i] = x1[i] - x2[i];
-	}
-
-	return xi;
-}
-
-vector<double> Evaluation::decumulateDouble(const vector<double> &x)
-{
-	const size_t n = x.size() - 1;
-	vector<double> xi(n);
-	vector<double> x1(n);
-	vector<double> x2(n);
-
-	for (size_t i = 0; i < n; i++)
-	{
-		x1[i] = x[i + 1];
-
-	}
-	for (int i = 0; i < n; i++)
-	{
-		x2[i] = x[i];
-	}
-
-	for (int i = 0; i < n; i++)
-	{
-		xi[i] = x1[i] - x2[i];
-	}
-
-	return xi;
 }
 
 vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
@@ -180,34 +124,4 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 	}
 
 	return indice_arr;
-}
-
-vector<int> Evaluation::deleteXint(vector<int> &arr, int pos)
-{
-	size_t size = arr.size();
-
-	if (pos > size)
-		return arr;
-
-	for (size_t i = size; i > pos; i--)
-	{
-		size_t a = i - 2;
-		size_t b = i - 1;
-		arr[a] = arr[b];
-	}
-
-	return arr;
-}
-
-double Evaluation::IntMeanR(const vector<int>& mean0)
-{
-	int sum = 0;
-	double meanR = 0.0;
-	for (int i = 0; i < mean0.size(); i++)
-	{
-		sum += mean0[i];
-	}
-
-	meanR = (double)sum / mean0.size();
-	return meanR;
 }

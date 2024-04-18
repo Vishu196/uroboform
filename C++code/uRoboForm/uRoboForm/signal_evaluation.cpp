@@ -4,53 +4,38 @@ using namespace std;
 
 double signal_evaluation::Spek_InterpolR(const vector<double>& A) 
 {
+	const auto A_size = 256;
+	const auto A2_size = A_size / 2;
 
-	uint32_t A_size = 256;
-	uint32_t A2_size = A_size / 2;
+	const auto m = std::max_element(A.begin(), A.begin() + A2_size);
+	auto n_0 = std::distance(A.begin(), m);
 
-	vector<double> A2(A2_size);
-	for (uint32_t i = 0; i < A2_size; i++)
-	{
-		A2[i] = A[i];
-	}
-
-	int n_0 = (int)std::distance(A2.begin(), std::max_element(A2.begin(), A2.begin() + A2_size));
-
-	int a = n_0 + 1;
-	int b = n_0 - 1;
-	double y_ln1 = log(A[a]);
-	double y_ln0 = log(A[n_0]);
-	double y_ln_1 = log(A[b]);
-	double tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	double n_g = (n_0 + tmp / 2);
-
-	return n_g;
+	const auto a = n_0 + 1;
+	const auto b = n_0 - 1;
+	const auto y_ln1 = log(A[a]);
+	const auto y_ln0 = log(A[n_0]);
+	const auto y_ln_1 = log(A[b]);
+	const auto tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
+	
+	return (n_0 + tmp / 2);
 }
 
-vector<double> signal_evaluation::BlackmanWindowR(int n)
+double signal_evaluation::BlackmanWindowR(int n, int pos)
 {
 	const double a0 = 0.42;
 	const double a1 = 0.5;
 	const double a2 = 0.08;
-	int wLen = n - 1;
+	const int wLen = n - 1;
 	vector<double> wFun(n);
 
-	for (int i = 0; i < n; ++i)
-	{
-		double wi = 0.0;
-		wi = a0 - (a1 * cos((2 * M_PI * i) / wLen)) + (a2 * cos((4 * M_PI * i) / wLen));
-		wFun[i] = wi;
-	}
-	
-	return wFun;
+	return a0 - (a1 * cos((2 * M_PI * pos) / wLen)) + (a2 * cos((4 * M_PI * pos) / wLen));
 }
 
 vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 {
 	size_t size = image_windowR.size();
 	const int N = 256;
-	fftw_complex* y = 0;
-	y = new fftw_complex[N];
+	fftw_complex* y = new fftw_complex[N];
 	double in[N]{};
 	fftw_plan p;
 
@@ -71,7 +56,7 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 
 	for (int i = 0; i < N; i++)
 	{
-		y1[i] = abs(yy[i]);
+		y1[i] = abs(*reinterpret_cast<std::complex<double>*>(y + i));
 	}
 
 	fftw_destroy_plan(p);
@@ -81,7 +66,7 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
-	size_t N = x.size();
+	auto N = x.size();
 	double* x_arr = new double[N]();
 	copy(x.begin(), x.end(), x_arr);
 	double* y = new double[N]();
@@ -117,7 +102,7 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 
 vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 {
-	size_t N = x.size();
+	auto N = x.size();
 	double* y = new double[N]();
 
 	double* xx = new double[N]();
@@ -138,7 +123,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 
 	fftw_plan p;
 
-	p = fftw_plan_r2r_1d((int)N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 
 	fftw_execute(p);
 
@@ -146,7 +131,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 
 	vector<double> yy(N);
 	for (int i = 0; i < N; i++)
-	{
+	{ 
 		y[i] /= N;
 		yy[i] = y[i];
 	}
@@ -159,62 +144,40 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, s
 {
 	vector<double> f_x = RFFT(x);
 
-	vector<double> f_x_cut;
-	f_x_cut = f_x;
-
 	for (int i = 0; i < x0; i++)
 	{
-		f_x_cut[i] = 0;
+		f_x[i] = 0;
 	}
 
 	for (size_t i = x1; i < x.size(); i++)
 	{
-		f_x_cut[i] = 0;
+		f_x[i] = 0;
 	}
 
-	vector<double> x_cut = IRFFT(f_x_cut);
-
-	return x_cut;
+	return IRFFT(f_x);
 }
 
-struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, int stop)
+struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, int size)
 {
 	struct MFreq mf;
-	double f_g = 0.0;
-	const int size = stop - start;
+	auto istart = B0.begin() + start;
 
-	vector<double> B(size);
+	vector<double> B1;
+	B1.reserve(size);
 
 	mf.Image_window.reserve(size);
 
-
-	for (int k = 0; k < size; k++)
-	{
-		int w = k + start;
-		B[k] = B0[w];
-	}
-
-	double Mean = Evaluation::MeanR(B);
-
-	vector<double> B1(size);
+	const double Mean = Evaluation::Mean(istart,istart+size);
 
 	for (int i = 0; i < size; i++)
 	{
-		double x = B[i] - Mean;
-		B1[i] = x;
-	}
-
-	vector<double> wFun = BlackmanWindowR(size);
-	for (int i = 0; i < size; i++)
-	{
-		mf.Image_window.push_back(B1[i] * wFun[i]);
+		mf.Image_window.push_back((*(istart + i) - Mean) * BlackmanWindowR(size, i));
 	}
 
 	vector<double> y1 = FFTR(mf.Image_window);
 
 	mf.n_g = Spek_InterpolR(y1);
-	uint32_t size_B = size;
-	mf.f_g = mf.n_g / size_B;
+	mf.f_g = mf.n_g / size;
 
 	return mf;
 }

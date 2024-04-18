@@ -23,7 +23,7 @@ class signal_evaluation
 public:
 
 	double static Spek_InterpolR(const std::vector<double>& A);
-	std::vector<double> static BlackmanWindowR(int n);
+	double static BlackmanWindowR(int n,int pos);
 	std::vector<double> static FFTR(const std::vector<double>& image_window);
 	std::vector<double> static Bandfilter(const std::vector<double>& x, int start, size_t end);
 	std::vector<double> static RFFT(const std::vector<double>& x);
