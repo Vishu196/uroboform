@@ -52,7 +52,7 @@ private:
 	cqueue<stage23> fifo;
 
 public:
-	void Execute(stage12 s12);
+	void Execute(const stage12 &s12);
 	stage23 getNext()
 	{
 		stage23 s23;

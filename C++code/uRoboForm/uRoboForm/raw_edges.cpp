@@ -36,7 +36,7 @@ double raw_edges::Calc_main_d(const vector<double> &mean0)
 	return Evaluation::Median(t1);;
 }
 
-void raw_edges::ExecuteR(Mat Image)
+void raw_edges::ExecuteR(const Mat &Image)
 {
 	stage12 s12;
 

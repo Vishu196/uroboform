@@ -130,6 +130,7 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 
 	const int conditionValue = 33;
 	size_t size = im_col.size();
+	thro.through_loc.reserve(size / 2);
 
 	vector<bool> signbit(size);
 	for(int i = 0; i < size; i++)
@@ -153,7 +154,8 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	vector<int> d_through;
 	d_through = Evaluation::decumulate(thro.through_loc);
 
-	thro.cut_through;
+	thro.cut_through.reserve(d_through.size()); // Reserve space upfront
+
 	for (int i = 0; i < (d_through.size()); i++)
 	{
 		if (d_through[i] > conditionValue)
@@ -267,25 +269,20 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 	return cut_list;
 }
 
-void find_edges::Execute(stage12 s12)
+void find_edges::Execute(const stage12 &s12)
 {
 	stage23 s23;
-	
+
 	if ((s12.main_d_0 > 13) && (s12.main_d_1 > 13))
 	{	
 		double s_max, s_min;
 		const size_t mid = s12.mean0.size() / 2;
-		size_t i0 = mid - search_range;
-		size_t i1 = mid + search_range;
-		size_t R = i1 - i0;
+		const size_t i0 = mid - search_range;
+		const size_t i1 = mid + search_range;
+		const size_t R = i1 - i0;
 
-		vector<double> mean_range0(R);
-		for (size_t i = i0; i < i1; i++)
-		{
-			size_t a = i - i0;
-			mean_range0[a] = s12.mean0[i];
-		}
-		
+		vector<double> mean_range0(s12.mean0.begin() + i0, s12.mean0.begin() + i1);
+
 		int rank = 0;
 		size_t len = s12.img2.rows;
 		vector<double> im_col(len);
@@ -481,5 +478,5 @@ void find_edges::Execute(stage12 s12)
 	s23.img2 = s12.img2.clone();
 
 	fifo.push(s23);
-	cout << s23;	
+	cout << s23;
 }

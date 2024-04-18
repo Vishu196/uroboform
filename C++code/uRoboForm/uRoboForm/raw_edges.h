@@ -28,7 +28,7 @@ private:
 
 public:
 
-	void ExecuteR(cv::Mat image);
+	void ExecuteR(const cv::Mat &image);
 	stage12 getNext() 
 	{
 		stage12 s12;
