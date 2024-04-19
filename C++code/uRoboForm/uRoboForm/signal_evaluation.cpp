@@ -143,16 +143,12 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
 	vector<double> f_x = RFFT(x);
-
+	
 	for (int i = 0; i < x0; i++)
-	{
 		f_x[i] = 0;
-	}
 
 	for (size_t i = x1; i < x.size(); i++)
-	{
 		f_x[i] = 0;
-	}
 
 	return IRFFT(f_x);
 }

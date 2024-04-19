@@ -2,6 +2,12 @@
 
 using namespace std;
 using namespace cv;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
+
+
 
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
@@ -13,25 +19,18 @@ std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
-	size_t x_size = x.size();
-	int dx = 1;
+	const auto x_size = x.size();
+	const int dx = 1;
 	vector<double> grad(x_size);
 
 	grad[0] = (x[1] - x[0]) / dx;
 
-	for (int i = 1; i <= (x_size-2); i++)
-	{
-		int a = i + 1;
-		int b = i - 1;
-		grad[i] = (x[a] - x[b]) / (2 * dx);  // for i in [1,N-2]
+	for (auto i = 1; i <= (x_size-2); i++)
+		grad[i] = (x[i + 1] - x[i - 1]) / (2 * dx);  // for i in [1,N-2]
 
-	}
-	size_t n = x_size - 1;
-	size_t m = x_size - 2;
-	grad[n] = (x[n] - x[m]) / dx;
+	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
 
 	return grad;
-
 }
 
 Mat grid_pos01::cutGrid(const Mat &grid_rot)
@@ -40,47 +39,26 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 	Mat grid_cut(grid_rot.rows, grid_rot.cols, CV_8U, (int)grid_rot.step);
 	uint8_t* grid_cutData = grid_cut.data;
 
-	int len = grid_rot.rows / 2;
-	int wid = grid_rot.cols / 2;
+	const int len = grid_rot.rows / 2;
+	const int wid = grid_rot.cols / 2;
 
-	Mat grid_rot2(len, wid, CV_8U, (int)grid_rot.step/2);
-	uint8_t* grid_rot2Data = grid_rot2.data;
-
-	int s = 0;
-	int t = 0;
+	Mat grid_rot2;
+	resize(grid_rot, grid_rot2, Size(), 0.5, 0.5, cv::INTER_NEAREST);
 	
-		for (int i = 0; i < grid_rot.rows; i += 2)
-		{
-			for (int j = 0; j < (grid_rot.cols - 1); j += 2)
-			{
-				int val = grid_rot.data[i * grid_rot.step + j];
-				size_t idx = (s * grid_rot2.step + t );
-				*(grid_rot2Data + idx) = val;
-
-				if (t < wid - 1)
-					t++;
-			}
-			if (s < len - 1)
-				s++;
-			t = 0;
-		}
-	
-	vector<double> mean_row(len);
-
-	mean_row = Evaluation::Mean1R(grid_rot2);
-	double im_mean = Evaluation::MeanR(mean_row);
+	vector<double> mean_row =  Evaluation::Mean1R(grid_rot2);
+	const double im_mean = Evaluation::MeanR(mean_row);
 
 	double max_val, min_val;
 	minMaxLoc(grid_rot2, &min_val, &max_val);
 
-	int val_range = (int)(max_val - min_val);
+	const int val_range = (int)(max_val - min_val);
 
 	std::vector<int> where_out;
-	for (int i = 0; i < len; i++) {
+	where_out.reserve(10);
+	for (int i = 0; i < len; i++)
+	{
 		if (((mean_row[i] < im_mean - 0.075 * val_range) || (mean_row[i] >= im_mean + 0.075 * val_range)) && (i < len / 4 || i >= len * 3 / 4)) 
-		{
 			where_out.push_back(i);
-		}
 	}
 
 	if (where_out.size() >= 1) 
@@ -89,35 +67,22 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 		where_out.push_back(len - 1);
 
 		vector <int> where_arg1 = Evaluation::decumulate(where_out);
-		int where_arg = max_element(where_arg1.begin(), where_arg1.end()) - where_arg1.begin();
-		int x11 = where_out[where_arg] * 2;
-		int x20 = where_arg + 1;
-		int x22 = where_out[x20] * 2;
-		int p = 0;
-		int q = 0;
+		const int where_arg = max_element(where_arg1.begin(), where_arg1.end()) - where_arg1.begin();
+		const int x11 = where_out[where_arg] * 2;
+		const int x20 = where_arg + 1;
+		const int x22 = where_out[x20] * 2;
 		grid_cutRows = x22 - x11;
 		for (int i = x11; i < x22; i++)
 		{
 			for (int j = 0; j < grid_rot.cols; j++)
 			{
-				int val = grid_rot.data[i * grid_rot.step + j];
-				size_t idx = (p * grid_cut.step + q);
-				*(grid_cutData + idx) = val;
-				//grid_cut.data[p* grid_cut.step + q] = grid_rot.data[i * grid_rot.step + j];
-				if (q < grid_rot.cols - 1)
-					q++;
+				grid_cut.data[(i-x11)*grid_cut.step + j] = grid_rot.data[i * grid_rot.step + j];
 			}
-			if (p < grid_rot.rows - 1)
-				p++;
-			q = 0;
 		}
 		grid_cut.resize(grid_cutRows);
 	}
-
 	else
-	{
 		grid_cut = grid_rot.clone();
-	}
 
 	return grid_cut;
 }
@@ -128,30 +93,22 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	vector<int> peaksIndices(50);
 	vector<double> peaksValues(50);
 	vector<double> peaksProminence(50);
-	int a = 0;
 	int count = 0;
+	int a = 0;
 
 	for (int i = 1; i < n - 1; i++)
 	{
-		int e = i - 1;
-		int f = i + 1;
-		if (arr[i] >= arr[e] && arr[i] >= arr[f])
+		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1])
 		{
 			peaksIndices[a] = i;
 			peaksValues[a] = arr[i];
-				a++;
-				if (a > 0)
-				{
-					int a1 = a - 1;
-					int a2 = a + 1;
-					if (peaksIndices[a] - peaksIndices[a1] < dist)
-					{
-						peaksIndices[a] = peaksIndices[a2];
-						peaksValues[a] = peaksValues[a2];
-						count++;						
-					}
-				}
-			
+			a++;
+			if (peaksIndices[a] - peaksIndices[a - 1] < dist)
+			{
+				peaksIndices[a] = peaksIndices[a + 1];
+				peaksValues[a] = peaksValues[a + 1];
+				count++;						
+			}	
 		}
 	}
 	
@@ -213,36 +170,38 @@ struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_ma
 	for (int i_b = 0; i_b < B_max.stripes.size(); i_b++)
 	{
 		int mid = B_max.stripes[i_b];
-
-		if (B_min.stripes.size() >=2)
+		int b_min_size = B_min.stripes.size();
+		if (b_min_size >=2)
 		{
-			for (int i_0 = 0; i_0 < B_min.stripes.size(); i_0++)
+			for (int i_0 = 0; i_0 < b_min_size; i_0++)
 			{
 				if (B_min.stripes[i_0] < mid)
 					xmin = i_0;
+				if (B_min.stripes[b_min_size - i_0] > mid)
+					xmax = i_0;
 			}
-			for (int i_1 = 0; i_1 <= B_min.stripes.size(); i_1++)
+			/*for (int i_1 = 0; i_1 <= B_min.stripes.size(); i_1++)
 			{
 				if (B_min.stripes[B_min.stripes.size() - i_1] > mid)
 					xmax = i_1;
-			}
+			}*/
 
-			try
-			{
-				if (xmin!=xmax)
-				{
-					//to do
-					//curve fit function pending
-				}
-			}
-			catch (const runtime_error)
-			{
-				//cout << "Optimal Parameters not found for image at x =' " << mid << endl;
-			}
-			catch (std::exception&)
-			{
-				continue;
-			}
+			//try
+			//{
+			//	if (xmin!=xmax)
+			//	{
+			//		//to do
+			//		//curve fit function pending
+			//	}
+			//}
+			//catch (const runtime_error)
+			//{
+			//	//cout << "Optimal Parameters not found for image at x =' " << mid << endl;
+			//}
+			//catch (std::exception&)
+			//{
+			//	continue;
+			//}
 		}
 	}
 
@@ -282,15 +241,9 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 			{
 				if ((xmin != xmax) && (xmin != 0) && (xmax != 0))
 				{
-					int l = 0;
 					int x_size = xmax - xmin;
 					vector<int> x (x_size);
-					for (int k = xmin; k < xmax; k++)
-					{
-						x[l] = k;
-						l++;
-					}
-
+					iota(x.begin(), x.end(), xmin);
 					
 					Mat W0 = Mat::eye(x_size,x_size, CV_64F);
 					Mat Phi(x_size, 3, CV_64F);
@@ -315,9 +268,7 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 
 					Mat a_dach0(3, 1, CV_64F);
 					a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
-					//cout << "a_dach0:" << a_dach0 << endl;
 					p.max_pos.push_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
-
 				}
 			}
 			catch (const exception)
@@ -326,9 +277,7 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 			}
 		}
 	}
-
 	p.pres = {};
-
 	return p;
 }
 
@@ -339,9 +288,7 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 	p.pres;
 
 	vector<double> B0 = Evaluation::Mean0R(cutGrid);
-
 	double B = Evaluation::MeanR(B0);
-
 	int y = cutGrid.cols;
 	if (y >=60)
 	{
@@ -365,9 +312,9 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 		double Phi = std::arg(F_k);
 		double d = Phi / (2 * M_PI * m.f_g);
 
-		double A1 = pow(real(F_k),2);
-		double A2 = pow(imag(F_k), 2);
-		double A = pow((A1 + A2), 0.5);
+		double A1 = (real(F_k))* (real(F_k));
+		double A2 = (imag(F_k)) * (imag(F_k));
+		double A = sqrt((A1 + A2));
 
 		size_t lenImg = m.Image_window.size();
 		vector<int> ImgWin_arange(lenImg);
@@ -380,22 +327,15 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 			y1[i] = (2 * M_PI * m.f_g * (ImgWin_arange[i])) - Phi;
 			y_cos[i] = A * cos(y1[i]);
 		}
-
 		if (d < d_mean/2)
-		{
 			d += d_mean;
-		}
 
 		for (int i_max = 0; i_max < (m.n_g-1); i_max++)
-		{
 			p.max_pos.push_back(d + i_max * d_mean);
-		}
-
 	}
 	else
-	{
 		p.max_pos.clear();
-	}
+	
 	p.pres.clear();
 
 	return p;
@@ -411,16 +351,11 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 	}
 	else
 	{
-		vector<double>B;
-		B = Evaluation::Mean0R(cutGrid);
+		//vector<double>B = Evaluation::Mean0R(cutGrid);
 
 		double filt = (double)y/10;
-
-		vector<double> B_cut(y);
-		B_cut = signal_evaluation::Bandfilter(B, 0, (int)filt);
-		
+		vector<double> B_cut = signal_evaluation::Bandfilter(Evaluation::Mean0R(cutGrid), 0, (int)filt);		
 		double d_min = stripe_width / (double)1000 * 2 / px_size / 2;
-
 		double prom = ((*std::max_element(B_cut.begin(), B_cut.begin() + y)) - (*std::min_element(B_cut.begin(), B_cut.begin() + y)))*0.2;
 		
 		vector<double> B_cut_N(y);
@@ -435,48 +370,38 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 		if ((B_max.stripes.size() >= 1) && (B_min.stripes.size() >= 1))
 		{
 			if ((B_min.stripes[0]>B_max.stripes[0]) && (B_max.stripes[0] >= 0.9*d_min))
-			{
 				B_min.stripes.insert(B_min.stripes.begin(),0);
-			}
 			if ((B_min.stripes[B_min.stripes.size() - 1] < B_max.stripes[B_max.stripes.size() - 1]) && (y - B_max.stripes[B_max.stripes.size() - 1] >= 0.9 * d_min))
-			{
 				B_min.stripes.insert(B_min.stripes.end(), (y - 1));
-			}
 			if ((B_max.stripes[0] - B_min.stripes[0] > 0) && (B_max.stripes[0] - B_min.stripes[0] < 0.8*d_min))
-			{
 				B_min.stripes.erase(B_min.stripes.begin());
-			}
 
-			vector<int> d00(B_max.stripes.size());
-			d00 = Evaluation::decumulate(B_max.stripes);
+			//vector<int> d0 = Evaluation::decumulate(B_max.stripes);
 
-			vector<double> d0 (d00.size());
+			/*vector<double> d0 (d00.size());
 						
 			for (int i = 0; i < d00.size(); i++)
 			{
 				d0[i] = (double)d00[i];
-			}
+			}*/
 
-			double d_m = Evaluation::MeanR(d0);
+			double d_m = Evaluation::MeanR(Evaluation::decumulate(B_max.stripes));
 			//to do
 			if (mode == "gauss")
 			{
-				int e = 0;
 			  //p = subpx_gauss(B_cut, B_max,B_min, d_m);
 			}
 
 			else if (mode == "parabel")
 			{
-				int t = 0;
 			    p = subpx_parabel(B_cut, B_max, B_min, d_m);
 			}
 		}
 	}
-
 	return p;
 }
 
-void modify_list(stage23 &s23)
+Grid** get_grids(stage23 &s23, stage34 &s34)
 {
 	if (s23.cut_ver.front() * 2 < 10)
 	{
@@ -493,44 +418,24 @@ void modify_list(stage23 &s23)
 
 	s23.cut_hor.push_back(s23.img.rows / 2);
 	s23.cut_ver.push_back(s23.img.cols / 2);
-}
 
-Mat get_grid0(stage23& s23, int row, int col )
-{
-	int x1 = s23.cut_hor[row] * 2;
-	int x2 = s23.cut_hor[row + 1] * 2;
-	int y1 = s23.cut_ver[col] * 2;
-	int y2 = s23.cut_ver[col + 1] * 2;
-	int s1 = x2 - x1;
-	int s2 = y2 - y1;
-
-	Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
-	uint8_t* grid0Data = grid0.data;
-
-	if (x2 > x1 && y2 > y1)
+	s34.grids = new Grid * [s23.cut_hor.size()];
+	for (int h = 0; h < s23.cut_hor.size(); h++)
 	{
-		for (int x = x1; x < x2; x++)
-		{
-			for (int y = y1; y < y2; y++)
-			{
-				int val = s23.img.data[x * s23.img.step + y];
-				size_t idx = ((x - x1) * grid0.step + (y - y1));
-				*(grid0Data + idx) = val;
-			}
-		}
+		s34.grids[h] = new Grid[s23.cut_ver.size()];
 	}
 
-	return grid0;
+	return s34.grids;
 }
 
 Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &orientation)
 {
-	int x1 = s23.cut_hor[row] * 2;
-	int x2 = s23.cut_hor[row + 1] * 2;
-	int y1 = s23.cut_ver[col] * 2;
-	int y2 = s23.cut_ver[col + 1] * 2;
-	int s1 = x2 - x1;
-	int s2 = y2 - y1;
+	const int x1 = s23.cut_hor[row] * 2;
+	const int x2 = s23.cut_hor[row + 1] * 2;
+	const int y1 = s23.cut_ver[col] * 2;
+	const int y2 = s23.cut_ver[col + 1] * 2;
+	const int s1 = x2 - x1;
+	const int s2 = y2 - y1;
 
 	Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
 	uint8_t* grid0Data = grid0.data;
@@ -541,59 +446,43 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 		{
 			for (int y = y1; y < y2; y++)
 			{
-				int val = s23.img.data[x * s23.img.step + y];
 				size_t idx = ((x - x1) * grid0.step + (y - y1));
-				*(grid0Data + idx) = val;
+				*(grid0Data + idx) = s23.img.data[x * s23.img.step + y];
 			}
 		}
 	}
 
 	vector<double> mean_grad = get_mean_grad(s23, row, col);
 
-	int gridrot_row = 0;
-	int gridrot_col = 0;
-	Mat grid_rot(gridrot_row, gridrot_col, CV_8U);
-
 	if (mean_grad[1] > mean_grad[0])
 	{
 		orientation = "hor";
-		gridrot_row = s2;
-		gridrot_col = s1;
-
-		grid_rot = grid0.t();
+		return grid0.t();
 	}
 	else
 	{
 		orientation = "ver";
-		gridrot_row = s1;
-		gridrot_col = s2;
-
-		grid_rot = grid0;
+		return grid0;
 	}
-	return grid_rot;
 }
 
 vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
 {
-	int x11 = s23.cut_hor[row ];
-	int x22 = s23.cut_hor[row + 1];
-	int y11 = s23.cut_ver[col];
-	int y22 = s23.cut_ver[col + 1];
-	int w1 = x22 - x11;
-	int w2 = y22 - y11;
+	const int x11 = s23.cut_hor[row ];
+	const int x22 = s23.cut_hor[row + 1];
+	const int y11 = s23.cut_ver[col];
+	const int y22 = s23.cut_ver[col + 1];
+	const int w1 = x22 - x11;
+	const int w2 = y22 - y11;
 
 	Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
 	uint8_t* mean2Data = mean2.data;
-	for (int x = x11; x < x22; x++)
+	for (auto x = x11; x < x22; x++)
 	{
-		for (int y = y11; y < y22; y++)
+		for (auto y = y11; y < y22; y++)
 		{
-			int o = x - x11;
-			int p = y - y11;
-
-			int val = s23.img2.data[x * s23.img2.step + y];
-			size_t idx = (o * mean2.step + p);
-			*(mean2Data + idx) = val;
+			size_t idx = ((x-x11) * mean2.step + (y-y11));
+			*(mean2Data + idx) = s23.img2.data[x * s23.img2.step + y];
 		}
 	}
 
@@ -615,33 +504,8 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 	double mean_0grad0 = Evaluation::MeanR(mean_grad0);
 	double mean_1grad1 = Evaluation::MeanR(mean_grad1);
 
-	vector<double> mean_grad = { mean_0grad0 ,mean_1grad1 };
+	vector<double> mean_grad = {mean_0grad0, mean_1grad1 };
 	return mean_grad;
-}
-
-Mat grid_pos01::get_gridcut(const Mat &grid_rot, const int s1, const int s2, string &orientation)
-{
-	int gridcut_row = 0;
-	int gridcut_col = 0;
-
-	Mat grid_cut(gridcut_row, gridcut_row, CV_8U, (int)grid_rot.step);
-
-	if (orientation == "hor")
-	{
-		gridcut_row = s2;
-		gridcut_col = s1;
-
-		grid_cut = cutGrid(grid_rot);
-	}
-	else
-	{
-		gridcut_row = s1;
-		gridcut_col = s2;
-
-		grid_cut = cutGrid(grid_rot);
-	}
-
-	return grid_cut;
 }
 
 void modify_max_pos(subPX &p)
@@ -662,6 +526,16 @@ void modify_max_pos(subPX &p)
 
 }
 
+void display_time02(const chrono::steady_clock::time_point& t01,
+	const chrono::steady_clock::time_point& t02)
+{
+	/* Getting number of milliseconds as an integer. */
+	auto ms_int = duration_cast<milliseconds>(t02 - t01);
+	duration<double, milli> ms_double = t02 - t01;
+	cout << "grid_pos01 Time: " << ms_double.count() << "ms" << endl;
+	cout << endl;
+}
+
 void grid_pos01::Execute(stage23 s23) 
 {
 	stage34 s34;
@@ -669,54 +543,46 @@ void grid_pos01::Execute(stage23 s23)
 	string orientation;
 	s34.grids = {};
 
-	modify_list(s23);
-		
-	s34.grids = new Grid* [s23.cut_hor.size()];
-	for (int h = 0; h < s23.cut_hor.size(); h++)
-		{
-			s34.grids[h] = new Grid[s23.cut_ver.size()];
-		}
+	s34.grids = get_grids(s23, s34);
+	
 	const int image_size = s23.img.cols * s23.img.rows;
 	const double five_percent = image_size * 0.05;
 
-		for (int row = 0; row < (s23.cut_hor.size()-1); row++)
+	for (int row = 0; row < (s23.cut_hor.size()-1); row++)
+	{
+		for (int col = 0; col < (s23.cut_ver.size()-1); col++)
 		{
-			for (int col = 0; col < (s23.cut_ver.size()-1); col++)
-			{
-				int s1 = (s23.cut_hor[row + 1] * 2) - (s23.cut_hor[row] * 2);
-				int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);
+			int s1 = (s23.cut_hor[row + 1] * 2) - (s23.cut_hor[row] * 2);
+			int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);
 		
-				Mat grid_rot = get_gridrot(s23, row, col, orientation);
-				struct subPX p;
-				const int grid_rot_size = s1 * s2;
+			Mat grid_rot = get_gridrot(s23, row, col, orientation);
+			struct subPX p;
+			const int grid_rot_size = grid_rot.rows * grid_rot.cols;
 
-				if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
-				{
-					Mat grid_cut = get_gridcut(grid_rot, s1, s2, orientation);
-					p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
-					modify_max_pos(p);
-				}
-				else
-				{
-					p.max_pos = {};
-					p.pres.clear();
-				}
-				vector<int>coord(2);
-				coord[0]=(s23.cut_hor[row] * 2);
-				coord[1]=(s23.cut_ver[col] * 2);
-				s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
-
-				/*vector<double> max_p = s34.grids[row][col].max_pos;
-				for(auto vi:max_p)
-					cout << vi << endl;*/
+			if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
+			{
+				Mat grid_cut = cutGrid(grid_rot);
+				p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
+				modify_max_pos(p);
 			}
-		}		
+			else
+			{
+				p.max_pos = {};
+				p.pres.clear();
+			}
+			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
+			s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
+			
+			/*vector<double> max_p = s34.grids[row][col].max_pos;
+			for(auto vi:max_p)
+				cout << vi << endl;*/
+		}
+	}
 	s34.img = s23.img;
 	s34.gridRows = (int)s23.cut_hor.size()-1;
 	s34.gridCols = (int)s23.cut_ver.size()-1;
 
 	fifo.push(s34);
 	std::cout << s34;
-
 }
 

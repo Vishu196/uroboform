@@ -56,7 +56,6 @@ int main(int argc, char* argv[])
 	// storing all o/p values to respective vector lists and then passing list as i/p to csv fn so that we can get
 	//a table of all o/p values.
 	
-	vector<double> time_list;
 	vector<double> xi_i;
 	vector<double> zi_i;
 	vector<double> k_i;
@@ -77,10 +76,7 @@ int main(int argc, char* argv[])
 	raw_edges edge0{};
 	find_edges edge{};
 	grid_pos grid_final{};
-	/*grid_pos01 grid0{};
-	grid_pos02 index{};
-	grid_pos03 center{};*/
-
+	
 	auto t01 = high_resolution_clock::now();
 
 	edge0.ExecuteR(image);

@@ -80,7 +80,6 @@ double Evaluation::Median(vector<double> array)
 double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 {
 	double sum = 0.0, standardDeviation = 0.0;
-	int i;
 	int size = stop - start;
 
 	vector<double> B(size);
