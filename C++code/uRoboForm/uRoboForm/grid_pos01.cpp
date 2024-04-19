@@ -476,6 +476,192 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 	return p;
 }
 
+void modify_list(stage23 &s23)
+{
+	if (s23.cut_ver.front() * 2 < 10)
+	{
+		s23.cut_ver.erase(s23.cut_ver.begin());
+	}
+
+	if (s23.cut_hor.front() * 2 < 10)
+	{
+		s23.cut_hor.erase(s23.cut_hor.begin());
+	}
+
+	s23.cut_hor.insert(s23.cut_hor.begin(),0);
+	s23.cut_ver.insert(s23.cut_ver.begin(), 0);
+
+	s23.cut_hor.push_back(s23.img.rows / 2);
+	s23.cut_ver.push_back(s23.img.cols / 2);
+}
+
+Mat get_grid0(stage23& s23, int row, int col )
+{
+	int x1 = s23.cut_hor[row] * 2;
+	int x2 = s23.cut_hor[row + 1] * 2;
+	int y1 = s23.cut_ver[col] * 2;
+	int y2 = s23.cut_ver[col + 1] * 2;
+	int s1 = x2 - x1;
+	int s2 = y2 - y1;
+
+	Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
+	uint8_t* grid0Data = grid0.data;
+
+	if (x2 > x1 && y2 > y1)
+	{
+		for (int x = x1; x < x2; x++)
+		{
+			for (int y = y1; y < y2; y++)
+			{
+				int val = s23.img.data[x * s23.img.step + y];
+				size_t idx = ((x - x1) * grid0.step + (y - y1));
+				*(grid0Data + idx) = val;
+			}
+		}
+	}
+
+	return grid0;
+}
+
+Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &orientation)
+{
+	int x1 = s23.cut_hor[row] * 2;
+	int x2 = s23.cut_hor[row + 1] * 2;
+	int y1 = s23.cut_ver[col] * 2;
+	int y2 = s23.cut_ver[col + 1] * 2;
+	int s1 = x2 - x1;
+	int s2 = y2 - y1;
+
+	Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
+	uint8_t* grid0Data = grid0.data;
+
+	if (x2 > x1 && y2 > y1)
+	{
+		for (int x = x1; x < x2; x++)
+		{
+			for (int y = y1; y < y2; y++)
+			{
+				int val = s23.img.data[x * s23.img.step + y];
+				size_t idx = ((x - x1) * grid0.step + (y - y1));
+				*(grid0Data + idx) = val;
+			}
+		}
+	}
+
+	vector<double> mean_grad = get_mean_grad(s23, row, col);
+
+	int gridrot_row = 0;
+	int gridrot_col = 0;
+	Mat grid_rot(gridrot_row, gridrot_col, CV_8U);
+
+	if (mean_grad[1] > mean_grad[0])
+	{
+		orientation = "hor";
+		gridrot_row = s2;
+		gridrot_col = s1;
+
+		grid_rot = grid0.t();
+	}
+	else
+	{
+		orientation = "ver";
+		gridrot_row = s1;
+		gridrot_col = s2;
+
+		grid_rot = grid0;
+	}
+	return grid_rot;
+}
+
+vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
+{
+	int x11 = s23.cut_hor[row ];
+	int x22 = s23.cut_hor[row + 1];
+	int y11 = s23.cut_ver[col];
+	int y22 = s23.cut_ver[col + 1];
+	int w1 = x22 - x11;
+	int w2 = y22 - y11;
+
+	Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
+	uint8_t* mean2Data = mean2.data;
+	for (int x = x11; x < x22; x++)
+	{
+		for (int y = y11; y < y22; y++)
+		{
+			int o = x - x11;
+			int p = y - y11;
+
+			int val = s23.img2.data[x * s23.img2.step + y];
+			size_t idx = (o * mean2.step + p);
+			*(mean2Data + idx) = val;
+		}
+	}
+
+	vector<double> mean_grad00 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean0R(mean2), 0, (w2 / 6)));
+	vector<double> mean_grad11 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean1R(mean2), 0, (w1 / 6)));
+
+	vector<double> mean_grad0(w2);
+	vector<double> mean_grad1(w1);
+
+	int t = w1 > w2 ? w1 : w2;
+	for (int i = 0; i < t; i++)
+	{
+		if (i < w2)
+			mean_grad0[i] = abs(mean_grad00[i]);
+		if (i < w1)
+			mean_grad1[i] = abs(mean_grad11[i]);
+	}
+
+	double mean_0grad0 = Evaluation::MeanR(mean_grad0);
+	double mean_1grad1 = Evaluation::MeanR(mean_grad1);
+
+	vector<double> mean_grad = { mean_0grad0 ,mean_1grad1 };
+	return mean_grad;
+}
+
+Mat grid_pos01::get_gridcut(const Mat &grid_rot, const int s1, const int s2, string &orientation)
+{
+	int gridcut_row = 0;
+	int gridcut_col = 0;
+
+	Mat grid_cut(gridcut_row, gridcut_row, CV_8U, (int)grid_rot.step);
+
+	if (orientation == "hor")
+	{
+		gridcut_row = s2;
+		gridcut_col = s1;
+
+		grid_cut = cutGrid(grid_rot);
+	}
+	else
+	{
+		gridcut_row = s1;
+		gridcut_col = s2;
+
+		grid_cut = cutGrid(grid_rot);
+	}
+
+	return grid_cut;
+}
+
+void modify_max_pos(subPX &p)
+{
+	size_t r = p.max_pos.size();
+
+	vector <double> max_pos_de = Evaluation::decumulate(p.max_pos);
+
+	if ((r > 1) && (max_pos_de.back() > 65))
+	{
+		p.max_pos.pop_back();
+	}
+
+	if ((r > 1) && (max_pos_de[0] > 65))
+	{
+		p.max_pos.erase(p.max_pos.begin());
+	}
+
+}
+
 void grid_pos01::Execute(stage23 s23) 
 {
 	stage34 s34;
@@ -485,198 +671,37 @@ void grid_pos01::Execute(stage23 s23)
 
 	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
 	{
-		if (s23.cut_ver.front() * 2 < 10)
-		{
-			s23.cut_ver.pop_front();
-		}
-
-		if (s23.cut_hor.front() * 2 < 10)
-		{
-			s23.cut_hor.pop_front();
-		}
-
-		s23.cut_hor.push_front(0);
-		s23.cut_ver.push_front(0);
-
-		s23.cut_hor.push_back(s23.img.rows / 2);
-		s23.cut_ver.push_back(s23.img.cols / 2);
-
-		int* cut_hor_arr = new int[(int)s23.cut_hor.size()];
-		std::copy(s23.cut_hor.begin(), s23.cut_hor.end(), cut_hor_arr);
-
-		int* cut_ver_arr = new int[(int)s23.cut_ver.size()];
-		std::copy(s23.cut_ver.begin(), s23.cut_ver.end(), cut_ver_arr);
-
+		modify_list(s23);
+		
 		s34.grids = new Grid* [s23.cut_hor.size()];
 		for (int h = 0; h < s23.cut_hor.size(); h++)
 		{
 			s34.grids[h] = new Grid[s23.cut_ver.size()];
 		}
 
-		//memset(s34.grids, 0, sizeof(s34.grids[0][0]) * s23.cut_hor.size() * s23.cut_ver.size());
-
-		int image_size = s23.img.cols * s23.img.rows;
-		double five_percent = image_size * 0.05;
+		const int image_size = s23.img.cols * s23.img.rows;
+		const double five_percent = image_size * 0.05;
 
 		for (int row = 0; row < (s23.cut_hor.size()-1); row++)
 		{
-			int b = 0;
 			for (int col = 0; col < (s23.cut_ver.size()-1); col++)
 			{
-				int a = row + 1;
-				b = col + 1;
-				int x1 = cut_hor_arr[row] * 2;
-				int x2 = cut_hor_arr[a] * 2;
-				int y1 = cut_ver_arr[col] * 2;
-				int y2 = cut_ver_arr[b] * 2;
-				int s1 = x2 - x1;
-				int s2 = y2 - y1;
-
-				Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
-				uint8_t* grid0Data = grid0.data;
-
-				if (x2>x1 && y2>y1)
-				{
-					for (int x = x1; x < x2; x++)
-					{
-						for (int y = y1; y < y2; y++)
-						{
-							int o = x - x1;
-							int p = y - y1;
-							
-							int val = s23.img.data[x * s23.img.step + y];
-							size_t idx = (o * grid0.step + p);
-							*(grid0Data + idx) = val;
-						}
-					}
-				}				
-
-				int x11 = cut_hor_arr[row];
-				int x22 = cut_hor_arr[row + 1];
-				int y11 = cut_ver_arr[col];
-				int y22 = cut_ver_arr[col + 1];
-				int w1 = x22 - x11;
-				int w2 = y22 - y11;
-
-				Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
-				uint8_t* mean2Data = mean2.data;
-
-				for (int x = x11; x < x22; x++)
-				{
-					for (int y = y11; y < y22; y++)
-					{
-						int o = x - x11;
-						int p = y - y11;
-
-						int val = s23.img2.data[x * s23.img2.step + y];
-						size_t idx = (o * mean2.step + p);
-						*(mean2Data + idx) = val;
-					}
-				}
-
-				vector <double> mean2_0(w2);
-				vector <double> mean2_1(w1);
-				
-				mean2_0 = Evaluation::Mean0R(mean2);
-				mean2_1 = Evaluation::Mean1R(mean2);
-
-				int wid1 = w2 / 6;
-				int wid2 = w1 / 6;
-
-				vector<double> mean_grad000(w2);
-				mean_grad000 = signal_evaluation::Bandfilter(mean2_0, 0, wid1);
-				vector<double> mean_grad111(w1);
-				mean_grad111 = signal_evaluation::Bandfilter(mean2_1, 0, wid2);
-				
-				vector<double> mean_grad00(w2);
-				mean_grad00 = gradient(mean_grad000);
-				vector<double> mean_grad11(w1);
-				mean_grad11 = gradient(mean_grad111);
-
-				vector<double> mean_grad0(w2);
-
-				for (int i = 0; i < w2; i++)
-				{
-					mean_grad0[i] = abs(mean_grad00[i]);
-				}
-
-				vector<double> mean_grad1(w1);
-
-				for (int i = 0; i < w1; i++)
-				{
-					mean_grad1[i] = abs(mean_grad11[i]);
-				}
-
-				double mean_0grad0 = Evaluation::MeanR(mean_grad0);
-				double mean_1grad1 = Evaluation::MeanR(mean_grad1);
-
-				int gridrot_row = 0;
-				int gridrot_col = 0;
-				Mat grid_rot(gridrot_row, gridrot_col, CV_8U);
-				
-				if (mean_1grad1 > mean_0grad0)
-				{
-					orientation = "hor";
-				}
-				else
-				{
-					orientation = "ver";
-				}
-
-				if (orientation == "hor")
-				{
-					gridrot_row = s2;
-					gridrot_col = s1;
-
-					grid_rot = grid0.t();
-				}
-
-				else
-				{					
-					gridrot_row = s1;
-					gridrot_col = s2;
-
-					grid_rot = grid0;
-				}
+				int s1 = (s23.cut_hor[row + 1] * 2) - (s23.cut_hor[row] * 2);
+				int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);
+		
+				Mat grid_rot = get_gridrot(s23, row, col, orientation);
 
 				struct subPX p;
-				int grid_rot_size = s1 * s2;
+
+				const int grid_rot_size = s1 * s2;
+
 				if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
 				{
-					int gridcut_row = 0;
-					int gridcut_col = 0;
-					Mat grid_cut(gridcut_row, gridcut_row, CV_8U,(int) grid_rot.step);
-
-					if (orientation == "hor")
-					{
-						gridcut_row = s2;
-						gridcut_col = s1;
-					
-						grid_cut = cutGrid(grid_rot);
-					}
-					else
-					{
-						gridcut_row = s1;
-						gridcut_col = s2;
-					
-						grid_cut = cutGrid(grid_rot);
-					}
+					Mat grid_cut = get_gridcut(grid_rot, s1, s2, orientation);
 
 					p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
 
-					size_t r = p.max_pos.size();
-					
-					vector <double> max_pos_de = Evaluation:: decumulate(p.max_pos);
-					
-					if ((r>1) && (max_pos_de.back()>65))
-					{
-						p.max_pos.pop_back();
-					}
-
-					if ((r > 1) && (max_pos_de[0] > 65))
-					{
-						p.max_pos.erase(p.max_pos.begin());
-					}
+					modify_max_pos(p);
 				}
 				else
 				{
@@ -685,9 +710,10 @@ void grid_pos01::Execute(stage23 s23)
 				}
 
 				vector<int>coord(2);
-				coord[0]=(cut_hor_arr[row] * 2);
-				coord[1]=(cut_ver_arr[col] * 2);
+				coord[0]=(s23.cut_hor[row] * 2);
+				coord[1]=(s23.cut_ver[col] * 2);
 				s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
+
 				/*vector<double> max_p = s34.grids[row][col].max_pos;
 				for(auto vi:max_p)
 					cout << vi << endl;*/
@@ -708,3 +734,4 @@ void grid_pos01::Execute(stage23 s23)
 	cout << s34;
 
 }
+

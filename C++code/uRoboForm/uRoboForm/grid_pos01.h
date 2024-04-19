@@ -42,6 +42,9 @@ private:
 	struct subPX subpx_gauss(const std::vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
 	struct subPX subpx_parabel(const std::vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m);
 	struct subPX subpx_phase(const cv::Mat &cutGrid);
+	std::vector<double> get_mean_grad(stage23& s23, const int row, const int col);
+	cv::Mat get_gridrot(stage23& s23, const int row, const int col, std::string& orientation);
+	cv::Mat get_gridcut(const cv::Mat& grid_rot, const int s1, const int s2, std::string& orientation);
 	cqueue<stage34> fifo;
 
 public:
