@@ -1,13 +1,103 @@
 #include "grid_pos03.h"
 
 using namespace std;
+using namespace cv;
 
 std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 {
+	cout << "k:" << s56.k << endl;
 	cout << "xi: " << s56.xi << endl;
 	cout << "zi: " << s56.zi << endl;
 	cout << "grid_pos03 complete." << endl;
 	return ostr;
+}
+
+double grid_pos03::calc_d_k(vector<vector <double>> lines)
+{
+	int n = (int)lines.size();
+	const int n1 = n - 1;
+	const int n2 = n - 2;
+	double line_0, line_n;
+	if (lines[1][0] == lines[0][0])
+	{
+		vector<double> line_arr(2);
+		line_arr[0] = lines[0][1];
+		line_arr[1] = lines[1][1];
+		line_0 = Evaluation::MeanR(line_arr);
+	}
+	else
+	{
+		line_0 = lines[0][1];
+	}
+
+	if (lines[n1][0] == lines[n2][0])
+	{
+		vector<double> line_arr(2);
+		line_arr[0] = lines[n1][1];
+		line_arr[1] = lines[n2][1];
+		line_n = Evaluation::MeanR(line_arr);
+	}
+	else
+	{
+		line_n = lines[lines.size() - 1][1];
+	}
+	return (line_n - line_0) / ((lines[n1][0] - lines[0][0]) / 200);
+}
+
+double grid_pos03::get_d_k(Grid**& cgrids, int gRows, int gCols)
+{
+	vector<vector<double>>lines_hor;
+	vector<vector<double>> lines_ver;
+	for (int row = 0; row < gRows; row++)
+	{
+		for (int col = 0; col < gCols; col++)
+		{
+			Grid field = cgrids[row][col];
+
+			if (field.max_pos.size() >= 1)
+			{
+				if (field.orientation == "hor")
+				{
+					vector<double> h1;
+					h1.push_back(grid_pos02::get_mask_pos(field, row, col, 0));
+					h1.push_back(field.max_pos.front());
+					lines_hor.push_back(h1);
+
+					vector<double> h2;
+					h2.push_back(grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
+					h2.push_back(field.max_pos.back());
+					lines_hor.push_back(h2);
+				}
+				else
+				{
+					vector<double> v1;
+					v1.push_back(grid_pos02::get_mask_pos(field, row, col, 0));
+					v1.push_back(field.max_pos.front());
+					lines_ver.push_back(v1);
+
+					vector<double> v2;
+					v2.push_back(grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
+					v2.push_back(field.max_pos.back());
+					lines_ver.push_back(v2);
+				}
+			}
+		}
+	}
+	double d_k_mean = 0;
+
+	if ((lines_ver.size() >= 3) && (lines_hor.size() >= 3))
+	{
+		sort(lines_hor.begin(), lines_hor.end());
+		sort(lines_ver.begin(), lines_ver.end());
+		double d_k_hor = calc_d_k(lines_hor);
+		double d_k_ver = calc_d_k(lines_ver);
+		d_k_mean = (d_k_hor + d_k_ver) / 2;
+	}
+	else
+	{
+		d_k_mean = 200 / px_size;
+	}
+	return d_k_mean;
 }
 
 vector<vector<list<int>>> grid_pos03::grid_params(void)
@@ -94,6 +184,26 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 stage56 grid_pos03::Execute(stage45 s45)
 {
 	stage56 s56;
+
+	for (int row = 0; row < s45.gridRows; row++)
+	{
+		for (int col = 0; col < s45.gridCols; col++)
+		{
+			Grid& field = s45.grids[row][col];
+
+			if (field.max_pos.size() > 0)
+			{
+				if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || (row == (s45.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || (col == (s45.gridCols - 1)))))
+				{
+					field.max_pos.erase(field.max_pos.begin());
+				}
+			}
+		}
+	}
+
+	double d_k = get_d_k(s45.grids, s45.gridRows, s45.gridCols);
+	s56.k = d_k * (px_size / 200);
+
 	vector<vector<double>> center_hor;
 	vector<vector<double>> center_ver;
 	list<int> look_el;
@@ -125,7 +235,7 @@ stage56 grid_pos03::Execute(stage45 s45)
 		for (int col = 0; col < s45.gridCols; col++)
 		{
 			vector<double> center;
-			Grid field = s45.grids[row][col];
+			Grid &field = s45.grids[row][col];
 
 			for (int i_max = 0; i_max < field.max_pos.size(); i_max++)
 			{
@@ -140,9 +250,9 @@ stage56 grid_pos03::Execute(stage45 s45)
 					{
 						P = mask_pos + look_el.back();
 					}
-					double pa = (-P * s45.k);
+					double pa = (-P * s56.k);
 					double va = (field.max_pos[i_max] * px_size);
-					center.push_back((-P * s45.k) + (field.max_pos[i_max] * px_size));
+					center.push_back((-P * s56.k) + (field.max_pos[i_max] * px_size));
 
 				}
 			}
@@ -172,7 +282,6 @@ stage56 grid_pos03::Execute(stage45 s45)
 	s56.gridCols = s45.gridCols;
 	s56.grids = s45.grids;
 	s56.index = s45.index;
-	s56.k = s45.k;
 	s56.ind_ori = s45.ind_ori;
 	
 	fifo.push(s56);

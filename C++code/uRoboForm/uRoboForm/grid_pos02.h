@@ -10,11 +10,11 @@ struct stage45
 	int gridRows;
 	int gridCols;
 	Grid** grids;
+	cv::Mat img;
 	int index;
-	double k;
 	std::string ind_ori;
 
-	stage45() :gridRows(0), gridCols(0), index(0), k(0.0), grids(0),ind_ori()
+	stage45() :gridRows(0), gridCols(0), grids(0), index(0), ind_ori()
 	{};
 };
 
@@ -34,10 +34,8 @@ private:
 
 	Grid** checkGrid(Grid** &grids01, int gRows, int gCols);
 	std::vector<int> linspace(double start, double end, int num);
-	struct RdBinary ReadBinary(Grid** &cgrids, const cv::Mat &img);
+	RdBinary ReadBinary(Grid**& cgrids, const cv::Mat& img);
 	int static get_mask_pos(Grid field, int row, int col, size_t i_max);
-	double calc_d_k(std::vector<vector<double>> lines);
-	double get_d_k(Grid** &cgrids, int gRows, int gCols);
 	cqueue<stage45> fifo;
 
 public:

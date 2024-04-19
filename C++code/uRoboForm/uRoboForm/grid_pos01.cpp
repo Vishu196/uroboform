@@ -678,7 +678,6 @@ void grid_pos01::Execute(stage23 s23)
 		{
 			s34.grids[h] = new Grid[s23.cut_ver.size()];
 		}
-
 		const int image_size = s23.img.cols * s23.img.rows;
 		const double five_percent = image_size * 0.05;
 
@@ -690,17 +689,13 @@ void grid_pos01::Execute(stage23 s23)
 				int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);
 		
 				Mat grid_rot = get_gridrot(s23, row, col, orientation);
-
 				struct subPX p;
-
 				const int grid_rot_size = s1 * s2;
 
 				if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
 				{
 					Mat grid_cut = get_gridcut(grid_rot, s1, s2, orientation);
-
 					p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
-
 					modify_max_pos(p);
 				}
 				else
@@ -708,7 +703,6 @@ void grid_pos01::Execute(stage23 s23)
 					p.max_pos = {};
 					p.pres.clear();
 				}
-
 				vector<int>coord(2);
 				coord[0]=(s23.cut_hor[row] * 2);
 				coord[1]=(s23.cut_ver[col] * 2);
@@ -718,13 +712,11 @@ void grid_pos01::Execute(stage23 s23)
 				for(auto vi:max_p)
 					cout << vi << endl;*/
 			}
-		}
-		
+		}		
 		s34.img = s23.img;
 		s34.gridRows = (int)s23.cut_hor.size()-1;
 		s34.gridCols = (int)s23.cut_ver.size()-1;
 	}
-	
 	else
 	{
 		s34.grids = {};
