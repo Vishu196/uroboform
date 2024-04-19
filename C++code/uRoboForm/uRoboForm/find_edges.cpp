@@ -235,11 +235,6 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		}
 		double d_m_0 = abs(Evaluation::MeanR(ver0));
 
-		/*int* ver11 = new int[d_cut_ver_1.size()];
-		int* ver1 = new int[d_cut_ver_1.size()];
-		copy(d_cut_ver_1.begin(), d_cut_ver_1.end(), ver11);
-
-		*/
 		vector<int> ver1;
 		vector<int> ver11;
 		copy(d_cut_ver_1.begin(), d_cut_ver_1.end(), ver11.begin());
@@ -247,7 +242,7 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 		{
 			ver1[i] = ver11[i] - ideal_d;
 		}
-		//transform(ver11.begin(), ver11.end(), ver1.begin(), op_subtract);
+		
 		double d_m_1 = abs(Evaluation::MeanR(ver1));
 
 		if (d_m_0 > d_m_1)
@@ -269,201 +264,204 @@ list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 	return cut_list;
 }
 
+vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &index)
+{
+	//double s_max, s_min;
+	const size_t mid = s12.mean0.size() / 2;
+	const size_t i0 = mid - search_range;
+	const size_t i1 = mid + search_range;
+
+	vector<double> mean_range0(s12.mean0.begin() + i0, s12.mean0.begin() + i1);
+
+	size_t len = s12.img2.rows;
+	vector<double> im_col(len);
+	while (rank < 5)
+	{
+		rank += 1;
+		index = Line_Index(mean_range0, s12.th_edge, (int)i0, rank);
+		int s_m = (int)index.s_max;
+		bool res = isnan(index.s_max);
+		if (!res)
+		{
+			size_t x = s12.img2.rows / 6;
+			vector<double> img_col(len);
+			for (int i = 0; i < len; i++)
+			{
+				img_col[i] = (double)s12.img2.data[i * s12.img2.step + s_m];
+			}
+
+			im_col = signal_evaluation::Bandfilter(img_col, 0, x);
+
+			size_t n1 = len - 150;
+			vector<double> std_col(n1);
+			for (int i = 0; i < n1; i++)
+			{
+				std_col.push_back(Evaluation::std_dev(im_col, i, i + 150));
+			}
+			double c1 = *min_element(std_col.begin(), std_col.begin() + n1);
+			double c2 = (*max_element(im_col.begin(), im_col.begin() + len)) - (*min_element(im_col.begin(), im_col.begin() + len));
+			double condition1 = c1 / c2;
+			if (condition1 <= 0.085)
+			{
+				break;
+			}
+		}
+	}
+	return im_col;
+}
+
+void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
+{
+	indexes index;
+
+	vector<double> im_col = Execute_1(s12, rank, index);
+
+	try
+	{
+		s23.cut_hor.clear();
+
+		if (rank != 5)
+		{
+			Detect_throu t = Detect_Through(im_col, s12.th_edge);
+
+			for (int i = 0; i < t.cut_through.size(); i++)
+			{
+				int a = t.through_loc[t.cut_through[i]] + 1;
+				int b1 = t.cut_through[i] + 1;
+				int b = t.through_loc[i];
+				int c = t.through_loc[t.cut_through[i]] + 1;
+				if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[a] > s12.th_edge))
+				{
+					s23.cut_hor.push_back(t.through_loc[b1]);
+				}
+				else if (t.cut_through[i] == (t.through_loc.size() - 2))
+				{
+					s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+				}
+				else if (im_col[c] > s12.th_edge)
+				{
+					if (t.through_loc[t.cut_through[i]] > 10)
+					{
+						s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
+					}
+					s23.cut_hor.push_back(t.through_loc[b1]);
+				}
+			}
+
+			//cut_hor = Delete_Edges(s23.cut_hor, 300);
+		}
+
+	}
+	catch (const std::out_of_range)
+	{
+		s23.cut_hor.clear();
+	}
+	
+}
+
+void find_edges::get_cut_ver(int &rank, const stage12& s12, stage23 &s23)
+{
+	indexes index;
+	int s1 = s23.cut_hor[1] - s23.cut_hor[0];
+	int k = 0;
+
+	vector<double> mean_range1(s12.mean1.begin() + s23.cut_hor[0], s12.mean1.begin() + s23.cut_hor[1]);
+	
+	index = Line_Index(mean_range1, s12.th_edge, s23.cut_hor[0], rank = 1);
+	int s_m = (int)index.s_max;
+	int s_mi = (int)index.s_min;
+
+	try
+	{
+		size_t y = s12.img2.cols / 6;
+		size_t wid = s12.img2.cols;
+		vector<double> img_row_l(wid);
+		for (int i = 0; i < wid; i++)
+		{
+			img_row_l[i] = (double)s12.img2.data[s_mi * s12.img2.step + i];
+		}
+
+		vector<double> im_row_low = signal_evaluation::Bandfilter(img_row_l, 0, y);
+
+		size_t n2 = wid - 200;
+		vector<double> std_row(n2);
+		for (int i = 0; i < n2; i++)
+		{
+			std_row.push_back(Evaluation::std_dev(im_row_low, i, i + 200));
+		}
+		double cc1 = *min_element(std_row.begin(), std_row.begin() + n2);
+		double cc2 = (*max_element(im_row_low.begin(), im_row_low.begin() + wid)) - (*min_element(im_row_low.begin(), im_row_low.begin() + wid));
+		double condition2 = cc1 / cc2;
+		if (condition2 <= 0.085)
+		{
+			Detect_throu t = Detect_Through(im_row_low, s12.th_edge);
+
+			for (int i_row_l = 0; i_row_l < t.cut_through.size(); i_row_l++)
+			{
+				if (t.through_loc.at(t.cut_through.at(i_row_l)) != 0)
+				{
+					s23.cut_ver.push_back(t.through_loc.at(t.cut_through.at(i_row_l)));
+				}
+			}
+		}
+
+		vector<double> img_row;
+		for (int i = 0; i < wid; i++)
+		{
+			img_row.push_back((double)s12.img2.data[s_m * s12.img2.step + i]);
+		}
+
+		vector<double> im_row = signal_evaluation::Bandfilter(img_row, 0, y);
+
+		size_t n3 = wid - 200;
+		vector<double> std_row_h;
+		for (int i = 0; i < n3; i++)
+		{
+			std_row_h.push_back(Evaluation::std_dev(im_row, i, i + 200));
+		}
+
+		double c11 = *min_element(std_row_h.begin(), std_row_h.begin() + n2);
+		double c22 = (*max_element(im_row.begin(), im_row.begin() + wid)) - (*min_element(im_row.begin(), im_row.begin() + wid));
+		double condition3 = c11 / c22;
+		if (condition3 <= 0.088)
+		{
+			Detect_throu t1 = Detect_Through(im_row, s12.th_edge);
+
+			for (int i_row_h = 0; i_row_h < t1.cut_through.size(); i_row_h++)
+			{
+				if (t1.through_loc.at(t1.cut_through.at(i_row_h) + 1) != im_row.size())
+				{
+					int m = t1.cut_through.at(i_row_h) + 1;
+					s23.cut_ver.push_back(t1.through_loc.at(m));
+				}
+			}
+		}
+		sort(s23.cut_ver.begin(), s23.cut_ver.end());
+
+		//to do
+		//cut_ver = Delete_Edges(s23.cut_ver, 300);
+
+	}
+	catch (const std::out_of_range)
+	{
+		s23.cut_ver.clear();
+	}
+
+}
+
 void find_edges::Execute(const stage12 &s12)
 {
 	stage23 s23;
 
 	if ((s12.main_d_0 > 13) && (s12.main_d_1 > 13))
 	{	
-		double s_max, s_min;
-		const size_t mid = s12.mean0.size() / 2;
-		const size_t i0 = mid - search_range;
-		const size_t i1 = mid + search_range;
-		const size_t R = i1 - i0;
-
-		vector<double> mean_range0(s12.mean0.begin() + i0, s12.mean0.begin() + i1);
-
 		int rank = 0;
-		size_t len = s12.img2.rows;
-		vector<double> im_col(len);
-		while (rank < 5)
-		{
-			rank += 1;
-			indexes index = Line_Index(mean_range0, s12.th_edge, (int)i0, rank);
-			s_max = index.s_max;
-			int s_m = (int) s_max;
-			bool res = isnan(s_max);
-			if (!res)
-			{
-				size_t x = s12.img2.rows / 6;
-				vector<double> img_col(len);
-				for (int i = 0; i < len; i++)
-				{
-					img_col[i] = (double)s12.img2.data[i * s12.img2.step + s_m];
-				}
-				
-				im_col = signal_evaluation::Bandfilter(img_col, 0, x);
 
-				size_t n1 = len - 150;
-				vector<double> std_col(n1);
-				for (int i = 0; i < n1; i ++)
-				{
-					double tmp = Evaluation::std_dev(im_col, i, i + 150);
-					std_col[i] = tmp;
-				}
-				double c1 = *min_element(std_col.begin(), std_col.begin() + n1);
-				double c2 = (*max_element(im_col.begin(), im_col.begin() + len)) - (*min_element(im_col.begin(), im_col.begin() + len));
-				double condition1 = c1 / c2;
-				if (condition1 <= 0.085)
-				{
-					break;
-				}
-			}
+		get_cut_hor(rank, s12, s23);
 	
-		}
-		try
-		{
-			s23.cut_hor.clear();
-			vector<int> cut_hor_arr;
-			if (rank != 5)
-			{
-				Detect_throu t = Detect_Through(im_col, s12.th_edge);
-
-				for (int i = 0; i < t.cut_through.size(); i++)
-				{
-					int a = t.through_loc[t.cut_through[i]] + 1;
-					int b1 = t.cut_through[i] + 1;
-					int b = t.through_loc[i];
-					int c = t.through_loc[t.cut_through[i]] + 1;
-					if ((t.through_loc[t.cut_through[i]] == 0) && (im_col[a] > s12.th_edge))
-					{
-						s23.cut_hor.push_back(t.through_loc[b1]);
-					}
-					else if (t.cut_through[i] == (t.through_loc.size() - 2))
-					{
-						s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
-					}
-					else if (im_col[c] > s12.th_edge)
-					{
-						if (t.through_loc[t.cut_through[i]] > 10)
-						{
-							s23.cut_hor.push_back(t.through_loc[t.cut_through[i]]);
-						}
-						s23.cut_hor.push_back(t.through_loc[b1]);
-					}
-				}
-				//copy(cut_hor.begin(), cut_hor.end(), cut_hor_arr);
-				////to do
-				//cut_hor = Delete_Edges(cut_hor_arr, 300);
-			}
-
-		}
-		catch (const std::out_of_range)
-		{
-			s23.cut_hor.clear();
-		}
 		if (s23.cut_hor.size() >= 2)
 		{
-			/*list<int>::iterator it = s23.cut_hor.begin();
-			advance(it, 1);
-			int j0 = s23.cut_hor.front();
-			int j1 = *it;*/
-			int j0 = s23.cut_hor.front();
-			int s1 = s23.cut_hor[1] - s23.cut_hor[0];
-			int k = 0;
-			vector<double> mean_range1(s1);
-			for (int i = j0; i < s23.cut_hor[1]; i++)
-			{
-				mean_range1[k] = s12.mean1[i];
-				k++;
-			}
-			indexes index = Line_Index(mean_range1,s12.th_edge, j0, rank=1);
-			s_max = index.s_max;
-			s_min = index.s_min;
-			int s_m = (int)s_max;
-			int s_mi = (int)s_min;
-
-			try
-			{
-				size_t y = s12.img2.cols / 6;
-				size_t wid = s12.img2.cols;
-				vector<double> img_row_l(wid);
-				for (int i = 0; i < wid; i++)
-				{
-					img_row_l[i] = (double)s12.img2.data[s_mi * s12.img2.step + i];
-				}
-
-				vector<double> im_row_low(wid);
-				im_row_low = signal_evaluation::Bandfilter(img_row_l, 0, y);
-
-				size_t n2 = wid - 200;
-				vector<double> std_row(n2);
-				for (int i = 0; i < n2; i++)
-				{
-					double tmp = Evaluation::std_dev(im_row_low, i, i + 200);
-					std_row.push_back(tmp);
-				}
-				double cc1 = *min_element(std_row.begin(), std_row.begin() + n2);
-				double cc2 = (*max_element(im_row_low.begin(), im_row_low.begin() + wid)) - (*min_element(im_row_low.begin(), im_row_low.begin() + wid));
-				double condition2 = cc1 / cc2;
-				if (condition2 <= 0.085)
-				{
-					Detect_throu t = Detect_Through(im_row_low, s12.th_edge);
-
-					for (int i_row_l = 0; i_row_l < t.cut_through.size(); i_row_l++)
-					{
-						if (t.through_loc.at(t.cut_through.at(i_row_l))  != 0)
-						{
-							s23.cut_ver.push_back(t.through_loc.at(t.cut_through.at(i_row_l)));
-						}
-					}
-				}
-
-				vector<double> img_row;
-				for (int i = 0; i < wid; i++)
-				{
-					img_row.push_back((double)s12.img2.data[s_m * s12.img2.step + i]);
-				}
-
-				vector<double> im_row;
-				im_row = signal_evaluation::Bandfilter(img_row, 0, y);
-
-				size_t n3 = wid - 200;
-				vector<double> std_row_h;
-				for (int i = 0; i < n3; i++)
-				{
-					double tmp = Evaluation::std_dev(im_row, i, i + 200);
-					std_row_h.push_back(tmp);
-				}
-
-				double c11 = *min_element(std_row_h.begin(), std_row_h.begin() + n2);
-				double c22 = (*max_element(im_row.begin(), im_row.begin() + wid)) - (*min_element(im_row.begin(), im_row.begin() + wid));
-				double condition3 = c11 / c22;
-				if (condition3 <= 0.088)
-				{
-					Detect_throu t1 = Detect_Through(im_row, s12.th_edge);
-
-					for (int i_row_h = 0; i_row_h < t1.cut_through.size(); i_row_h++)
-					{
-						if (t1.through_loc.at(t1.cut_through.at(i_row_h)+1) != im_row.size())
-						{
-							int m = t1.cut_through.at(i_row_h) + 1;
-							s23.cut_ver.push_back(t1.through_loc.at(m));
-						}
-					}
-				}
-				sort(s23.cut_ver.begin(), s23.cut_ver.end());
-				//s23.cut_ver.sort();
-				//to do
-				/*vector<int> cut_ver_arr;
-				copy(cut_ver.begin(), cut_ver.end(), cut_ver_arr);
-				cut_ver = Delete_Edges(cut_ver_arr, 300);*/
-
-			}
-			catch (const std::out_of_range)
-			{
-				s23.cut_ver.clear();
-			}
+			get_cut_ver(rank, s12, s23);			
 		}
 		else
 		{
