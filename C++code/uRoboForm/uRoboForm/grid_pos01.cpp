@@ -5,9 +5,9 @@ using namespace cv;
 
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
-	cout << "GridRows: " << s34.gridRows << endl;
-	cout << "GridCols: " << s34.gridCols << endl;
-	cout << "Stage 3 complete" << endl;
+	std::cout << "GridRows: " << s34.gridRows << endl;
+	std::cout << "GridCols: " << s34.gridCols << endl;
+	std::cout << "Stage 3 complete" << endl;
 	return ostr;
 }
 
@@ -669,17 +669,15 @@ void grid_pos01::Execute(stage23 s23)
 	string orientation;
 	s34.grids = {};
 
-	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
-	{
-		modify_list(s23);
+	modify_list(s23);
 		
-		s34.grids = new Grid* [s23.cut_hor.size()];
-		for (int h = 0; h < s23.cut_hor.size(); h++)
+	s34.grids = new Grid* [s23.cut_hor.size()];
+	for (int h = 0; h < s23.cut_hor.size(); h++)
 		{
 			s34.grids[h] = new Grid[s23.cut_ver.size()];
 		}
-		const int image_size = s23.img.cols * s23.img.rows;
-		const double five_percent = image_size * 0.05;
+	const int image_size = s23.img.cols * s23.img.rows;
+	const double five_percent = image_size * 0.05;
 
 		for (int row = 0; row < (s23.cut_hor.size()-1); row++)
 		{
@@ -713,17 +711,12 @@ void grid_pos01::Execute(stage23 s23)
 					cout << vi << endl;*/
 			}
 		}		
-		s34.img = s23.img;
-		s34.gridRows = (int)s23.cut_hor.size()-1;
-		s34.gridCols = (int)s23.cut_ver.size()-1;
-	}
-	else
-	{
-		s34.grids = {};
-	}
+	s34.img = s23.img;
+	s34.gridRows = (int)s23.cut_hor.size()-1;
+	s34.gridCols = (int)s23.cut_ver.size()-1;
 
 	fifo.push(s34);
-	cout << s34;
+	std::cout << s34;
 
 }
 

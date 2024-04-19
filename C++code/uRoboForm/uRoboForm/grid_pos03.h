@@ -31,7 +31,7 @@ private:
 	cqueue<stage56> fifo;
 
 public:
-	stage56 Execute(stage45 s45);
+	void Execute(stage45 s45, stage56 &s56);
 	stage56 getNext()
 	{
 		stage56 s56;

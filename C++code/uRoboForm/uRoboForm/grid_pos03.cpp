@@ -181,10 +181,8 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	return av_val;
 }
 
-stage56 grid_pos03::Execute(stage45 s45)
+void grid_pos03::Execute(stage45 s45, stage56 &s56)
 {
-	stage56 s56;
-
 	for (int row = 0; row < s45.gridRows; row++)
 	{
 		for (int col = 0; col < s45.gridCols; col++)
@@ -286,5 +284,4 @@ stage56 grid_pos03::Execute(stage45 s45)
 	
 	fifo.push(s56);
 	cout << s56;
-	return s56;
 }

@@ -76,9 +76,10 @@ int main(int argc, char* argv[])
 
 	raw_edges edge0{};
 	find_edges edge{};
-	grid_pos01 grid0{};
+	grid_pos grid_final{};
+	/*grid_pos01 grid0{};
 	grid_pos02 index{};
-	grid_pos03 center{};
+	grid_pos03 center{};*/
 
 	auto t01 = high_resolution_clock::now();
 
@@ -94,21 +95,9 @@ int main(int argc, char* argv[])
 
 	auto t03 = high_resolution_clock::now();
 
-	grid0.Execute(edge.getNext());
-
-	display_time(t03, high_resolution_clock::now());
-
-	auto t04 = high_resolution_clock::now();
-
-	index.Execute(grid0.getNext());
-
-	display_time(t04, high_resolution_clock::now());
-
-	auto t05 = high_resolution_clock::now();
-
-	stage56 s56 = center.Execute(index.getNext());
+	stage56 s56 = grid_final.Execute(edge.getNext());
 	
-	display_time(t05, high_resolution_clock::now());
+	display_time(t03, high_resolution_clock::now());
 
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());

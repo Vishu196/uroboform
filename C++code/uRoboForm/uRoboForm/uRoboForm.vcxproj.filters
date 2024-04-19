@@ -39,6 +39,9 @@
     <ClCompile Include="grid_pos03.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="grid_pos.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="find_edges.h">
