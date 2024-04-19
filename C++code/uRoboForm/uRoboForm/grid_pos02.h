@@ -10,7 +10,6 @@ struct stage45
 	int gridRows;
 	int gridCols;
 	Grid** grids;
-	cv::Mat img;
 	int index;
 	std::string ind_ori;
 

@@ -143,8 +143,8 @@ RdBinary grid_pos02::ReadBinary(Grid**& cgrids, const Mat& img)
 			{
 				const int w11 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
 				const int w22 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
-				int coded_areaRows = w22 - w11;
-				int coded_areaCols = y;
+				const int coded_areaRows = w22 - w11;
+				const int coded_areaCols = y;
 				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
 
 				for (int i = w11; i < w22; i++)
@@ -159,8 +159,8 @@ RdBinary grid_pos02::ReadBinary(Grid**& cgrids, const Mat& img)
 				const int l11 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
 				const int l22 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
 
-				int coded_areaRows = x;
-				int coded_areaCols = l11 - l22;
+				const int coded_areaRows = x;
+				const int coded_areaCols = l11 - l22;
 				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
 
 				for (int i = 0; i < x; i++)
@@ -282,7 +282,6 @@ void grid_pos02::Execute(stage34 s34)
 	
 	s45.gridRows = s34.gridRows;
 	s45.gridCols = s34.gridCols;
-	s45.img = s34.img;
 	s45.index = I.index;
 	s45.ind_ori = I.ind_ori;
 
