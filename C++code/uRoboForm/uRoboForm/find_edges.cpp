@@ -293,12 +293,13 @@ vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &ind
 			im_col = signal_evaluation::Bandfilter(img_col, 0, x);
 
 			size_t n1 = len - 150;
-			vector<double> std_col(n1);
+			vector<double> std_col;
+			std_col.reserve(n1);
 			for (int i = 0; i < n1; i++)
 			{
 				std_col.push_back(Evaluation::std_dev(im_col, i, i + 150));
 			}
-			double c1 = *min_element(std_col.begin(), std_col.begin() + n1);
+			double c1 = *min_element(std_col.begin(), std_col.end());
 			double c2 = (*max_element(im_col.begin(), im_col.begin() + len)) - (*min_element(im_col.begin(), im_col.begin() + len));
 			double condition1 = c1 / c2;
 			if (condition1 <= 0.085)
@@ -313,8 +314,7 @@ vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &ind
 void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
 {
 	indexes index;
-
-	vector<double>im_col = Execute_1(s12, rank, index);
+	vector<double> im_col = Execute_1(s12, rank, index);
 
 	try
 	{
