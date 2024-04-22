@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	raw_edges edge0{};
+	raw_edges edge0(freq_range);
 	find_edges edge{};
 	grid_pos grid_final{};
 	

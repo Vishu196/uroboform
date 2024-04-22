@@ -149,7 +149,7 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 		}
 	}
 
-	thro.through_loc.push_back(size);
+	thro.through_loc.push_back((int)size);
 
 	vector<int> d_through;
 	d_through = Evaluation::decumulate(thro.through_loc);

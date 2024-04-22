@@ -44,15 +44,15 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 	return (line_n - line_0) / ((lines[n1][0] - lines[0][0]) / 200);
 }
 
-double grid_pos03::get_d_k(Grid**& cgrids, int gRows, int gCols)
+double grid_pos03::get_d_k(const stage45 &s45)
 {
 	vector<vector<double>>lines_hor;
 	vector<vector<double>> lines_ver;
-	for (int row = 0; row < gRows; row++)
+	for (int row = 0; row < s45.gridRows; row++)
 	{
-		for (int col = 0; col < gCols; col++)
+		for (int col = 0; col < s45.gridCols; col++)
 		{
-			Grid field = cgrids[row][col];
+			Grid field = s45.grids[row][col];
 
 			if (field.max_pos.size() >= 1)
 			{
@@ -181,32 +181,9 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	return av_val;
 }
 
-void grid_pos03::Execute(stage45 s45, stage56 &s56)
+list<int> grid_pos03::get_look_el(const stage45 &s45)
 {
-	for (int row = 0; row < s45.gridRows; row++)
-	{
-		for (int col = 0; col < s45.gridCols; col++)
-		{
-			Grid& field = s45.grids[row][col];
-
-			if (field.max_pos.size() > 0)
-			{
-				if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || (row == (s45.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || (col == (s45.gridCols - 1)))))
-				{
-					field.max_pos.erase(field.max_pos.begin());
-				}
-			}
-		}
-	}
-
-	double d_k = get_d_k(s45.grids, s45.gridRows, s45.gridCols);
-	s56.k = d_k * (px_size / 200);
-
-	vector<vector<double>> center_hor;
-	vector<vector<double>> center_ver;
 	list<int> look_el;
-	int P;
-
 	vector<vector<list<int>>> look_up = grid_params();
 
 	if ((s45.index >= 0) && (s45.index < 200))
@@ -228,12 +205,24 @@ void grid_pos03::Execute(stage45 s45, stage56 &s56)
 		look_el.push_back(0);
 	}
 
+	return look_el;
+}
+
+axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
+{
+	list<int> look_el = get_look_el(s45);
+	
+	axis a;
+	a.center_hor;
+	a.center_ver;
+	int P;
+
 	for (int row = 0; row < s45.gridRows; row++)
 	{
 		for (int col = 0; col < s45.gridCols; col++)
 		{
 			vector<double> center;
-			Grid &field = s45.grids[row][col];
+			Grid& field = s45.grids[row][col];
 
 			for (int i_max = 0; i_max < field.max_pos.size(); i_max++)
 			{
@@ -262,20 +251,44 @@ void grid_pos03::Execute(stage45 s45, stage56 &s56)
 			t1.push_back(field.px_num);
 
 			if (field.orientation == "hor")
-			{
-				center_hor.push_back(t1);
-			}
+				a.center_hor.push_back(t1);
 			else
-			{
-				center_ver.push_back(t1);
-			}
+				a.center_ver.push_back(t1);
 			s45.grids[row][col] = field;
 		}
 	}
 
-	s56.xi = weighted_avg(center_ver);
-	s56.zi = weighted_avg(center_hor);
+	return a;
+}
 
+void Execute_1(stage45& s45)
+{
+	for (int row = 0; row < s45.gridRows; row++)
+	{
+		for (int col = 0; col < s45.gridCols; col++)
+		{
+			Grid& field = s45.grids[row][col];
+
+			if (field.max_pos.size() > 0)
+			{
+				if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || (row == (s45.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || (col == (s45.gridCols - 1)))))
+				{
+					field.max_pos.erase(field.max_pos.begin());
+				}
+			}
+		}
+	}
+}
+
+void grid_pos03::Execute(stage45 s45, stage56 &s56)
+{
+	Execute_1(s45);
+	double d_k = get_d_k(s45);
+	s56.k = d_k * (px_size / 200);
+	axis a = get_center_arr(s45, s56);
+
+	s56.xi = weighted_avg(a.center_ver);
+	s56.zi = weighted_avg(a.center_hor);
 	s56.gridRows = s45.gridRows;
 	s56.gridCols = s45.gridCols;
 	s56.grids = s45.grids;

@@ -132,6 +132,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\alglib-cpp\src;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;C:\Users\prash\Downloads\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <Optimization>Full</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;cblas.lib;gsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;gsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

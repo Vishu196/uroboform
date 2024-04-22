@@ -420,9 +420,9 @@ Grid** get_grids(stage23 &s23, stage34 &s34)
 	s23.cut_ver.push_back(s23.img.cols / 2);
 
 	s34.grids = new Grid * [s23.cut_hor.size()];
-	for (int h = 0; h < s23.cut_hor.size(); h++)
+	for (int h = 0; h < (int)s23.cut_hor.size(); h++)
 	{
-		s34.grids[h] = new Grid[s23.cut_ver.size()];
+		s34.grids[h] = new Grid[(int)s23.cut_ver.size()];
 	}
 
 	return s34.grids;
