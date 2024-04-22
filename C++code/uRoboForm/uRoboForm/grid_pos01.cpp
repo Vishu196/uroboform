@@ -40,7 +40,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 	const int len = grid_rot.rows / 2;
 	const int wid = grid_rot.cols / 2;
 
-	Mat grid_rot2;
+	Mat grid_rot2(len,wid,CV_8U);
 	resize(grid_rot, grid_rot2, Size(), 0.5, 0.5, cv::INTER_NEAREST);
 	
 	vector<double> mean_row =  Evaluation::Mean1R(grid_rot2);
@@ -70,13 +70,12 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 		const int x20 = where_arg + 1;
 		const int x22 = where_out[x20] * 2;
 		grid_cutRows = x22 - x11;
-		for (int i = x11; i < x22; i++)
-		{
-			for (int j = 0; j < grid_rot.cols; j++)
-			{
-				grid_cut.data[(i-x11)*grid_cut.step + j] = grid_rot.data[i * grid_rot.step + j];
-			}
-		}
+		
+		// Extract the region of interest from grid_rot
+		Mat sourceRegion = grid_rot.rowRange(x11, x22);
+
+		// Copy the extracted region to grid_cut
+		sourceRegion.copyTo(grid_cut.rowRange(0, x22 - x11));
 		grid_cut.resize(grid_cutRows);
 	}
 	else
@@ -416,15 +415,15 @@ void get_grids(stage23 &s23, stage34 &s34)
 Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &orientation)
 {
 	const int x1 = s23.cut_hor[row] * 2;
-	const int x2 = s23.cut_hor[row + 1] * 2;
+	const int x2 = (s23.cut_hor[row + 1] * 2);
 	const int y1 = s23.cut_ver[col] * 2;
-	const int y2 = s23.cut_ver[col + 1] * 2;
+	const int y2 = (s23.cut_ver[col + 1] * 2);
 	const int s1 = x2 - x1;
 	const int s2 = y2 - y1;
 
-	Mat grid0(s1, s2, CV_8U, (int)s23.img.step);
+	Mat grid0(s1, s2, CV_8U);
 	uint8_t* grid0Data = grid0.data;
-
+	
 	if (x2 > x1 && y2 > y1)
 	{
 		for (int x = x1; x < x2; x++)
@@ -432,7 +431,7 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 			for (int y = y1; y < y2; y++)
 			{
 				size_t idx = ((x - x1) * grid0.step + (y - y1));
-				*(grid0Data + idx) = s23.img.data[x * s23.img.step + y];
+				*(grid0Data + idx) = s23.img.data[x * s23.img.step + y];  
 			}
 		}
 	}
@@ -462,6 +461,7 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 
 	Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
 	uint8_t* mean2Data = mean2.data;
+
 	for (auto x = x11; x < x22; x++)
 	{
 		for (auto y = y11; y < y22; y++)

@@ -23,7 +23,7 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 		vector<double> line_arr(2);
 		line_arr[0] = lines[0][1];
 		line_arr[1] = lines[1][1];
-		line_0 = Evaluation::MeanR(line_arr);
+		line_0 = (line_arr[0] + line_arr[1])/2;
 	}
 	else
 	{
@@ -35,7 +35,7 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 		vector<double> line_arr(2);
 		line_arr[0] = lines[n1][1];
 		line_arr[1] = lines[n2][1];
-		line_n = Evaluation::MeanR(line_arr);
+		line_n = (line_arr[0] + line_arr[1]) / 2;
 	}
 	else
 	{

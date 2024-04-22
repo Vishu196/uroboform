@@ -31,22 +31,20 @@ Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 				bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
 				while (con)
 				{
-					vector<int> m_pos_de1(r);
-					int f = 0;
+					vector<int> m_pos_de1;
+					m_pos_de1.reserve(r);
+
 					for (int e = 0; e < r; e++)
 					{
 						if (m_pos_de[e] > 100)
 						{
-							m_pos_de1[f] = e;
-							f++;
+							m_pos_de1.push_back(e);
 						}
 					}
 
-					m_pos_de1.resize(f);
-
 					reverse(m_pos_de1.begin(), m_pos_de1.end());
 
-					for (int i = 0; i < f; i++)
+					for (auto i = 0; i < m_pos_de1.size(); i++)
 					{
 						int i_fill = m_pos_de1[i];
 						int fill1 = i_fill + 1;
@@ -77,14 +75,13 @@ Grid** grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 
 vector<int> grid_pos02::linspace(double start, double end, int num)
 {
-	std::vector<int> bounds;
+	vector<int> bounds;
+	bounds.reserve(num);
 
 	if (0 != num)
 	{
 		if (1 == num)
-		{
 			bounds.push_back((int)start);
-		}
 		else
 		{
 			double delta = (end - start) / (num - 1);
@@ -139,35 +136,27 @@ RdBinary grid_pos02::ReadBinary(Grid**& cgrids, const Mat& img)
 			const double end = max_mean[3] + (d_mean * 3 / 4);
 			vector<int> bounds = linspace(start, end, 10);
 			vector<double> coded_line;
+			
 			if (ori == "hor")
 			{
 				const int w11 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
 				const int w22 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
-				const int coded_areaRows = w22 - w11;
-				const int coded_areaCols = y;
-				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
 
-				for (int i = w11; i < w22; i++)
-				{
-					for (int j = 0; j < y; j++)
-						coded_area.at<uint8_t>((i - w11), j) = img.data[i * img.step + j];
-				}
+				Mat coded_area(w22-w11, y, CV_8U);				
+				Mat sourceRegion = img.rowRange(w11, w22);
+				sourceRegion.copyTo(coded_area.rowRange(0, w22 - w11));
+				
 				coded_line = Evaluation::Mean0R(coded_area);
 			}
 			else
 			{
-				const int l11 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
-				const int l22 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
-
-				const int coded_areaRows = x;
-				const int coded_areaCols = l11 - l22;
-				Mat coded_area(coded_areaRows, coded_areaCols, CV_8U, (int)img.step);
-
-				for (int i = 0; i < x; i++)
-				{
-					for (int j = l22; j < l11; j++)
-						coded_area.at<uint8_t>(i, (j - l22)) = img.data[i * img.step + j];
-				}
+				const int l22 = int(cgrids[1][1].max_pos[0] + d_mean / 4);
+				const int l11 = int(cgrids[1][1].max_pos[0] - d_mean / 4);
+				
+				Mat coded_area(x, l22-l11, CV_8U);
+				Mat sourceRegion = img.colRange(l11, l22);
+				sourceRegion.copyTo(coded_area.colRange(0, l22 - l11));
+				
 				coded_line = Evaluation::Mean1R(coded_area);
 			}
 
@@ -175,31 +164,17 @@ RdBinary grid_pos02::ReadBinary(Grid**& cgrids, const Mat& img)
 			for (int i = 0; i < 9; i++)
 			{
 				int u = i + 1;
-				int row_size = bounds[u] - bounds[i];
-				vector<double> coded_line_p(row_size);
-				int l0 = 0;
-				for (int l = bounds[i]; l < bounds[u]; l++)
-				{
-					coded_line_p[l0] = coded_line[l];
-					l0++;
-				}
+				std::vector<double> coded_line_p(coded_line.begin() + bounds[i], coded_line.begin() + bounds[u]);
 				code_mean[i] = Evaluation::MeanR(coded_line_p);
 			}
 
-			vector<int> flat_img(img.rows * img.cols);
-			int m = 0;
-			for (int r = 0; r < x; r++)
-			{
-				for (int c = 0; c < y; c++)
-				{
-					flat_img[m] = img.data[r * img.step + c];
-					m++;
-				}
-			}
+			double max_val, min_val;
+			minMaxLoc(img, &min_val, &max_val);
 
-			int amin = *min_element(flat_img.begin(), flat_img.end());
-			double mean = Evaluation::MeanR(flat_img);
-			double th = amin + ((mean - amin) * 0.85);
+			int amin = min_val; 
+			Scalar tempVal = mean(img);
+			double means = tempVal.val[0];
+			double th = amin + ((means - amin) * 0.85);
 
 			vector<int>code_bin(9);
 			for (size_t i = 0; i < code_mean.size(); i++)
