@@ -7,8 +7,6 @@ using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
 
-
-
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
 	std::cout << "GridRows: " << s34.gridRows << endl;
@@ -146,7 +144,7 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	peaksIndices.resize(count);
 	peaksValues.resize(count);
 
-	struct FP peaks;
+	FP peaks;
 	peaks.stripes = peaksIndices;
 	peaks.s_dic = peaksValues;
 
@@ -159,9 +157,8 @@ double* gauss_limited(double x, double k, double sigma, double mu, double offset
 	return 0;
 }
 
-struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m)
+void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, subPX& p)
 {
-	struct subPX p;
 	p.max_pos;
 	p.pres;
 	int xmin = 0;
@@ -204,16 +201,10 @@ struct subPX grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_ma
 			//}
 		}
 	}
-
-	
-	return p;
 }
 
-struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m)
+void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, subPX& p)
 {
-	subPX p;
-	p.max_pos;
-	
 	for (int va = 0; va < B_max.stripes.size(); va++)
 	{
 		int i_b = B_max.stripes[va];
@@ -278,15 +269,10 @@ struct subPX grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_
 		}
 	}
 	p.pres = {};
-	return p;
 }
 
-struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
+void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
 {
-	struct subPX p;
-	p.max_pos;
-	p.pres;
-
 	vector<double> B0 = Evaluation::Mean0R(cutGrid);
 	double B = Evaluation::MeanR(B0);
 	int y = cutGrid.cols;
@@ -337,17 +323,16 @@ struct subPX grid_pos01::subpx_phase(const Mat &cutGrid)
 		p.max_pos.clear();
 	
 	p.pres.clear();
-
-	return p;
 }
 
-struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, double px_size, string mode)
+void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
 {
 	int y = cutGrid.cols;
-	struct subPX p;
+	
+	double px_size0 = px_size / 1000;
 	if (mode == "phase")
 	{
-		p = subpx_phase(cutGrid);
+		subpx_phase(cutGrid, p);
 	}
 	else
 	{
@@ -355,7 +340,7 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 
 		double filt = (double)y/10;
 		vector<double> B_cut = signal_evaluation::Bandfilter(Evaluation::Mean0R(cutGrid), 0, (int)filt);		
-		double d_min = stripe_width / (double)1000 * 2 / px_size / 2;
+		double d_min = stripe_width / (double)1000 * 2 / px_size0 / 2;
 		double prom = ((*std::max_element(B_cut.begin(), B_cut.begin() + y)) - (*std::min_element(B_cut.begin(), B_cut.begin() + y)))*0.2;
 		
 		vector<double> B_cut_N(y);
@@ -389,19 +374,19 @@ struct subPX grid_pos01::subpx_max_pos(const Mat& cutGrid, int stripe_width, dou
 			//to do
 			if (mode == "gauss")
 			{
-			  //p = subpx_gauss(B_cut, B_max,B_min, d_m);
+			   subpx_gauss(B_cut, B_max,B_min, d_m, p);
 			}
 
 			else if (mode == "parabel")
 			{
-			    p = subpx_parabel(B_cut, B_max, B_min, d_m);
+			    subpx_parabel(B_cut, B_max, B_min, d_m,p);
 			}
 		}
 	}
-	return p;
+	//return p;
 }
 
-Grid** get_grids(stage23 &s23, stage34 &s34)
+void get_grids(stage23 &s23, stage34 &s34)
 {
 	if (s23.cut_ver.front() * 2 < 10)
 	{
@@ -425,7 +410,7 @@ Grid** get_grids(stage23 &s23, stage34 &s34)
 		s34.grids[h] = new Grid[(int)s23.cut_ver.size()];
 	}
 
-	return s34.grids;
+	//return s34.grids;
 }
 
 Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &orientation)
@@ -543,7 +528,7 @@ void grid_pos01::Execute(stage23 s23)
 	string orientation;
 	s34.grids = {};
 
-	s34.grids = get_grids(s23, s34);
+	get_grids(s23, s34);
 	
 	const int image_size = s23.img.cols * s23.img.rows;
 	const double five_percent = image_size * 0.05;
@@ -562,7 +547,7 @@ void grid_pos01::Execute(stage23 s23)
 			if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
 			{
 				Mat grid_cut = cutGrid(grid_rot);
-				p = subpx_max_pos(grid_cut, stripe_width, px_size/1000, mode);
+				subpx_max_pos(grid_cut, mode, p);
 				modify_max_pos(p);
 			}
 			else

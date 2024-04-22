@@ -15,6 +15,7 @@ struct stage45
 
 	stage45() :gridRows(0), gridCols(0), grids(0), index(0), ind_ori()
 	{};
+	friend std::ostream& operator<<(std::ostream& ostr, const stage45& s45);
 };
 
 struct RdBinary

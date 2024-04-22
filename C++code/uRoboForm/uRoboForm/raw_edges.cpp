@@ -20,8 +20,14 @@ Mat raw_edges::ImageSliceR(Mat image, int n)
 
 double raw_edges::Calc_main_d(const vector<double> &mean0)
 {
+	if (mean0.size() < Freq_Range)
+	{
+		cout << "Mean0 size not sufficient in Calc_main_d " << endl;
+		return -1;
+	}
+
 	int interval = 50;
-	const auto last_index = (int)mean0.size() - freq_range;
+	const auto last_index = (int)mean0.size() - Freq_Range;
 	const int n1 = (last_index / interval) + 1;
 	
 	vector<double> t1;
@@ -29,10 +35,9 @@ double raw_edges::Calc_main_d(const vector<double> &mean0)
 
 	for (int i = 0; i < last_index; i += interval)
 	{
-		struct MFreq m = signal_evaluation::Main_FreqR(mean0, i, freq_range);
+		struct MFreq m = signal_evaluation::Main_FreqR(mean0, i, Freq_Range);
 		t1.push_back(1 / m.f_g);
 	}
-
 	return Evaluation::Median(t1);;
 }
 

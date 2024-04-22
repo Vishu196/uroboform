@@ -39,6 +39,7 @@ struct stage23
 		cut_hor = {};
 		cut_ver = {};
 	}
+	friend std::ostream& operator<<(std::ostream& ostr, const stage23& s23);
 };
 
 class find_edges

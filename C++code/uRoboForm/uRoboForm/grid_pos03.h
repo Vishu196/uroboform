@@ -16,8 +16,9 @@ struct stage56
 	double xi;
 	double zi;
 
-	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0),xi(0.0),zi(0.0)
+	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0), index(0), xi(0.0), zi(0.0)
 	{};
+	friend std::ostream& operator<<(std::ostream& ostr, const stage56& s56);
 };
 
 struct axis

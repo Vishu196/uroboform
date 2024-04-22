@@ -313,47 +313,8 @@ vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &ind
 void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
 {
 	indexes index;
-	const size_t mid = s12.mean0.size() / 2;
-	const size_t i0 = mid - search_range;
-	const size_t i1 = mid + search_range;
 
-	vector<double> mean_range0(s12.mean0.begin() + i0, s12.mean0.begin() + i1);
-
-	size_t len = s12.img2.rows;
-	vector<double> im_col(len);
-	while (rank < 5)
-	{
-		rank += 1;
-		index = Line_Index(mean_range0, s12.th_edge, (int)i0, rank);
-		int s_m = (int)index.s_max;
-		bool res = isnan(index.s_max);
-		if (!res)
-		{
-			size_t x = s12.img2.rows / 6;
-			vector<double> img_col(len);
-			for (int i = 0; i < len; i++)
-			{
-				img_col[i] = (double)s12.img2.data[i * s12.img2.step + s_m];
-			}
-
-			im_col = signal_evaluation::Bandfilter(img_col, 0, x);
-
-			size_t n1 = len - 150;
-			vector<double> std_col;
-			std_col.reserve(n1);
-			for (int i = 0; i < n1; i++)
-			{
-				std_col.push_back(Evaluation::std_dev(im_col, i, i + 150));
-			}
-			double c1 = *min_element(std_col.begin(), std_col.end());
-			double c2 = (*max_element(im_col.begin(), im_col.end())) - (*min_element(im_col.begin(), im_col.end()));
-			double condition1 = c1 / c2;
-			if (condition1 <= 0.085)
-			{
-				break;
-			}
-		}
-	}
+	vector<double>im_col = Execute_1(s12, rank, index);
 
 	try
 	{

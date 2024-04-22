@@ -119,6 +119,5 @@ int main(int argc, char* argv[])
 	write_to_csv(csvname, colname, data1, index_i, ori_i);
 
 	return 0;
-
 }
  
