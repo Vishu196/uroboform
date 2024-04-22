@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "cqueue.h"
 #include <complex>
+#include <functional>
 
 struct Detect_throu
 {

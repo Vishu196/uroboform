@@ -28,26 +28,22 @@ peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 	{
 		int u = i - 1;
 		int v = i + 1;
-		if (arr[i] >= arr[u] && arr[i] >= arr[v])
+		if ((arr[i] >= arr[u] && arr[i] >= arr[v]) && (arr[i] > th_edge))
 		{
-			if (arr[i] > th_edge)
+			stripes[a] = i;
+			s_dic[a] = arr[i];
+			a++;
+			if (a>0) 
 			{
-				stripes[a] = i;
-				s_dic[a] = arr[i];
-				a++;
-				if (a>0) 
+				int p = a - 1;
+				int w = a - 2;
+				int x = a + 1;
+				if (stripes[a] - stripes[p] < 25)
 				{
-					int p = a - 1;
-					int w = a - 2;
-					int x = a + 1;
-					if (stripes[a] - stripes[p] < 25)
-					{
-						stripes[a] = stripes[x];
-						s_dic[a] = s_dic[x];
-						count++;
-					}
+					stripes[a] = stripes[x];
+					s_dic[a] = s_dic[x];
+					count++;
 				}
-
 			}
 		}
 	}
@@ -68,15 +64,11 @@ indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_ed
 	index.s_max, index.s_min;
 	size_t s = mean_range_in.size();
 	int x1 = int(s / 6);
-	vector<double> mean_range(s);
-	mean_range = signal_evaluation::Bandfilter(mean_range_in, 0, x1);
+	vector<double> mean_range = signal_evaluation::Bandfilter(mean_range_in, 0, x1);
 
 	vector<double> mean_rangeN(s);
 	
-	for (int i = 0; i < s; i++)
-	{
-		mean_rangeN[i] = mean_range[i] * (-1);
-	}
+	transform(mean_range.begin(), mean_range.end(), mean_rangeN.begin(), negate<double>());
 
 	peaks peaks_max = Find_Peaks(mean_range, th_edge);
 	peaks peaks_min = Find_Peaks(mean_rangeN, -th_edge);

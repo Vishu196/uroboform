@@ -51,7 +51,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 
 	const int val_range = (int)(max_val - min_val);
 
-	std::vector<int> where_out;
+	vector<int> where_out;
 	where_out.reserve(10);
 	for (int i = 0; i < len; i++)
 	{
@@ -71,10 +71,7 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 		const int x22 = where_out[x20] * 2;
 		grid_cutRows = x22 - x11;
 		
-		// Extract the region of interest from grid_rot
 		Mat sourceRegion = grid_rot.rowRange(x11, x22);
-
-		// Copy the extracted region to grid_cut
 		sourceRegion.copyTo(grid_cut.rowRange(0, x22 - x11));
 		grid_cut.resize(grid_cutRows);
 	}
@@ -236,11 +233,12 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 					iota(x.begin(), x.end(), xmin);
 					
 					Mat W0 = Mat::eye(x_size,x_size, CV_64F);
-					Mat Phi(x_size, 3, CV_64F);
+					Mat Phi(x_size, 3, CV_64F);					
+					Phi.col(0).setTo(1);
 
 					for (int i = 0; i < Phi.rows; i++)
 					{
-						Phi.at<double>(i, 0) = 1;
+						//Phi.at<double>(i, 0) = 1;
 						Phi.at<double>(i, 1) = x[i];
 						Phi.at<double>(i, 2) = x[i] * x[i];
 					}
@@ -250,11 +248,7 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 					
 					int u = 0;
 					Mat B_cut01(x_size, 1, CV_64F);
-					for (int t = xmin; t < xmax; t++)
-					{
-						B_cut01.at<double>(u, 0) = B_cut[t];
-						u++;
-					}
+					copy(B_cut.begin() + xmin, B_cut.begin() + xmax, B_cut01.ptr<double>());
 
 					Mat a_dach0(3, 1, CV_64F);
 					a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
@@ -343,10 +337,7 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
 		double prom = ((*std::max_element(B_cut.begin(), B_cut.begin() + y)) - (*std::min_element(B_cut.begin(), B_cut.begin() + y)))*0.2;
 		
 		vector<double> B_cut_N(y);
-		for (int i = 0; i < y; i++)
-		{
-			B_cut_N[i] = B_cut[i] * (-1);
-		}
+		transform(B_cut.begin(), B_cut.end(), B_cut_N.begin(), std::negate<double>());
 
 		FP B_max = Find_Peaks(B_cut, d_min, prom);
 		FP B_min = Find_Peaks(B_cut_N, d_min, 0.0);
@@ -388,14 +379,10 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
 void get_grids(stage23 &s23, stage34 &s34)
 {
 	if (s23.cut_ver.front() * 2 < 10)
-	{
 		s23.cut_ver.erase(s23.cut_ver.begin());
-	}
 
 	if (s23.cut_hor.front() * 2 < 10)
-	{
 		s23.cut_hor.erase(s23.cut_hor.begin());
-	}
 
 	s23.cut_hor.insert(s23.cut_hor.begin(),0);
 	s23.cut_ver.insert(s23.cut_ver.begin(), 0);
@@ -496,19 +483,13 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 void modify_max_pos(subPX &p)
 {
 	size_t r = p.max_pos.size();
-
 	vector <double> max_pos_de = Evaluation::decumulate(p.max_pos);
 
 	if ((r > 1) && (max_pos_de.back() > 65))
-	{
 		p.max_pos.pop_back();
-	}
 
 	if ((r > 1) && (max_pos_de[0] > 65))
-	{
 		p.max_pos.erase(p.max_pos.begin());
-	}
-
 }
 
 void display_time02(const chrono::steady_clock::time_point& t01,

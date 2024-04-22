@@ -26,9 +26,7 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 		line_0 = (line_arr[0] + line_arr[1])/2;
 	}
 	else
-	{
 		line_0 = lines[0][1];
-	}
 
 	if (lines[n1][0] == lines[n2][0])
 	{
@@ -38,9 +36,8 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 		line_n = (line_arr[0] + line_arr[1]) / 2;
 	}
 	else
-	{
 		line_n = lines[lines.size() - 1][1];
-	}
+	
 	return (line_n - line_0) / ((lines[n1][0] - lines[0][0]) / 200);
 }
 
@@ -58,27 +55,23 @@ double grid_pos03::get_d_k(const stage45 &s45)
 			{
 				if (field.orientation == "hor")
 				{
-					vector<double> h1;
-					h1.push_back(grid_pos02::get_mask_pos(field, row, col, 0));
-					h1.push_back(field.max_pos.front());
-					lines_hor.push_back(h1);
+					double h11 = (grid_pos02::get_mask_pos(field, row, col, 0));
+					double h12 = (field.max_pos.front());
+					lines_hor.push_back({h11,h12});
 
-					vector<double> h2;
-					h2.push_back(grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
-					h2.push_back(field.max_pos.back());
-					lines_hor.push_back(h2);
+					double h21 = (grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
+					double h22 = (field.max_pos.back());
+					lines_hor.push_back({ h21,h22 });
 				}
 				else
 				{
-					vector<double> v1;
-					v1.push_back(grid_pos02::get_mask_pos(field, row, col, 0));
-					v1.push_back(field.max_pos.front());
-					lines_ver.push_back(v1);
-
-					vector<double> v2;
-					v2.push_back(grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
-					v2.push_back(field.max_pos.back());
-					lines_ver.push_back(v2);
+					double v11 = (grid_pos02::get_mask_pos(field, row, col, 0));
+					double v12 = (field.max_pos.front());
+					lines_ver.push_back({ v11,v12 });
+					
+					double v21 = (grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
+					double v22 = (field.max_pos.back());
+					lines_ver.push_back({ v21,v22 });
 				}
 			}
 		}
@@ -114,31 +107,15 @@ vector<vector<list<int>>> grid_pos03::grid_params(void)
 
 		if (((int)(i / 10)) % 2 == 0)
 		{
-			//trial method
-			list<int>i0;
-			i0.push_back(d_row);
-			i0.push_back(d_col);
-			look_up[i][0] = i0;
-
-			list<int>i1;
-			i1.push_back(d_row);
-			i1.push_back(d_col + grid_width);
-			look_up[i][1] = i1;
+			look_up[i][0] = { d_row, d_col };
+			look_up[i][1] = {d_row, d_col+grid_width};
 		}
 		else
 		{
-			list<int>i0;
-			i0.push_back(d_row);
-			i0.push_back(d_col + grid_width);
-			look_up[i][0] = i0;
-
-			list<int>i1;
-			i1.push_back(d_row);
-			i1.push_back(d_col);
-			look_up[i][1] = i1;
+			look_up[i][0] = { d_row, d_col + grid_width };
+			look_up[i][1] = { d_row, d_col };
 		}
 	}
-
 	return look_up;
 }
 
@@ -161,18 +138,18 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	}
 	try
 	{
-		vector<double> vv_0((int)valid_vals.size());
-		vector<double> vv_1((int)valid_vals.size());
-		vector<double> vv_01((int)valid_vals.size());
+		double sum_vv_01 = 0.0;
+		double sum_vv_1 = 0.0;
 
-		for (size_t i = 0; i < valid_vals.size(); i++)
+		for (const auto& val : valid_vals) 
 		{
-			vv_0[i] = valid_vals[i][0];
-			vv_1[i] = valid_vals[i][1];
-			vv_01[i] = vv_0[i] * vv_1[i];
+			double vv_0 = val[0];
+			double vv_1 = val[1];
+			sum_vv_01 += vv_0 * vv_1;
+			sum_vv_1 += vv_1;
 		}
 
-		av_val = reduce(vv_01.begin(), vv_01.end()) / reduce(vv_1.begin(), vv_1.end());
+		av_val = sum_vv_01 / sum_vv_1;
 	}
 	catch (const std::out_of_range&)
 	{
@@ -230,17 +207,12 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 				{
 					int mask_pos = grid_pos02::get_mask_pos(field, row, col, i_max);
 					if (field.orientation == "hor")
-					{
 						P = mask_pos + look_el.front();
-					}
 					else
-					{
 						P = mask_pos + look_el.back();
-					}
 					double pa = (-P * s56.k);
 					double va = (field.max_pos[i_max] * px_size);
 					center.push_back((-P * s56.k) + (field.max_pos[i_max] * px_size));
-
 				}
 			}
 
@@ -254,6 +226,7 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 				a.center_hor.push_back(t1);
 			else
 				a.center_ver.push_back(t1);
+			
 			s45.grids[row][col] = field;
 		}
 	}

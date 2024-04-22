@@ -11,7 +11,7 @@ std::ostream& operator<<(std::ostream& ostr, const stage12& s12)
 	return ostr;
 }
 
-Mat raw_edges::ImageSliceR(Mat image, int n)
+Mat raw_edges::ImageSliceR(const Mat &image, int n)
 {
 	Mat newImg;
 	resize(image, newImg, Size(), 1.0 / n, 1.0 / n, cv::INTER_NEAREST);
