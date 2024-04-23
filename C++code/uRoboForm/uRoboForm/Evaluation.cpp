@@ -6,45 +6,35 @@ using namespace cv;
 
 vector<double> Evaluation::Mean0R(const Mat &image2)
 {
-	vector<double> Mean0Arr(image2.cols);
+	vector<double> Mean0Arr(image2.cols,0.0);
 
-	double avg = 0.0;
 	int sum = 0;
-	int x = 0;
-	for (int w = 0; w < image2.cols; w++)
+	for (int w = 0; w < image2.cols; ++w)
 	{
 		sum = 0;
-		for (int h = 0; h < image2.rows; h++)
+		for (int h = 0; h < image2.rows; ++h)
 		{
-			x = image2.data[h * image2.step + w];
-			sum += x;
+			sum += image2.data[h * image2.step + w];
 		}
-		avg = (double)sum / (double)image2.rows;
-		Mean0Arr[w] = avg;
+		Mean0Arr[w] = (double)sum / (double)image2.rows;
 	}
-
 	return Mean0Arr;
 }
 
 vector<double> Evaluation::Mean1R(const Mat& image2)
 {
-	vector<double> Mean1Arr(image2.rows);
+	vector<double> Mean1Arr(image2.rows,0.0);
 
-	double avg = 0.0;
 	double sum = 0.0;
-	int x = 0;
-	for (int h = 0; h < image2.rows; h++)
+	for (int h = 0; h < image2.rows; ++h)
 	{
 		sum = 0;
-		for (int w = 0; w < image2.cols; w++)
+		for (int w = 0; w < image2.cols; ++w)
 		{
-			x = image2.data[h * image2.step + w];
-			sum += (double)x;
+			sum += image2.data[h * image2.step + w];
 		}
-		avg = sum / (double)image2.cols;
-		Mean1Arr[h] = avg;
+		Mean1Arr[h] = sum / (double)image2.cols;;
 	}
-
 	return Mean1Arr;
 }
 

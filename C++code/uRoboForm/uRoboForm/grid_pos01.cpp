@@ -413,9 +413,9 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 	
 	if (x2 > x1 && y2 > y1)
 	{
-		for (int x = x1; x < x2; x++)
+		for (int x = x1; x < x2; ++x)
 		{
-			for (int y = y1; y < y2; y++)
+			for (int y = y1; y < y2; ++y)
 			{
 				size_t idx = ((x - x1) * grid0.step + (y - y1));
 				*(grid0Data + idx) = s23.img.data[x * s23.img.step + y];  
@@ -446,12 +446,16 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 	const int w1 = x22 - x11;
 	const int w2 = y22 - y11;
 
-	Mat mean2(w1, w2, CV_8U, (int)s23.img2.step);
+	Mat mean2 (w1, w2, CV_8U, (int)s23.img2.step);
 	uint8_t* mean2Data = mean2.data;
 
-	for (auto x = x11; x < x22; x++)
+	//cv::Rect roi(x11, y11, w2, w1);
+	//cv::Mat imgROI = s23.img2(roi).clone();  // Clone to ensure deep copy
+	//imgROI.copyTo(mean2);
+
+	for (auto x = x11; x < x22; ++x)
 	{
-		for (auto y = y11; y < y22; y++)
+		for (auto y = y11; y < y22; ++y)
 		{
 			size_t idx = ((x-x11) * mean2.step + (y-y11));
 			*(mean2Data + idx) = s23.img2.data[x * s23.img2.step + y];
