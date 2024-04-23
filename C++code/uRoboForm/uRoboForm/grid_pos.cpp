@@ -30,17 +30,17 @@ stage56 grid_pos::Execute(stage23 s23)
 		auto t11 = high_resolution_clock::now();
 		
 		grid1.Execute(s23);
-		display_time01(t11, high_resolution_clock::now());
+		/*display_time01(t11, high_resolution_clock::now());
 		
-		auto t12 = high_resolution_clock::now();
+		auto t12 = high_resolution_clock::now();*/
 		
 		grid2.Execute(grid1.getNext());
-		display_time01(t12, high_resolution_clock::now());
+		/*display_time01(t12, high_resolution_clock::now());
 
-		auto t13 = high_resolution_clock::now();
+		auto t13 = high_resolution_clock::now();*/
 
 		grid3.Execute(grid2.getNext(), s56);
-		display_time01(t13, high_resolution_clock::now());
+		/*display_time01(t13, high_resolution_clock::now());*/
 	}
 	else
 	{

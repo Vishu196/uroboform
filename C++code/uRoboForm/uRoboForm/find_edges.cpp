@@ -159,101 +159,58 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	return thro;
 }
 
-//to do
-list<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
+vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 {
-	list<int>cut_list;
 	for (int i_cut = ((int)cut_arr.size() - 1); i_cut >= 0; i_cut--)
 	{
 		for (int j = 0; j < cut_arr.size(); j++)
 		{
-			bool c1 = abs(cut_arr.at(j) - cut_arr.at(i_cut)) > (ideal_d - 40);
-			bool c2 = abs(cut_arr.at(j) - cut_arr.at(i_cut)) > (ideal_d + 40);
-			bool c = (!(c1 && c2));
-
-			if (c)
-			{
+			bool c1 = (ideal_d - 40) < abs(cut_arr[j] - cut_arr[i_cut]) < (ideal_d + 40);
+			if (!c1)
 				cut_arr.erase(cut_arr.begin() + i_cut);
-			}
 		}
 	}
 
 	vector<int> cut_ver_de = Evaluation::decumulate(cut_arr);
 	vector<int> close_edges;
+	close_edges.reserve(5);
 
-	for (int i = 0; i < cut_arr.size(); i++)
+	for (int i = 0; i < cut_ver_de.size(); i++)
 	{
-		if (cut_ver_de[i] < ideal_d - 20)
-		{
+		if (cut_ver_de[i] < (ideal_d - 20))
 			close_edges.push_back(i);
-		}
 	}
 
-	/*int* close_edges = new int[p];
-	std::copy(close_edges1, close_edges1 + p, close_edges);*/
-	for (int i_close = ((int) close_edges.size() - 1); i_close >= 0; i_close--)
+	for (int i_close = (close_edges.size() - 1); i_close >= 0; i_close--)
 	{
-		list<int>d_cut_ver_0; 
-		list<int> d_cut_ver_1;
-		d_cut_ver_0.clear();
-		d_cut_ver_1.clear();
-
-		int vl = close_edges.at(i_close);
-		int vl1 = vl - 1;
-		int vl2 = vl + 1;
-		int vl3 = vl + 2;
-		if (close_edges.at(i_close)>0)
-		{
-			int x0 = abs(cut_arr.at(vl) - cut_arr.at(vl1));
-			int x1 = abs(cut_arr.at(vl2) - cut_arr.at(vl1));
-			d_cut_ver_0.push_back(x0);
-			d_cut_ver_1.push_back(x1);
-		}
-		if (close_edges.at(i_close) < (close_edges.size() - 2))
-		{
-			int x0 = abs(cut_arr.at(vl) - cut_arr.at(vl3));
-			int x1 = abs(cut_arr.at(vl2) - cut_arr.at(vl3));
-			d_cut_ver_0.push_back(x0);
-			d_cut_ver_1.push_back(x1);
-		}
-
-		vector<int> ver0;
-		vector<int> ver01;
-		copy(d_cut_ver_0.begin(), d_cut_ver_0.end(), ver01.begin());
-		//transform(ver01.begin(), ver01.end(), ver0.begin(), op_subtract);
-		for (int i = 0; i < d_cut_ver_0.size(); i++)
-		{
-			ver0[i] = ver01[i] - ideal_d;
-		}
-		double d_m_0 = abs(Evaluation::MeanR(ver0));
-
-		vector<int> ver1;
-		vector<int> ver11;
-		copy(d_cut_ver_1.begin(), d_cut_ver_1.end(), ver11.begin());
-		for (int i = 0; i < d_cut_ver_0.size(); i++)
-		{
-			ver1[i] = ver11[i] - ideal_d;
-		}
+		vector<int>d_cut_ver_0; 
+		vector<int> d_cut_ver_1;
 		
-		double d_m_1 = abs(Evaluation::MeanR(ver1));
+		const int vl = close_edges[i_close];
+		if (vl>0)
+		{
+			d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl - 1]));
+			d_cut_ver_1.push_back(abs(cut_arr[vl+1] - cut_arr[vl - 1]));
+		}
+		if (vl < (cut_arr.size() - 2))
+		{
+			d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl + 2]));
+			d_cut_ver_1.push_back(abs(cut_arr[vl +1] - cut_arr[vl + 2]));
+		}
 
+		auto op_subtract = [ideal_d](auto x) { return x - ideal_d; };	
+		transform(d_cut_ver_0.begin(), d_cut_ver_0.end(), d_cut_ver_0.begin(), op_subtract);
+		transform(d_cut_ver_1.begin(), d_cut_ver_1.end(), d_cut_ver_1.begin(), op_subtract);
+
+		double d_m_0 = abs(Evaluation::MeanR(d_cut_ver_0));
+		double d_m_1 = abs(Evaluation::MeanR(d_cut_ver_1));
+		
 		if (d_m_0 > d_m_1)
-		{
 			cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
-		}
 		else
-		{
 			cut_arr.erase(cut_arr.begin() + close_edges[i_close+1]);
-		}
 	}
-
-	for (int i = 0; i < cut_arr.size(); i++)
-	{
-		cut_list.push_back(cut_arr[i]);
-	}
-
-	//delete[] close_edges1;
-	return cut_list;
+	return cut_arr;
 }
 
 vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &index)
@@ -340,7 +297,7 @@ void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
 				}
 			}
 
-			//cut_hor = Delete_Edges(s23.cut_hor, 300);
+			s23.cut_hor = Delete_Edges(s23.cut_hor, 225);
 		}
 
 	}
@@ -432,8 +389,7 @@ void find_edges::get_cut_ver(int &rank, const stage12& s12, stage23 &s23)
 		}
 		sort(s23.cut_ver.begin(), s23.cut_ver.end());
 
-		//to do
-		//cut_ver = Delete_Edges(s23.cut_ver, 300);
+		s23.cut_ver = Delete_Edges(s23.cut_ver, 300);
 
 	}
 	catch (const std::out_of_range)

@@ -55,7 +55,6 @@ void raw_edges::ExecuteR(const Mat &Image)
 	s12.main_d_1 = Calc_main_d(s12.mean1);
 
 	s12.th_edge = Evaluation::MeanR(s12.mean0);
-
 	s12.img = Image;
 	s12.img2 = Image2;
 

@@ -13,11 +13,9 @@ vector<double> Evaluation::Mean0R(const Mat &image2)
 	return Mean0Arr;
 }
 
-vector<double> Evaluation::Mean1R(const Mat& image2)
+vector<double> Evaluation::Mean1R(const Mat &image2)
 {
 	vector<double> Mean1Arr(image2.rows,0.0);
-	/*int axis = 1;
-	cv::reduce(image2, Mean1Arr, axis, cv::REDUCE_AVG);*/
 	double sum = 0.0;
 	for (int h = 0; h < image2.rows; ++h)
 	{
@@ -62,18 +60,10 @@ double Evaluation::Median(vector<double> array)
 
 double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 {
-	double sum = 0.0, standardDeviation = 0.0;
+	double standardDeviation = 0.0;
 	int size = stop - start;
 
-	vector<double> B(size);
-
-	for (auto i = 0; i < size; ++i)
-	{
-		const int w = i + start;
-		sum += arr[w];
-	}
-
-	const double mean = sum / size;
+	const double mean = Mean(arr.begin() + start, arr.begin() + stop);
 
 	for (auto i = 0; i < size; ++i)
 	{

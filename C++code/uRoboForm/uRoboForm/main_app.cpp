@@ -78,22 +78,22 @@ int main(int argc, char* argv[])
 	grid_pos grid_final{};
 	
 	auto t01 = high_resolution_clock::now();
-
+	
 	edge0.ExecuteR(image);
 
-	display_time(t01, high_resolution_clock::now());
+	//display_time(t01, high_resolution_clock::now());
 
-	auto t02 = high_resolution_clock::now();
+	//auto t02 = high_resolution_clock::now();
 
 	edge.Execute(edge0.getNext());
 
-	display_time(t02, high_resolution_clock::now());
+	/*display_time(t02, high_resolution_clock::now());
 
-	auto t03 = high_resolution_clock::now();
+	auto t03 = high_resolution_clock::now();*/
 
 	stage56 s56 = grid_final.Execute(edge.getNext());
 	
-	display_time(t03, high_resolution_clock::now());
+	//display_time(t03, high_resolution_clock::now());
 
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());
