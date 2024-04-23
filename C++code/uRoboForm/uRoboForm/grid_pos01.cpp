@@ -23,7 +23,7 @@ vector<double> grid_pos01::gradient(const vector<double> &x)
 
 	grad[0] = (x[1] - x[0]) / dx;
 
-	for (auto i = 1; i <= (x_size-2); i++)
+	for (auto i = 1; i <= (x_size-2); ++i)
 		grad[i] = (x[i + 1] - x[i - 1]) / (2 * dx);  // for i in [1,N-2]
 
 	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
@@ -53,10 +53,10 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 
 	vector<int> where_out;
 	where_out.reserve(10);
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < len; ++i)
 	{
 		if (((mean_row[i] < im_mean - 0.075 * val_range) || (mean_row[i] >= im_mean + 0.075 * val_range)) && (i < len / 4 || i >= len * 3 / 4)) 
-			where_out.push_back(i);
+			where_out.emplace_back(i);
 	}
 
 	if (where_out.size() >= 1) 
@@ -90,7 +90,7 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	int count = 0;
 	int a = 0;
 
-	for (int i = 1; i < n - 1; i++)
+	for (int i = 1; i < n - 1; ++i)
 	{
 		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1])
 		{
@@ -160,13 +160,13 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struc
 	int xmin = 0;
 	int xmax = 0;
 
-	for (int i_b = 0; i_b < B_max.stripes.size(); i_b++)
+	for (int i_b = 0; i_b < B_max.stripes.size(); ++i_b)
 	{
 		int mid = B_max.stripes[i_b];
 		int b_min_size = B_min.stripes.size();
 		if (b_min_size >=2)
 		{
-			for (int i_0 = 0; i_0 < b_min_size; i_0++)
+			for (int i_0 = 0; i_0 < b_min_size; ++i_0)
 			{
 				if (B_min.stripes[i_0] < mid)
 					xmin = i_0;
@@ -201,7 +201,7 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struc
 
 void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, subPX& p)
 {
-	for (int va = 0; va < B_max.stripes.size(); va++)
+	for (int va = 0; va < B_max.stripes.size(); ++va)
 	{
 		int i_b = B_max.stripes[va];
 		int mid = i_b;
@@ -211,7 +211,7 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 			int xmin{};
 			int xmax{};
 
-			for (int vb = 0; vb < B_min.stripes.size(); vb++)
+			for (int vb = 0; vb < B_min.stripes.size(); ++vb)
 			{
 				int i_0 = B_min.stripes[vb];
 				if (i_0 < mid)
@@ -236,7 +236,7 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 					Mat Phi(x_size, 3, CV_64F);					
 					Phi.col(0).setTo(1);
 
-					for (int i = 0; i < Phi.rows; i++)
+					for (int i = 0; i < Phi.rows; ++i)
 					{
 						//Phi.at<double>(i, 0) = 1;
 						Phi.at<double>(i, 1) = x[i];
@@ -252,7 +252,7 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 
 					Mat a_dach0(3, 1, CV_64F);
 					a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
-					p.max_pos.push_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
+					p.max_pos.emplace_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
 				}
 			}
 			catch (const exception)
@@ -281,7 +281,7 @@ void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
 		vector<complex<double>> F_k1(y);
 		complex<double> F_k = (0, 0); 
 
-		for (int i = 0; i < y; i++)
+		for (int i = 0; i < y; ++i)
 		{
 			exp_fac[i] = (0, (-2 * M_PI) * (B_arange[i]) / y);
 			F_k1[i] = m.Image_window[i] * exp(exp_fac[i] * m.n_g);
@@ -301,7 +301,7 @@ void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
 
 		vector<double> y1(lenImg);
 		vector<double> y_cos(lenImg);
-		for (int i = 0; i < lenImg; i++)
+		for (int i = 0; i < lenImg; ++i)
 		{
 			y1[i] = (2 * M_PI * m.f_g * (ImgWin_arange[i])) - Phi;
 			y_cos[i] = A * cos(y1[i]);
@@ -309,8 +309,8 @@ void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
 		if (d < d_mean/2)
 			d += d_mean;
 
-		for (int i_max = 0; i_max < (m.n_g-1); i_max++)
-			p.max_pos.push_back(d + i_max * d_mean);
+		for (int i_max = 0; i_max < (m.n_g-1); ++i_max)
+			p.max_pos.emplace_back(d + i_max * d_mean);
 	}
 	else
 		p.max_pos.clear();
@@ -351,15 +351,6 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
 			if ((B_max.stripes[0] - B_min.stripes[0] > 0) && (B_max.stripes[0] - B_min.stripes[0] < 0.8*d_min))
 				B_min.stripes.erase(B_min.stripes.begin());
 
-			//vector<int> d0 = Evaluation::decumulate(B_max.stripes);
-
-			/*vector<double> d0 (d00.size());
-						
-			for (int i = 0; i < d00.size(); i++)
-			{
-				d0[i] = (double)d00[i];
-			}*/
-
 			double d_m = Evaluation::MeanR(Evaluation::decumulate(B_max.stripes));
 			//to do
 			if (mode == "gauss")
@@ -391,7 +382,7 @@ void get_grids(stage23 &s23, stage34 &s34)
 	s23.cut_ver.push_back(s23.img.cols / 2);
 
 	s34.grids = new Grid * [s23.cut_hor.size()];
-	for (int h = 0; h < (int)s23.cut_hor.size(); h++)
+	for (int h = 0; h < (int)s23.cut_hor.size(); ++h)
 	{
 		s34.grids[h] = new Grid[(int)s23.cut_ver.size()];
 	}
@@ -410,17 +401,14 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 
 	Mat grid0(s1, s2, CV_8U);
 	uint8_t* grid0Data = grid0.data;
-	
+	Mat grid00(s1, s23.img.cols, CV_8U);
+
 	if (x2 > x1 && y2 > y1)
 	{
-		for (int x = x1; x < x2; ++x)
-		{
-			for (int y = y1; y < y2; ++y)
-			{
-				size_t idx = ((x - x1) * grid0.step + (y - y1));
-				*(grid0Data + idx) = s23.img.data[x * s23.img.step + y];  
-			}
-		}
+		Mat sourceRegion = s23.img.rowRange(x1, x2);
+		sourceRegion.copyTo(grid00.rowRange(0, s1));
+		Mat sourceRegion1 = grid00.colRange(y1, y2);
+		sourceRegion1.copyTo(grid0.colRange(0, s2));
 	}
 
 	vector<double> mean_grad = get_mean_grad(s23, row, col);
@@ -446,20 +434,16 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 	const int w1 = x22 - x11;
 	const int w2 = y22 - y11;
 
+	Mat mean22(w1, s23.img2.cols, CV_8U);
 	Mat mean2 (w1, w2, CV_8U, (int)s23.img2.step);
 	uint8_t* mean2Data = mean2.data;
 
-	//cv::Rect roi(x11, y11, w2, w1);
-	//cv::Mat imgROI = s23.img2(roi).clone();  // Clone to ensure deep copy
-	//imgROI.copyTo(mean2);
-
-	for (auto x = x11; x < x22; ++x)
+	if (x22 > x11 && y22 > y11)
 	{
-		for (auto y = y11; y < y22; ++y)
-		{
-			size_t idx = ((x-x11) * mean2.step + (y-y11));
-			*(mean2Data + idx) = s23.img2.data[x * s23.img2.step + y];
-		}
+		Mat sourceRegion = s23.img2.rowRange(x11, x22);
+		sourceRegion.copyTo(mean22.rowRange(0, w1));
+		Mat sourceRegion1 = mean22.colRange(y11, y22);
+		sourceRegion1.copyTo(mean2.colRange(0, w2));
 	}
 
 	vector<double> mean_grad00 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean0R(mean2), 0, (w2 / 6)));
@@ -469,7 +453,7 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 	vector<double> mean_grad1(w1);
 
 	int t = w1 > w2 ? w1 : w2;
-	for (int i = 0; i < t; i++)
+	for (int i = 0; i < t; ++i)
 	{
 		if (i < w2)
 			mean_grad0[i] = abs(mean_grad00[i]);
@@ -518,9 +502,9 @@ void grid_pos01::Execute(stage23 s23)
 	const int image_size = s23.img.cols * s23.img.rows;
 	const double five_percent = image_size * 0.05;
 
-	for (int row = 0; row < (s23.cut_hor.size()-1); row++)
+	for (int row = 0; row < (s23.cut_hor.size()-1); ++row)
 	{
-		for (int col = 0; col < (s23.cut_ver.size()-1); col++)
+		for (int col = 0; col < (s23.cut_ver.size()-1); ++col)
 		{
 			int s1 = (s23.cut_hor[row + 1] * 2) - (s23.cut_hor[row] * 2);
 			int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);

@@ -6,25 +6,18 @@ using namespace cv;
 
 vector<double> Evaluation::Mean0R(const Mat &image2)
 {
-	vector<double> Mean0Arr(image2.cols,0.0);
+	vector<double> Mean0Arr;
+	int axis = 0; 
+	cv::reduce(image2, Mean0Arr, axis, cv::REDUCE_AVG);
 
-	int sum = 0;
-	for (int w = 0; w < image2.cols; ++w)
-	{
-		sum = 0;
-		for (int h = 0; h < image2.rows; ++h)
-		{
-			sum += image2.data[h * image2.step + w];
-		}
-		Mean0Arr[w] = (double)sum / (double)image2.rows;
-	}
 	return Mean0Arr;
 }
 
 vector<double> Evaluation::Mean1R(const Mat& image2)
 {
 	vector<double> Mean1Arr(image2.rows,0.0);
-
+	/*int axis = 1;
+	cv::reduce(image2, Mean1Arr, axis, cv::REDUCE_AVG);*/
 	double sum = 0.0;
 	for (int h = 0; h < image2.rows; ++h)
 	{
@@ -47,9 +40,9 @@ double Evaluation::Mean(vector<double>::const_iterator start, vector<double>::co
 double Evaluation::Median(vector<double> array)
 {
 	size_t size = array.size();
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < size; ++i)
 	{
-		for (int j = i; j < (size - 1); j++)
+		for (int j = i; j < (size - 1); ++j)
 		{
 			const int w = j + 1;
 			if (array[i] > array[w])
@@ -99,9 +92,9 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 
 	sort(sorted_arr.begin(), sorted_arr.end());
 
-	for (int i = 0; i < s_dic.size(); i++)
+	for (int i = 0; i < s_dic.size(); ++i)
 	{
-		for (int j = 0; j < (s_dic.size()); j++)
+		for (int j = 0; j < (s_dic.size()); ++j)
 		{
 			if (sorted_arr[i] == s_dic[j])
 			{

@@ -5,6 +5,7 @@ using namespace std;
 
 std::ostream& operator<<(std::ostream& ostr, const stage12& s12)
 {
+	ostr << endl;
 	ostr << "main_d_0: " << s12.main_d_0 << endl;
 	ostr << "main_d_1: " << s12.main_d_1 << endl;
 	ostr << "Stage 1 complete." << endl;

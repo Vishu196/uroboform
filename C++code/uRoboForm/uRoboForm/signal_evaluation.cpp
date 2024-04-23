@@ -39,7 +39,7 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	double in[N]{};
 	fftw_plan p;
 
-	for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; ++i) {
 		if (i < size) {
 			in[i] = image_windowR[i];
 		}
@@ -54,7 +54,7 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	yy = reinterpret_cast<std::complex<double> *>(y);
 	vector<double> y1(N);
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; ++i)
 	{
 		y1[i] = abs(*reinterpret_cast<std::complex<double>*>(y + i));
 	}
@@ -107,13 +107,13 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 
 	double* xx = new double[N]();
 	xx[0] = x[0];
-	for (int i = 1; i < N / 2; i++)
+	for (int i = 1; i < N / 2; ++i)
 	{
 		int a = (2 * i) - 1;
 		xx[i] = x[a];
 	}
 
-	for (size_t i = N; i > ((N / 2) + 1); i--)
+	for (size_t i = N; i > ((N / 2) + 1); --i)
 	{
 		size_t a = (2 * (N - i)) + 2;
 		xx[i - 1] = x[a];
@@ -130,7 +130,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 	fftw_destroy_plan(p);
 
 	vector<double> yy(N);
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; ++i)
 	{ 
 		y[i] /= N;
 		yy[i] = y[i];
@@ -144,11 +144,13 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, s
 {
 	vector<double> f_x = RFFT(x);
 	
-	for (int i = 0; i < x0; i++)
+	fill(f_x.begin(), f_x.begin() + x0, 0);
+	fill(f_x.begin() + x1, f_x.end(), 0);
+	/*for (int i = 0; i < x0; ++i)
 		f_x[i] = 0;
 
-	for (size_t i = x1; i < x.size(); i++)
-		f_x[i] = 0;
+	for (size_t i = x1; i < x.size(); ++i)
+		f_x[i] = 0;*/
 
 	return IRFFT(f_x);
 }
@@ -165,10 +167,8 @@ struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, 
 
 	const double Mean = Evaluation::Mean(istart,istart+size);
 
-	for (int i = 0; i < size; i++)
-	{
-		mf.Image_window.push_back((*(istart + i) - Mean) * BlackmanWindowR(size, i));
-	}
+	for (int i = 0; i < size; ++i)
+		mf.Image_window.emplace_back((*(istart + i) - Mean) * BlackmanWindowR(size, i));
 
 	vector<double> y1 = FFTR(mf.Image_window);
 

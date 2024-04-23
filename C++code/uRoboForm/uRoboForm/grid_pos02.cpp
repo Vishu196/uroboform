@@ -168,8 +168,8 @@ RdBinary grid_pos02::ReadBinary(Grid**& cgrids, const Mat& img)
 				code_mean[i] = Evaluation::MeanR(coded_line_p);
 			}
 
-			double max_val, min_val;
-			minMaxLoc(img, &min_val, &max_val);
+			double min_val;
+			minMaxLoc(img, &min_val, nullptr);
 
 			int amin = min_val; 
 			Scalar tempVal = mean(img);
