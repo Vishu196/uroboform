@@ -261,5 +261,9 @@ void grid_pos02::Execute(stage34 s34)
 	s45.ind_ori = I.ind_ori;
 
 	fifo.push(s45);
+
+	#if DEBUGMODE == DebugMode::AllTimesValues
+	#elif DEBUGMODE == DebugMode::AllValues
 	cout << s45;
+	#endif
 }

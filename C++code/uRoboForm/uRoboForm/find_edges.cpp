@@ -428,5 +428,9 @@ void find_edges::Execute(const stage12 &s12)
 	s23.img2 = s12.img2.clone();
 
 	fifo.push(s23);
+
+	#if DEBUGMODE == DebugMode::AllTimesValues
+	#elif DEBUGMODE == DebugMode::AllValues
 	cout << s23;
+	#endif
 }

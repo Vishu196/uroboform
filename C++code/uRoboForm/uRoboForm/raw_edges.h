@@ -3,6 +3,7 @@
 #include "signal_evaluation.h"
 #include "cqueue.h"
 #include "constants.h"
+#include "debug_logs.h"
 
 struct stage12
 {		

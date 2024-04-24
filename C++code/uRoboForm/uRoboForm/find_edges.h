@@ -4,6 +4,7 @@
 #include "signal_evaluation.h"
 #include "constants.h"
 #include "cqueue.h"
+#include "debug_logs.h"
 #include <complex>
 #include <functional>
 

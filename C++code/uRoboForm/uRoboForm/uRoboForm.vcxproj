@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqueue.h" />
+    <ClInclude Include="debug_logs.h" />
     <ClInclude Include="Evaluation.h" />
     <ClInclude Include="find_edges.h" />
     <ClInclude Include="grid.h" />

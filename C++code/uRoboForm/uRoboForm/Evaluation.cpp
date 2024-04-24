@@ -77,8 +77,7 @@ double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 {
 	vector<int> indice_arr((int)s_dic.size());
-	vector<double> sorted_arr((int)s_dic.size());
-	sorted_arr = s_dic;
+	vector<double> sorted_arr = s_dic;
 
 	sort(sorted_arr.begin(), sorted_arr.end());
 

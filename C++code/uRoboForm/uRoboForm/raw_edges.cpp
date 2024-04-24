@@ -59,5 +59,9 @@ void raw_edges::ExecuteR(const Mat &Image)
 	s12.img2 = Image2;
 
 	fifo.push(s12);
+
+	#if DEBUGMODE == DebugMode::AllTimesValues
+	#elif DEBUGMODE == DebugMode::AllValues
 	cout << s12;
+	#endif
 }

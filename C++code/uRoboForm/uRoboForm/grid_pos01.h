@@ -5,6 +5,7 @@
 #include "signal_evaluation.h"
 #include "constants.h"
 #include "cqueue.h"
+#include "debug_logs.h"
 #include <numeric>
 #include <chrono>
 #include <fstream>

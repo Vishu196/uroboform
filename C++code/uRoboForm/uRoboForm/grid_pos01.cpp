@@ -537,6 +537,10 @@ void grid_pos01::Execute(stage23 s23)
 	s34.gridCols = (int)s23.cut_ver.size()-1;
 
 	fifo.push(s34);
+
+	#if DEBUGMODE == DebugMode::AllTimesValues
+	#elif DEBUGMODE == DebugMode::AllValues
 	std::cout << s34;
+	#endif
 }
 
