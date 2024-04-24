@@ -506,9 +506,6 @@ void grid_pos01::Execute(stage23 s23)
 	{
 		for (int col = 0; col < (s23.cut_ver.size()-1); ++col)
 		{
-			int s1 = (s23.cut_hor[row + 1] * 2) - (s23.cut_hor[row] * 2);
-			int s2 = (s23.cut_ver[col + 1] * 2) - (s23.cut_ver[col] * 2);
-		
 			Mat grid_rot = get_gridrot(s23, row, col, orientation);
 			struct subPX p;
 			const int grid_rot_size = grid_rot.rows * grid_rot.cols;
@@ -538,9 +535,6 @@ void grid_pos01::Execute(stage23 s23)
 
 	fifo.push(s34);
 
-	#if DEBUGMODE == DebugMode::AllTimesValues
-	#elif DEBUGMODE == DebugMode::AllValues
 	std::cout << s34;
-	#endif
 }
 

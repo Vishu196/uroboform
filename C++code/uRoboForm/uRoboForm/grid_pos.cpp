@@ -23,37 +23,26 @@ stage56 grid_pos::Execute(stage23 s23)
 
 	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
 	{
-		grid_pos01 grid1{};
-		grid_pos02 grid2{};
-		grid_pos03 grid3{};
+		grid_pos01 grid1;
+		grid_pos02 grid2;
+		grid_pos03 grid3;
 		
-		#if DEBUGMODE == DebugMode::AllTimesValues
-		#elif DEBUGMODE == DebugMode::AllTimes
 		auto t11 = high_resolution_clock::now();
-		#endif	
 
 		grid1.Execute(s23);
 
-		#if DEBUGMODE == DebugMode::AllTimesValues
-		#elif DEBUGMODE == DebugMode::AllTimes
 		display_time01(t11, high_resolution_clock::now());	
 		auto t12 = high_resolution_clock::now();
-		#endif		
 
 		grid2.Execute(grid1.getNext());
 
-		#if DEBUGMODE == DebugMode::AllTimesValues
-		#elif DEBUGMODE == DebugMode::AllTimes
 		display_time01(t12, high_resolution_clock::now());
 		auto t13 = high_resolution_clock::now();
-		#endif
 
 		grid3.Execute(grid2.getNext(), s56);
 
-		#if DEBUGMODE == DebugMode::AllTimesValues
-		#elif DEBUGMODE == DebugMode::AllTimes
 		display_time01(t13, high_resolution_clock::now());
-		#endif
+
 	}
 	else
 	{

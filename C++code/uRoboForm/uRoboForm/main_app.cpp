@@ -1,4 +1,5 @@
 #include "main.h"
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
@@ -73,42 +74,26 @@ int main(int argc, char* argv[])
 	find_edges edge{};
 	grid_pos grid_final{};
 	
-	#if DEBUGMODE DebugMode::AllTimesValues
-	#elif DEBUGMODE DebugMode::AllTimes
-    #elif DEBUGMODE DebugMode::FinalTime 
+	
 	auto t01 = high_resolution_clock::now();
-	#endif
 
 	edge0.ExecuteR(image);
 
-	#if DEBUGMODE == DebugMode::AllTimesValues
-	#elif DEBUGMODE == DebugMode::AllTimes
 	display_time(t01, high_resolution_clock::now());
 	auto t02 = high_resolution_clock::now();
-	#endif
-
+	
 	edge.Execute(edge0.getNext());
 
-	#if DEBUGMODE == DebugMode::AllTimesValues
-	#elif DEBUGMODE == DebugMode::AllTimes
 	display_time(t02, high_resolution_clock::now());
 	auto t03 = high_resolution_clock::now();
-	#endif
 
 	stage56 s56 = grid_final.Execute(edge.getNext());
 	
-	#if DEBUGMODE == DebugMode::AllTimesValues
-	#elif DEBUGMODE == DebugMode::AllTimes
-	display_time(t03, high_resolution_clock::now());
-	#endif
-	
+	display_time(t03, high_resolution_clock::now());	
 
-	#if DEBUGMODE DebugMode::AllTimesValues
-	#elif DEBUGMODE DebugMode::AllTimes
-	#elif DEBUGMODE DebugMode::FinalTime
+	
 	std::cout << "Complete runtime:";
 	display_time(t01, high_resolution_clock::now());
-	#endif
 
 	xi_i.push_back(s56.xi);
 	zi_i.push_back(s56.zi);

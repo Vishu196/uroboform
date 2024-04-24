@@ -36,7 +36,7 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	size_t size = image_windowR.size();
 	const int N = 256;
 	fftw_complex* y = new fftw_complex[N];
-	double in[N]{};
+	double in[N];
 	fftw_plan p;
 
 	for (int i = 0; i < N; ++i) {
@@ -146,12 +146,7 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, s
 	
 	fill(f_x.begin(), f_x.begin() + x0, 0);
 	fill(f_x.begin() + x1, f_x.end(), 0);
-	/*for (int i = 0; i < x0; ++i)
-		f_x[i] = 0;
-
-	for (size_t i = x1; i < x.size(); ++i)
-		f_x[i] = 0;*/
-
+	
 	return IRFFT(f_x);
 }
 

@@ -10,4 +10,4 @@ enum class DebugMode
     FinalTimeValue
 };
 
-//#define DEBUGMODE DebugMode::FinalTime
+#define DEBUGMODE DebugMode::FinalTime

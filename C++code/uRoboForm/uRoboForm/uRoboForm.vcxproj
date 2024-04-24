@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;C:\Users\prash\Downloads\boost_1_83_0;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\NumCpp-master\NumCpp-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtl-master\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\xtensor-master\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\sources\include;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,8 +141,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\fftw-3.3.5-dll64;D:\Vaishnavi\Master Thesis\Main Project\C++code\uRoboForm\lib\opencv\build\x64\vc16\lib;C:\Users\prash\Downloads\boost_1_83_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world480d.lib;libfftw3-3.lib;gsl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libfftw3-3.lib;gsl.lib;opencv_world480.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Evaluation.cpp" />

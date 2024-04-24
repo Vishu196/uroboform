@@ -262,8 +262,5 @@ void grid_pos02::Execute(stage34 s34)
 
 	fifo.push(s45);
 
-	#if DEBUGMODE == DebugMode::AllTimesValues
-	#elif DEBUGMODE == DebugMode::AllValues
 	cout << s45;
-	#endif
 }
