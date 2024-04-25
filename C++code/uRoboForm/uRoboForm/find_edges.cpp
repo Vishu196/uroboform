@@ -24,43 +24,31 @@ std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
 
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
-	size_t n = arr.size();
-	vector<int> stripes(50);
-	vector<double> s_dic(80);
-	int a = 0;
-	int count = 0;
+	peaks vec;
+	vec.stripes.reserve(15);
+	vec.s_dic.reserve(15);
 
-	for (int i = 1; i < n - 1; i++)
+	for (int i = 1; i < arr.size() - 1; ++i) 
 	{
-		int u = i - 1;
-		int v = i + 1;
-		if ((arr[i] >= arr[u] && arr[i] >= arr[v]) && (arr[i] > th_edge))
-		{
-			stripes[a] = i;
-			s_dic[a] = arr[i];
-			a++;
-			if (a>0) 
+		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) && (arr[i] > th_edge))
+		{ 
+			bool isFarEnough = true;
+			for (int j : vec.stripes) 
 			{
-				int p = a - 1;
-				int w = a - 2;
-				int x = a + 1;
-				if (stripes[a] - stripes[p] < 25)
+				if (abs(j - i) < 25) 
 				{
-					stripes[a] = stripes[x];
-					s_dic[a] = s_dic[x];
-					count++;
+					isFarEnough = false;
+					break;
 				}
+			}
+			if (isFarEnough) 
+			{
+				vec.stripes.push_back(i);
+				vec.s_dic.push_back(arr[i]);
 			}
 		}
 	}
-	stripes.resize(count);
-	s_dic.resize(count);
-
-	peaks peaks;
-	peaks.stripes = stripes;
-	peaks.s_dic = s_dic;
-
-	return peaks;
+	return vec;
 }
 
 indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_edge, int i0, int rank)

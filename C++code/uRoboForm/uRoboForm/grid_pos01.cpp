@@ -82,33 +82,36 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 
 struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double prom)
 {
-	size_t n = arr.size();
-	vector<int> peaksIndices(50);
-	vector<double> peaksValues(50);
-	vector<double> peaksProminence(50);
-	int count = 0;
-	int a = 0;
+	FP peaks;
+	peaks.stripes.reserve(15);
+	peaks.s_dic.reserve(15);
+	vector<double> peaksProminence(15);
+	
 
-	for (int i = 1; i < n - 1; ++i)
+	for (int i = 1; i < arr.size() - 1; ++i)
 	{
-		if (arr[i] >= arr[i - 1] && arr[i] >= arr[i + 1])
+		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]))
 		{
-			peaksIndices[a] = i;
-			peaksValues[a] = arr[i];
-			a++;
-			if (peaksIndices[a] - peaksIndices[a - 1] < dist)
+			bool isFarEnough = true;
+			for (int j : peaks.stripes)
 			{
-				peaksIndices[a] = peaksIndices[a + 1];
-				peaksValues[a] = peaksValues[a + 1];
-				count++;						
-			}	
+				if (abs(j - i) < 25)
+				{
+					isFarEnough = false;
+					break;
+				}
+			}
+			if (isFarEnough)
+			{
+				peaks.stripes.push_back(i);
+				peaks.s_dic.push_back(arr[i]);
+			}
 		}
 	}
 	
-	for (int i = 0; i < count; ++i) {
-		int peakIndex = peaksIndices[i];
+	for (int i = 0; i < peaks.stripes.size(); ++i) {
+		int peakIndex = peaks.stripes[i];
 
-		// Find left and right bases
 		int leftBaseIndex = peakIndex;
 		while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex]) 
 		{
@@ -124,25 +127,15 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 		double leftBaseValue = arr[leftBaseIndex];
 		double rightBaseValue = arr[rightBaseIndex];
 
-		//double peakValue = arr[peakIndex];
-
 		// Calculate prominence as the difference between peak value and the maximum of left and right bases
-		peaksProminence[i] = peaksValues[i] - std::max(leftBaseValue, rightBaseValue);
+		peaksProminence[i] = peaks.stripes[i] - std::max(leftBaseValue, rightBaseValue);
 		if (peaksProminence[i] < prom)
 		{
-			peaksValues.erase(peaksValues.begin() + i);
-			peaksIndices.erase(peaksIndices.begin() + i);
-			count--;
+			peaks.s_dic.erase(peaks.s_dic.begin() + i);
+			peaks.stripes.erase(peaks.stripes.begin() + i);
 		}
 	}
 	
-	peaksIndices.resize(count);
-	peaksValues.resize(count);
-
-	FP peaks;
-	peaks.stripes = peaksIndices;
-	peaks.s_dic = peaksValues;
-
 	return peaks;
 }
 
