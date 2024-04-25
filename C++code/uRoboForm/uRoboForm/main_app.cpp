@@ -1,9 +1,6 @@
 #include "main.h"
-#include <stdio.h>
-#include <iostream>
 #include <string>
-#include <chrono>
-#include <fstream>
+#include "utility.h"
 #include "constants.h"
 #include "raw_edges.h"
 #include "find_edges.h"
@@ -12,19 +9,7 @@
 using namespace cv;
 using namespace std;
 using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
-
-void display_time(const chrono::steady_clock::time_point& t01,const chrono::steady_clock::time_point& t02)
-{
-	/* Getting number of milliseconds as an integer. */
-	auto ms_int = duration_cast<milliseconds>(t02 - t01);
-	duration<double, milli> ms_double = t02 - t01;
-	cout << "Time: " << ms_double.count() << "ms" << endl;
-	cout << endl;
-}
 
 void write_to_csv(string filename, vector<string>colname, vector<vector<double>> data1, vector<int> index, vector<string>ori)
 {	
@@ -87,21 +72,21 @@ int main(int argc, char* argv[])
 
 	edge0.ExecuteR(image);
 
-	display_time(t01, high_resolution_clock::now());
+	utility::display_time(t01, high_resolution_clock::now());
 	auto t02 = high_resolution_clock::now();
 	
 	edge.Execute(edge0.getNext());
 
-	display_time(t02, high_resolution_clock::now());
+	utility::display_time(t02, high_resolution_clock::now());
 	auto t03 = high_resolution_clock::now();
 
 	stage56 s56 = grid_final.Execute(edge.getNext());
 	
-	display_time(t03, high_resolution_clock::now());	
+	utility::display_time(t03, high_resolution_clock::now());
 
 	
-	std::cout << "Complete runtime:";
-	display_time(t01, high_resolution_clock::now());
+	cout << "Complete runtime:";
+	utility::display_time(t01, high_resolution_clock::now());
 
 	xi_i.push_back(s56.xi);
 	zi_i.push_back(s56.zi);

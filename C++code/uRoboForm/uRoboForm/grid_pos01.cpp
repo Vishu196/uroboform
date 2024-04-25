@@ -4,17 +4,8 @@
 #include "constants.h"
 #include "debug_logs.h"
 
-#include <numeric>
-#include <chrono>
-#include <fstream>
-#include <iostream>
-
 using namespace std;
 using namespace cv;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
@@ -481,16 +472,6 @@ void modify_max_pos(vector<double>& max_pos)
 
 	if ((r > 1) && (max_pos_de[0] > 65))
 		max_pos.erase(max_pos.begin());
-}
-
-void display_time02(const chrono::steady_clock::time_point& t01,
-	const chrono::steady_clock::time_point& t02)
-{
-	/* Getting number of milliseconds as an integer. */
-	auto ms_int = duration_cast<milliseconds>(t02 - t01);
-	duration<double, milli> ms_double = t02 - t01;
-	cout << "grid_pos01 Time: " << ms_double.count() << "ms" << endl;
-	cout << endl;
 }
 
 void grid_pos01::Execute(stage23 s23) 
