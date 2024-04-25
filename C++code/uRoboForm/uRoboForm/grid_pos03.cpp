@@ -256,8 +256,9 @@ void Execute_1(stage45& s45)
 	}
 }
 
-void grid_pos03::Execute(stage45 s45, stage56 &s56)
+stage56 grid_pos03::Execute(stage45 s45)
 {
+	stage56 s56;
 	Execute_1(s45);
 	double d_k = get_d_k(s45);
 	s56.k = d_k * (px_size / 200);
@@ -274,4 +275,6 @@ void grid_pos03::Execute(stage45 s45, stage56 &s56)
 	fifo.push(s56);
 
 	cout << s56;
+
+	return s56;
 }

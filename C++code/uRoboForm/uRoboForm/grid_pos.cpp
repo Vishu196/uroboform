@@ -8,8 +8,6 @@ using std::chrono::high_resolution_clock;
 
 stage56 grid_pos::Execute(stage23 s23)
 {
-	stage56 s56;
-
 	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
 	{
 		grid_pos01 grid1;
@@ -28,20 +26,24 @@ stage56 grid_pos::Execute(stage23 s23)
 		utility::display_time(t12, high_resolution_clock::now());
 		auto t13 = high_resolution_clock::now();
 
-		grid3.Execute(grid2.getNext(), s56);
+		stage56 s56 = grid3.Execute(grid2.getNext());
 
 		utility::display_time(t13, high_resolution_clock::now());
 
+		return s56;
 	}
 	else
 	{
+		stage56 s56;
 		s56.index = (int)nan("");
 		s56.k = nan("");
 		s56.ind_ori = ("");
 		s56.grids = {};
 		s56.xi = nan("");
 		s56.zi = nan("");
+
+		return s56;
 	}
 
-	return s56;
+	
 }
