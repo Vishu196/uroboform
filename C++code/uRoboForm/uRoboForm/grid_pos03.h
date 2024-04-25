@@ -1,10 +1,5 @@
 #pragma once
 #include "grid_pos02.h"
-#include "grid.h"
-#include "constants.h"
-#include"Evaluation.h"
-#include "cqueue.h"
-#include "debug_logs.h"
 
 struct stage56
 {

@@ -1,4 +1,9 @@
 #include "raw_edges.h"
+#include"Evaluation.h"
+#include "signal_evaluation.h"
+#include "constants.h"
+#include "debug_logs.h"
+
 
 using namespace cv;
 using namespace std;

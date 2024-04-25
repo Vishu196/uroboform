@@ -1,6 +1,4 @@
 #pragma once
-#include <algorithm>
-#include <stdexcept>
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include <numeric>

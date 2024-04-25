@@ -1,9 +1,6 @@
 #pragma once
 #include "grid_pos01.h"
-#include "Evaluation.h"
-#include "cqueue.h"
-#include "debug_logs.h"
-#include <list>
+
 
 
 struct stage45
@@ -33,9 +30,9 @@ class grid_pos02
 	friend class grid_pos03;
 private:
 
-	Grid** checkGrid(Grid** &grids01, int gRows, int gCols);
+	void checkGrid(Grid** &grids01, int gRows, int gCols);
 	std::vector<int> linspace(double start, double end, int num);
-	RdBinary ReadBinary(Grid**& cgrids, const cv::Mat& img);
+	RdBinary ReadBinary(const stage34 &s34);
 	int static get_mask_pos(Grid field, int row, int col, size_t i_max);
 	cqueue<stage45> fifo;
 

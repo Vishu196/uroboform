@@ -1,4 +1,7 @@
 #include "signal_evaluation.h"
+#include "Evaluation.h"
+#include <fftw3.h>
+#include <complex>
 
 using namespace std;
 

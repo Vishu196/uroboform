@@ -1,16 +1,6 @@
 #pragma once
 #include "find_edges.h"
 #include "grid.h"
-#include"Evaluation.h"
-#include "signal_evaluation.h"
-#include "constants.h"
-#include "cqueue.h"
-#include "debug_logs.h"
-#include <numeric>
-#include <chrono>
-#include <fstream>
-#include <iostream>
-
 
 struct stage34
 {

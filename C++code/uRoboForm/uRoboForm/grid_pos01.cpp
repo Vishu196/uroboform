@@ -1,4 +1,13 @@
 #include "grid_pos01.h"
+#include"Evaluation.h"
+#include "signal_evaluation.h"
+#include "constants.h"
+#include "debug_logs.h"
+
+#include <numeric>
+#include <chrono>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 using namespace cv;
@@ -18,15 +27,14 @@ std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
 	const auto x_size = x.size();
-	const int dx = 1;
 	vector<double> grad(x_size);
 
-	grad[0] = (x[1] - x[0]) / dx;
+	grad[0] = (x[1] - x[0]);
 
 	for (auto i = 1; i <= (x_size-2); ++i)
-		grad[i] = (x[i + 1] - x[i - 1]) / (2 * dx);  // for i in [1,N-2]
+		grad[i] = (x[i + 1] - x[i - 1]) / 2;  // for i in [1,N-2]
 
-	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]) / dx;
+	grad[x_size - 1] = (x[x_size - 1] - x[x_size - 2]);
 
 	return grad;
 }
@@ -153,10 +161,8 @@ double* gauss_limited(double x, double k, double sigma, double mu, double offset
 	return 0;
 }
 
-void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, subPX& p)
+void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, vector<double>& max_pos)
 {
-	p.max_pos;
-	p.pres;
 	int xmin = 0;
 	int xmax = 0;
 
@@ -199,7 +205,7 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struc
 	}
 }
 
-void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, subPX& p)
+void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, vector<double>& max_pos)
 {
 	for (int va = 0; va < B_max.stripes.size(); ++va)
 	{
@@ -252,7 +258,7 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 
 					Mat a_dach0(3, 1, CV_64F);
 					a_dach0 = (PhiT * W0 * Phi).inv() * PhiT * W0 * B_cut01;
-					p.max_pos.emplace_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
+					max_pos.emplace_back(-a_dach0.at<double>(1,0) / a_dach0.at<double>(2,0) / 2);
 				}
 			}
 			catch (const exception)
@@ -261,10 +267,9 @@ void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, str
 			}
 		}
 	}
-	p.pres = {};
 }
 
-void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
+void grid_pos01::subpx_phase(const Mat &cutGrid, vector<double>& max_pos)
 {
 	vector<double> B0 = Evaluation::Mean0R(cutGrid);
 	double B = Evaluation::MeanR(B0);
@@ -310,22 +315,20 @@ void grid_pos01::subpx_phase(const Mat &cutGrid, subPX& p)
 			d += d_mean;
 
 		for (int i_max = 0; i_max < (m.n_g-1); ++i_max)
-			p.max_pos.emplace_back(d + i_max * d_mean);
+			max_pos.emplace_back(d + i_max * d_mean);
 	}
 	else
-		p.max_pos.clear();
-	
-	p.pres.clear();
+		max_pos.clear();
 }
 
-void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
+void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, vector<double>& max_pos)
 {
 	int y = cutGrid.cols;
 	
 	double px_size0 = px_size / 1000;
 	if (mode == "phase")
 	{
-		subpx_phase(cutGrid, p);
+		subpx_phase(cutGrid, max_pos);
 	}
 	else
 	{
@@ -355,12 +358,12 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, subPX &p)
 			//to do
 			if (mode == "gauss")
 			{
-			   subpx_gauss(B_cut, B_max,B_min, d_m, p);
+			   subpx_gauss(B_cut, B_max,B_min, d_m, max_pos);
 			}
 
 			else if (mode == "parabel")
 			{
-			    subpx_parabel(B_cut, B_max, B_min, d_m,p);
+			    subpx_parabel(B_cut, B_max, B_min, d_m, max_pos);
 			}
 		}
 	}
@@ -411,9 +414,9 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 		sourceRegion1.copyTo(grid0.colRange(0, s2));
 	}
 
-	vector<double> mean_grad = get_mean_grad(s23, row, col);
+	bool is_hor = get_mean_grad(s23, row, col);
 
-	if (mean_grad[1] > mean_grad[0])
+	if (is_hor)
 	{
 		orientation = "hor";
 		return grid0.t();
@@ -425,7 +428,7 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 	}
 }
 
-vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
+bool grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
 {
 	const int x11 = s23.cut_hor[row ];
 	const int x22 = s23.cut_hor[row + 1];
@@ -446,38 +449,38 @@ vector<double> grid_pos01::get_mean_grad(stage23 &s23, const int row, const int 
 		sourceRegion1.copyTo(mean2.colRange(0, w2));
 	}
 
-	vector<double> mean_grad00 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean0R(mean2), 0, (w2 / 6)));
-	vector<double> mean_grad11 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean1R(mean2), 0, (w1 / 6)));
+	vector<double> mean_grad0 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean0R(mean2), 0, (w2 / 6)));
+	vector<double> mean_grad1 = gradient(signal_evaluation::Bandfilter(Evaluation::Mean1R(mean2), 0, (w1 / 6)));
 
-	vector<double> mean_grad0(w2);
-	vector<double> mean_grad1(w1);
-
-	int t = w1 > w2 ? w1 : w2;
-	for (int i = 0; i < t; ++i)
+	for (int i = 0; i < w2; ++i)
 	{
-		if (i < w2)
-			mean_grad0[i] = abs(mean_grad00[i]);
-		if (i < w1)
-			mean_grad1[i] = abs(mean_grad11[i]);
+		mean_grad0[i] = abs(mean_grad0[i]);
+	}
+
+	for (int i = 0; i < w1; ++i)
+	{
+		mean_grad1[i] = abs(mean_grad1[i]);
 	}
 
 	double mean_0grad0 = Evaluation::MeanR(mean_grad0);
 	double mean_1grad1 = Evaluation::MeanR(mean_grad1);
 
-	vector<double> mean_grad = {mean_0grad0, mean_1grad1 };
-	return mean_grad;
+	if (mean_1grad1 > mean_0grad0)
+		return true;
+	else
+		return false;
 }
 
-void modify_max_pos(subPX &p)
+void modify_max_pos(vector<double>& max_pos)
 {
-	size_t r = p.max_pos.size();
-	vector <double> max_pos_de = Evaluation::decumulate(p.max_pos);
+	size_t r = max_pos.size();
+	vector <double> max_pos_de = Evaluation::decumulate(max_pos);
 
 	if ((r > 1) && (max_pos_de.back() > 65))
-		p.max_pos.pop_back();
+		max_pos.pop_back();
 
 	if ((r > 1) && (max_pos_de[0] > 65))
-		p.max_pos.erase(p.max_pos.begin());
+		max_pos.erase(max_pos.begin());
 }
 
 void display_time02(const chrono::steady_clock::time_point& t01,
@@ -507,22 +510,19 @@ void grid_pos01::Execute(stage23 s23)
 		for (int col = 0; col < (s23.cut_ver.size()-1); ++col)
 		{
 			Mat grid_rot = get_gridrot(s23, row, col, orientation);
-			struct subPX p;
+			vector<double> max_pos;
+			max_pos.reserve(15);
 			const int grid_rot_size = grid_rot.rows * grid_rot.cols;
 
 			if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
 			{
 				Mat grid_cut = cutGrid(grid_rot);
-				subpx_max_pos(grid_cut, mode, p);
-				modify_max_pos(p);
+				subpx_max_pos(grid_cut, mode, max_pos);
+				modify_max_pos(max_pos);
 			}
-			else
-			{
-				p.max_pos = {};
-				p.pres.clear();
-			}
+
 			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
-			s34.grids[row][col] = Grid(grid_rot, orientation, coord, p.max_pos);
+			s34.grids[row][col] = Grid(grid_rot, orientation, coord, max_pos);
 			
 			/*vector<double> max_p = s34.grids[row][col].max_pos;
 			for(auto vi:max_p)
