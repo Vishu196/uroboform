@@ -7,7 +7,7 @@
 class Grid
 {
     public:
-    Grid(cv::Mat image, std::string orientation, std::vector<int> coord, std::vector<double> max_posi)
+    Grid(cv::Mat image, std::string orientation, std::vector<int> coord, std::vector<double> max_pos)
     {
         this->image = image;
         this->px_num = image.rows * image.cols;
@@ -15,19 +15,19 @@ class Grid
         this->im_loc = coord;
             if (orientation == "hor")
             {
-                for (int i = 0; i < max_posi.size(); i++)
+                for (int i = 0; i < max_pos.size(); i++)
                 {
-                    this->max_pos.push_back(max_posi[i] + coord[0]);
+                    this->max_pos.push_back(max_pos[i] + coord[0]);
                 }
-                max_pos.resize(max_posi.size());
+                max_pos.resize(max_pos.size());
             }
             else
             {
-                for (int i = 0; i < max_posi.size(); i++)
+                for (int i = 0; i < max_pos.size(); i++)
                 {
-                    this->max_pos.push_back(max_posi[i] + coord[1]);
+                    this->max_pos.push_back(max_pos[i] + coord[1]);
                 }
-                max_pos.resize(max_posi.size());            
+                max_pos.resize(max_pos.size());            
             }
         
     }
