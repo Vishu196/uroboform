@@ -30,9 +30,9 @@ class grid_pos02
 	friend class grid_pos03;
 private:
 
-	void checkGrid(Grid** &grids01, int gRows, int gCols);
+	Grid** checkGrid(const stage34& s34);
 	std::vector<int> linspace(double start, double end, int num);
-	RdBinary ReadBinary(const stage34 &s34);
+	RdBinary ReadBinary(const stage45& s45, const cv::Mat& img);
 	int static get_mask_pos(Grid field, int row, int col, size_t i_max);
 	cqueue<stage45> fifo;
 

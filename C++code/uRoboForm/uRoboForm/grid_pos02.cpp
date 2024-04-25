@@ -19,12 +19,13 @@ bool isGreater(double n)
 	return n > 100;
 }
 
-void grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
+Grid** grid_pos02::checkGrid(const stage34 &s34)
 {
+	Grid** grids01 = s34.grids;
 
-	for (int row = 0; row < gRows; row++)
+	for (int row = 0; row < s34.gridRows; row++)
 	{
-		for (int col = 0; col < gCols; col++)
+		for (int col = 0; col < s34.gridCols; col++)
 		{
 			size_t r = grids01[row][col].max_pos.size();	
 			if (r > 0)
@@ -60,7 +61,7 @@ void grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 
 				if (r >= 1)
 				{
-					if (((row != (gRows - 1)) && (grids01[row][col].orientation == "hor") && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (gCols - 1)) && (grids01[row][col].orientation == "ver") && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
+					if (((row != (s34.gridRows - 1)) && (grids01[row][col].orientation == "hor") && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (s34.gridCols - 1)) && (grids01[row][col].orientation == "ver") && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
 					{
 						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.back());
 						grids01[row][col].max_pos.push_back(new_mp);
@@ -74,6 +75,8 @@ void grid_pos02::checkGrid(Grid** &grids01, int gRows, int gCols)
 			}
 		}
 	}
+
+	return grids01;
 }
 
 vector<int> grid_pos02::linspace(double start, double end, int num)
@@ -100,32 +103,33 @@ vector<int> grid_pos02::linspace(double start, double end, int num)
 	return bounds;
 }
 
-RdBinary grid_pos02::ReadBinary(const stage34 &s34)
+RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 {
-	string ori;
-	int code = 0;
+	struct RdBinary rd;
+	rd.ind_ori;
+	rd.index = 0;
 	vector<double> max_mean;
-	const int x = s34.img.rows;
-	const int y = s34.img.cols;
+	const int x = img.rows;
+	const int y = img.cols;
 
-	if (s34.grids[1][1].max_pos.size() >= 5)
+	if (s45.grids[1][1].max_pos.size() >= 5)
 	{
-		ori = s34.grids[1][1].orientation;
-		if (ori == "hor")
+		rd.ind_ori = s45.grids[1][1].orientation;
+		if (rd.ind_ori == "hor")
 		{
-			if (s34.grids[0][1].max_pos.size() == 9)
-				max_mean = s34.grids[0][1].max_pos;
-			else if (s34.grids[2][1].max_pos.size() == 9)
-				max_mean = s34.grids[2][1].max_pos;
+			if (s45.grids[0][1].max_pos.size() == 9)
+				max_mean = s45.grids[0][1].max_pos;
+			else if (s45.grids[2][1].max_pos.size() == 9)
+				max_mean = s45.grids[2][1].max_pos;
 			else
 				max_mean.clear();
 		}
 		else
 		{
-			if (s34.grids[1][0].max_pos.size() == 7)
-				max_mean = s34.grids[1][0].max_pos;
-			else if (s34.grids[1][2].max_pos.size() == 7)
-				max_mean = s34.grids[1][2].max_pos;
+			if (s45.grids[1][0].max_pos.size() == 7)
+				max_mean = s45.grids[1][0].max_pos;
+			else if (s45.grids[1][2].max_pos.size() == 7)
+				max_mean = s45.grids[1][2].max_pos;
 			else
 				max_mean.clear();
 		}
@@ -140,24 +144,24 @@ RdBinary grid_pos02::ReadBinary(const stage34 &s34)
 			vector<int> bounds = linspace(start, end, 10);
 			vector<double> coded_line;
 			
-			if (ori == "hor")
+			if (rd.ind_ori == "hor")
 			{
-				const int w11 = int(s34.grids[1][1].max_pos[0] - d_mean / 4);
-				const int w22 = int(s34.grids[1][1].max_pos[0] + d_mean / 4);
+				const int w11 = int(s45.grids[1][1].max_pos[0] - d_mean / 4);
+				const int w22 = int(s45.grids[1][1].max_pos[0] + d_mean / 4);
 
 				Mat coded_area(w22-w11, y, CV_8U);				
-				Mat sourceRegion = s34.img.rowRange(w11, w22);
+				Mat sourceRegion = img.rowRange(w11, w22);
 				sourceRegion.copyTo(coded_area.rowRange(0, w22 - w11));
 				
 				coded_line = Evaluation::Mean0R(coded_area);
 			}
 			else
 			{
-				const int l22 = int(s34.grids[1][1].max_pos[0] + d_mean / 4);
-				const int l11 = int(s34.grids[1][1].max_pos[0] - d_mean / 4);
+				const int l22 = int(s45.grids[1][1].max_pos[0] + d_mean / 4);
+				const int l11 = int(s45.grids[1][1].max_pos[0] - d_mean / 4);
 				
 				Mat coded_area(x, l22-l11, CV_8U);
-				Mat sourceRegion = s34.img.colRange(l11, l22);
+				Mat sourceRegion = img.colRange(l11, l22);
 				sourceRegion.copyTo(coded_area.colRange(0, l22 - l11));
 				
 				coded_line = Evaluation::Mean1R(coded_area);
@@ -168,31 +172,27 @@ RdBinary grid_pos02::ReadBinary(const stage34 &s34)
 				code_mean[i] = Evaluation::Mean(coded_line.begin() + bounds[i], coded_line.begin() + bounds[i+1]);
 
 			double min_val;
-			minMaxLoc(s34.img, &min_val, nullptr);
+			minMaxLoc(img, &min_val, nullptr);
 
 			int amin = min_val; 
-			Scalar tempVal = mean(s34.img);
+			Scalar tempVal = mean(img);
 			double means = tempVal.val[0];
 			double th = amin + ((means - amin) * 0.85);
 
 			for (size_t i = 1; i < code_mean.size(); i++)
 			{
-				code_mean[i] < th ? code |= (1u << (8-i)) : code &= ~(1u << (8 - i));
+				code_mean[i] < th ? rd.index |= (1u << (8-i)) : rd.index &= ~(1u << (8 - i));
 			}
 
 		}
 		else
-			code = 300;
+			rd.index = 300;
 	}
 	else
 	{
-		code = 400;
-		ori = "non";
+		rd.index = 400;
+		rd.ind_ori = "non";
 	}
-
-	struct RdBinary rd;
-	rd.index = code;
-	rd.ind_ori = ori;
 
 	return rd;
 }
@@ -238,15 +238,14 @@ void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;
 
-	checkGrid(s34.grids, s34.gridRows, s34.gridCols);
+	s45.grids = checkGrid(s34);
 
-	RdBinary I = ReadBinary(s34);
+	RdBinary I = ReadBinary(s45, s34.img);
 	
 	s45.gridRows = s34.gridRows;
 	s45.gridCols = s34.gridCols;
 	s45.index = I.index;
 	s45.ind_ori = I.ind_ori;
-	s45.grids = s34.grids;
 
 	fifo.push(s45);
 
