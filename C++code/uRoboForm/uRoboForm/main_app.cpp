@@ -12,7 +12,7 @@ using namespace std;
 using std::chrono::high_resolution_clock;
 
 
-void write_to_csv(const string &filename, const vector<string>&colname, const vector<vector<double>> &data1, const vector<int> &index, vector<string>ori, const vector<int> &img_num)
+void write_to_csv(const string &filename, const vector<string>&colname, const vector<vector<double>> &data1, const vector<int> &index, vector<string>ori, const vector<int> &img_num, const vector<double>& time_i)
 {	
 	// Create an output filestream object
 	ofstream myFile(filename);
@@ -27,7 +27,7 @@ void write_to_csv(const string &filename, const vector<string>&colname, const ve
 	// Send data to the stream
 	for (int j = 0; j < data1.size(); ++j) 
 	{
-		myFile << "  " << img_num[j] << "  ; " << data1[j][0] << " ; " << data1[j][1] << " ; " << data1[j][2] << " ;   " << index[j] << "   ;    " << ori[j] << "\n";
+		myFile << "  " << img_num[j] << "  ; " << data1[j][0] << " ; " << data1[j][1] << " ; " << data1[j][2] << " ;   " << index[j] << "   ;    " << ori[j] << "   ;   " << time_i[j] << "\n";
 		//if (j != data1.size() - 1) myFile << ","; // No comma at end of line	
 	}
 	myFile << "\n";
@@ -38,7 +38,8 @@ void write_to_csv(const string &filename, const vector<string>&colname, const ve
 int main(int argc, char* argv[])
 {
 	string csvname = "Result";
-	string foldername = "D:/Vaishnavi/C++Trial/terlau1/01";
+	string foldername = "D:/Vaishnavi/C++Trial/terlau1/0195";
+	//string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
 
 	// storing all o/p values to respective vector lists and then passing list as i/p to csv fn so that we can get
 	//a table of all o/p values.
@@ -48,19 +49,20 @@ int main(int argc, char* argv[])
 	vector<double> k_i;
 	vector<int> index_i;
 	vector<string> ori_i;
+	vector<double>time_i;
 
 
-	/*string filename = foldername + "image0001.bmp";
+	string filename = foldername + "image0001.bmp";
 	if (argc > 1)
 		filename = argv[1];
-	int a = 89;*/
+	int a = 95;
 
-	for (int a = 82 ; a < 93; a++)
+	/*for (int a = 806 ; a < 822; a++)
 	{
 		string num = to_string(a);
 		string filename = foldername + num + "image0001.bmp";
 		if (argc > 1)
-			filename = argv[1];
+			filename = argv[1];*/
 	
 	 // Read the image file in grayscale
 		Mat image = imread(filename, IMREAD_GRAYSCALE);
@@ -95,6 +97,7 @@ int main(int argc, char* argv[])
 	
 		cout << "Complete runtime:";
 		utility::display_time(t01, high_resolution_clock::now());
+		time_i.push_back(utility::get_time(t01, high_resolution_clock::now()));
 
 		img_num.push_back(a);
 		xi_i.push_back(s56.xi);
@@ -102,9 +105,8 @@ int main(int argc, char* argv[])
 		k_i.push_back(s56.k);
 		index_i.push_back(s56.index);
 		ori_i.push_back(s56.ind_ori);
-	
-	}
-	////for loop ends
+		
+	/*}*/
 
 	vector<vector<double>> data1(xi_i.size(), vector<double>(3));
 	for (size_t i = 0; i < xi_i.size(); i++)
@@ -114,9 +116,9 @@ int main(int argc, char* argv[])
 		data1[i][2] = k_i[i];
 	}
 	 
-	vector<string> colname = { "img_num","  xi    ","   zi    ","    k    ","  index  ","  orientation "};
+	vector<string> colname = { "img_num","  xi    ","   zi    ","    k    ","  index  ","  orientation " , "  time(ms)"};
 	
-	write_to_csv(csvname, colname, data1, index_i, ori_i,img_num);
+	write_to_csv(csvname, colname, data1, index_i, ori_i,img_num, time_i);
 
 	return 0;
 }

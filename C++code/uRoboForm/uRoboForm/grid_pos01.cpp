@@ -89,26 +89,22 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	peaks.stripes.reserve(15);
 	peaks.s_dic.reserve(15);
 	vector<double> peaksProminence(15);
-	
+	int a = 0;
 
 	for (int i = 1; i < arr.size() - 1; ++i)
 	{
 		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]))
 		{
-			bool isFarEnough = true;
-			for (int j : peaks.stripes)
+			peaks.stripes.push_back(i);
+			peaks.s_dic.push_back(arr[i]);
+			a++;
+
+			if ((peaks.stripes.size() > 1) && (abs(peaks.stripes[a-1] - peaks.stripes[a - 2]) < dist))
 			{
-				if (abs(j - i) < dist)
-				{
-					isFarEnough = false;
-					break;
-				}
+				peaks.stripes[a-2] = peaks.stripes[a-1];
+				peaks.s_dic[a - 2] = peaks.s_dic[a-1];
 			}
-			if (isFarEnough)
-			{
-				peaks.stripes.push_back(i);
-				peaks.s_dic.push_back(arr[i]);
-			}
+			
 		}
 	}
 	
@@ -131,7 +127,8 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 		double rightBaseValue = arr[rightBaseIndex];
 
 		// Calculate prominence as the difference between peak value and the maximum of left and right bases
-		peaksProminence[i] = peaks.stripes[i] - std::max(leftBaseValue, rightBaseValue);
+		double peakValue = arr[peakIndex];
+		peaksProminence[i] = peakValue - std::max(leftBaseValue, rightBaseValue);
 		if (peaksProminence[i] < prom)
 		{
 			peaks.s_dic.erase(peaks.s_dic.begin() + i);
@@ -501,9 +498,9 @@ void grid_pos01::Execute(stage23 s23)
 			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
 			s34.grids[row][col] = Grid(grid_rot, orientation, coord, max_pos);
 			
-			/*vector<double> max_p = s34.grids[row][col].max_pos;
+			vector<double> max_p = s34.grids[row][col].max_pos;
 			for(auto vi:max_p)
-				cout << vi << endl;*/
+				cout << vi << endl;
 		}
 	}
 
