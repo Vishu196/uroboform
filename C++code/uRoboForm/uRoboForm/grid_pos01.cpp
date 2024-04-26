@@ -2,10 +2,13 @@
 #include"Evaluation.h"
 #include "signal_evaluation.h"
 #include "constants.h"
+#include "utility.h"
 #include "debug_logs.h"
 
 using namespace std;
 using namespace cv;
+using std::chrono::high_resolution_clock;
+
 
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
@@ -95,7 +98,7 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 			bool isFarEnough = true;
 			for (int j : peaks.stripes)
 			{
-				if (abs(j - i) < 25)
+				if (abs(j - i) < dist)
 				{
 					isFarEnough = false;
 					break;
@@ -135,7 +138,7 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 			peaks.stripes.erase(peaks.stripes.begin() + i);
 		}
 	}
-	
+
 	return peaks;
 }
 
@@ -368,10 +371,10 @@ void get_grids(stage23 &s23, stage34 &s34)
 	s23.cut_hor.push_back(s23.img.rows / 2);
 	s23.cut_ver.push_back(s23.img.cols / 2);
 
-	s34.grids = new Grid * [s23.cut_hor.size()];
-	for (int h = 0; h < (int)s23.cut_hor.size(); ++h)
+	s34.grids = new Grid * [s23.cut_hor.size()-1];
+	for (int h = 0; h < (int)(s23.cut_hor.size()-1); ++h)
 	{
-		s34.grids[h] = new Grid[(int)s23.cut_ver.size()];
+		s34.grids[h] = new Grid[(int)s23.cut_ver.size()-1];
 	}
 
 	//return s34.grids;
@@ -503,6 +506,7 @@ void grid_pos01::Execute(stage23 s23)
 				cout << vi << endl;*/
 		}
 	}
+
 	s34.img = s23.img;
 	s34.gridRows = (int)s23.cut_hor.size()-1;
 	s34.gridCols = (int)s23.cut_ver.size()-1;
