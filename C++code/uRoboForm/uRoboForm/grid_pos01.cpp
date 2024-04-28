@@ -91,33 +91,59 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	vector<double> peaksProminence(50);
 	int a = 0;
 
-	for (int i = 1; i < arr.size() - 1; ++i)
-	{
-		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]))
-		{
+	//for (int i = 1; i < arr.size() - 1; ++i)
+	//{
+	//	if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]))
+	//	{
+	//		peaks.stripes.push_back(i);
+	//		peaks.s_dic.push_back(arr[i]);
+	//		a++;
+
+	//		/*if ((peaks.stripes.size() > 2) && (abs(peaks.stripes[a-1] - peaks.stripes[a-2]) < dist))
+	//		{
+	//			peaks.stripes[a - 2] = peaks.stripes[a - 1];
+	//			peaks.s_dic[a - 2] = peaks.s_dic[a - 1];
+
+	//		}*/
+	//		 
+	//	}
+	//}
+	//
+	//for (int i =1; i < peaks.stripes.size()-1; i++)
+	//{
+	//	if  (abs(peaks.stripes[i] - peaks.stripes[i-1]) < dist)
+	//	{
+	//		peaks.stripes.erase(peaks.stripes.begin()+i);
+	//		peaks.s_dic.erase(peaks.s_dic.begin() + i);
+	//	}
+
+	//}
+
+	for (int i = 1; i < arr.size() - 1; ++i) {
+		if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) {
 			peaks.stripes.push_back(i);
 			peaks.s_dic.push_back(arr[i]);
-			a++;
-
-			/*if ((peaks.stripes.size() > 2) && (abs(peaks.stripes[a-1] - peaks.stripes[a-2]) < dist))
-			{
-				peaks.stripes[a - 2] = peaks.stripes[a - 1];
-				peaks.s_dic[a - 2] = peaks.s_dic[a - 1];
-
-			}*/
-			 
 		}
 	}
-	
-	for (int i = 1; i < peaks.stripes.size()-2; i++)
-	{
-		if  (abs(peaks.stripes[i] - peaks.stripes[i-1]) < dist)
-		{
-			peaks.stripes.erase(peaks.stripes.begin()+i);
-			peaks.s_dic.erase(peaks.s_dic.begin() + i);
-
+	bool changed = true;
+	while (changed) {
+		changed = false;
+		for (int i = 0; i < peaks.stripes.size() - 1; ++i) {
+			if (peaks.stripes[i + 1] - peaks.stripes[i] < dist) {
+				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) {
+					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i+1);
+					changed = true;
+					break;
+				}
+				else {
+					peaks.stripes.erase(peaks.stripes.begin() + i);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i);
+					changed = true;
+					break;
+				}
+			}
 		}
-
 	}
 
 	for (int i = 0; i < peaks.stripes.size(); ++i) 
@@ -511,9 +537,9 @@ void grid_pos01::Execute(stage23 s23)
 			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
 			s34.grids[row][col] = Grid(grid_rot, orientation, coord, max_pos);
 			
-			vector<double> max_p = s34.grids[row][col].max_pos;
+			/*vector<double> max_p = s34.grids[row][col].max_pos;
 			for(auto vi:max_p)
-				cout << vi << endl;
+				cout << vi << endl;*/
 		}
 	}
 
