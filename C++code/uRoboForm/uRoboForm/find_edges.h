@@ -7,12 +7,6 @@ struct Detect_throu
 	std::vector<int> cut_through;
 };
 
-struct peaks
-{
-	std::vector<int> stripes;
-	std::vector<double> s_dic;
-};
-
 struct indexes 
 {
 	double s_max;
@@ -41,7 +35,6 @@ class find_edges
 {
 private:
 	
-	peaks Find_Peaks(const std::vector<double> &arr, double th_edge);
 	indexes Line_Index(const std::vector<double> &mean_range_in, double th_edge,int i0,int rank);
 	Detect_throu Detect_Through(const std::vector<double> &im_col, double th_edge);
 	std::vector<int> Delete_Edges(std::vector<int> cut_arr, int ideal_d);

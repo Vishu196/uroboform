@@ -3,6 +3,11 @@
 #include <opencv2/opencv.hpp>
 #include <numeric>
 
+struct peaks
+{
+	std::vector<int> stripes;
+	std::vector<double> s_dic;
+};
 
 class Evaluation
 {
@@ -37,5 +42,6 @@ public:
 		return xi;
 	}
 
+	peaks static Find_Peaks(const std::vector<double>& arr, double height, double dist, double prom);
 };
 

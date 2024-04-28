@@ -22,46 +22,6 @@ std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
 	return ostr;
 }
 
-peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
-{
-	peaks peaks;
-	peaks.stripes.reserve(15);
-	peaks.s_dic.reserve(15);
-
-	for (int i = 1; i < arr.size() - 1; ++i) 
-	{
-		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) && (arr[i] > th_edge))
-		{ 
-			peaks.stripes.push_back(i);
-			peaks.s_dic.push_back(arr[i]);
-
-		}
-	}
-
-	bool changed = true;
-	while (changed) {
-		changed = false;
-		for (int i = 0; i < peaks.stripes.size() - 1; ++i) {
-			if (peaks.stripes[i + 1] - peaks.stripes[i] < 25) {
-				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) {
-					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i + 1);
-					changed = true;
-					break;
-				}
-				else {
-					peaks.stripes.erase(peaks.stripes.begin() + i);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i);
-					changed = true;
-					break;
-				}
-			}
-		}
-	}
-
-	return peaks;
-}
-
 indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_edge, int i0, int rank)
 {
 	indexes index;
@@ -75,8 +35,8 @@ indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_ed
 	
 	transform(mean_range.begin(), mean_range.end(), mean_rangeN.begin(), negate<double>());
 
-	peaks peaks_max = Find_Peaks(mean_range, th_edge);
-	peaks peaks_min = Find_Peaks(mean_rangeN, -th_edge);
+	peaks peaks_max = Evaluation::Find_Peaks(mean_range, th_edge, 25.0, -1.0);
+	peaks peaks_min = Evaluation::Find_Peaks(mean_rangeN, -th_edge, 25.0, -1.0);
 
 	if (peaks_max.stripes.size() >= 1 && rank <= peaks_max.s_dic.size())
 	{

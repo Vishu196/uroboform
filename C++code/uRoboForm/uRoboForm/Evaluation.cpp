@@ -97,3 +97,95 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 
 	return indice_arr;
 }
+
+peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double dist, double prom)
+{
+	peaks peaks;
+	peaks.stripes.reserve(15);
+	peaks.s_dic.reserve(15);
+
+	if (height != 0.0)
+	{
+		for (int i = 1; i < arr.size() - 1; ++i)
+		{
+			if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) && (arr[i] > height))
+			{
+				peaks.stripes.push_back(i);
+				peaks.s_dic.push_back(arr[i]);
+
+			}
+		}
+	}
+	else
+	{
+		for (int i = 1; i < arr.size() - 1; ++i) 
+		{
+			if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) 
+			{
+				peaks.stripes.push_back(i);
+				peaks.s_dic.push_back(arr[i]);
+			}
+		}
+	}
+
+	bool changed = true;
+	while (changed) 
+	{
+		changed = false;
+		for (int i = 0; i < peaks.stripes.size() - 1; ++i) 
+		{
+			if (peaks.stripes[i + 1] - peaks.stripes[i] < dist) 
+			{
+				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) 
+				{
+					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i + 1);
+					changed = true;
+					break;
+				}
+				else 
+				{
+					peaks.stripes.erase(peaks.stripes.begin() + i);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i);
+					changed = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (prom != -1.0)
+	{
+		vector<double> peaksProminence(50);
+		for (int i = 0; i < peaks.stripes.size(); ++i)
+		{
+			int peakIndex = peaks.stripes[i];
+
+			int leftBaseIndex = peakIndex;
+			while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex])
+			{
+				--leftBaseIndex;
+			}
+
+			int rightBaseIndex = peakIndex;
+			while (rightBaseIndex < arr.size() - 1 && arr[rightBaseIndex + 1] < arr[rightBaseIndex])
+			{
+				++rightBaseIndex;
+			}
+
+			double leftBaseValue = arr[leftBaseIndex];
+			double rightBaseValue = arr[rightBaseIndex];
+
+			// Calculate prominence as the difference between peak value and the maximum of left and right bases
+			double peakValue = arr[peakIndex];
+			peaksProminence[i] = peakValue - std::max(leftBaseValue, rightBaseValue);
+			if (peaksProminence[i] < prom)
+			{
+				peaks.s_dic.erase(peaks.s_dic.begin() + i);
+				peaks.stripes.erase(peaks.stripes.begin() + i);
+			}
+		}
+	}
+
+	return peaks;
+}

@@ -83,79 +83,13 @@ Mat grid_pos01::cutGrid(const Mat &grid_rot)
 	return grid_cut;
 }
 
-struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double prom)
-{
-	FP peaks;
-	peaks.stripes.reserve(15);
-	peaks.s_dic.reserve(15);
-	vector<double> peaksProminence(50);
-	
-	for (int i = 1; i < arr.size() - 1; ++i) {
-		if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) {
-			peaks.stripes.push_back(i);
-			peaks.s_dic.push_back(arr[i]);
-		}
-	}
-	bool changed = true;
-	while (changed) {
-		changed = false;
-		for (int i = 0; i < peaks.stripes.size() - 1; ++i) {
-			if (peaks.stripes[i + 1] - peaks.stripes[i] < dist) {
-				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) {
-					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i+1);
-					changed = true;
-					break;
-				}
-				else {
-					peaks.stripes.erase(peaks.stripes.begin() + i);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i);
-					changed = true;
-					break;
-				}
-			}
-		}
-	}
-
-	for (int i = 0; i < peaks.stripes.size(); ++i) 
-	{
-		int peakIndex = peaks.stripes[i];
-
-		int leftBaseIndex = peakIndex;
-		while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex]) 
-		{
-			--leftBaseIndex;
-		}
-
-		int rightBaseIndex = peakIndex;
-		while (rightBaseIndex < arr.size() - 1 && arr[rightBaseIndex + 1] < arr[rightBaseIndex]) 
-		{
-			++rightBaseIndex;
-		}
-
-		double leftBaseValue = arr[leftBaseIndex];
-		double rightBaseValue = arr[rightBaseIndex];
-
-		// Calculate prominence as the difference between peak value and the maximum of left and right bases
-		double peakValue = arr[peakIndex];
-		peaksProminence[i] = peakValue - std::max(leftBaseValue, rightBaseValue);
-		if (peaksProminence[i] < prom)
-		{
-			peaks.s_dic.erase(peaks.s_dic.begin() + i);
-			peaks.stripes.erase(peaks.stripes.begin() + i);
-		}
-	}
-
-	return peaks;
-}
-
 //to do
 double* gauss_limited(double x, double k, double sigma, double mu, double offset,  int max_cut)
 {
 	return 0;
 }
 
-void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, vector<double>& max_pos)
+void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos)
 {
 	int xmin = 0;
 	int xmax = 0;
@@ -199,7 +133,7 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct FP B_max, struc
 	}
 }
 
-void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct FP B_max, struct FP B_min, double d_m, vector<double>& max_pos)
+void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos)
 {
 	for (int va = 0; va < B_max.stripes.size(); ++va)
 	{
@@ -336,8 +270,8 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, vector<double>& 
 		vector<double> B_cut_N(y);
 		transform(B_cut.begin(), B_cut.end(), B_cut_N.begin(), std::negate<double>());
 
-		FP B_max = Find_Peaks(B_cut, d_min, prom);
-		FP B_min = Find_Peaks(B_cut_N, d_min, 0.0);
+		peaks B_max = Evaluation::Find_Peaks(B_cut,0.0, d_min, prom);
+		peaks B_min = Evaluation::Find_Peaks(B_cut_N,0.0, d_min, 0.0);
 
 		if ((B_max.stripes.size() >= 1) && (B_min.stripes.size() >= 1))
 		{

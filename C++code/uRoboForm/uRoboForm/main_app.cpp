@@ -38,8 +38,8 @@ void write_to_csv(const string &filename, const vector<string>&colname, const ve
 int main(int argc, char* argv[])
 {
 	string csvname = "Result";
-	//string foldername = "D:/Vaishnavi/C++Trial/terlau1/01";
-	string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
+	string foldername = "D:/Vaishnavi/C++Trial/terlau1/01";
+	//string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
 
 	// storing all o/p values to respective vector lists and then passing list as i/p to csv fn so that we can get
 	//a table of all o/p values.
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 		filename = argv[1];
 	int a = 95;*/
 
-	for (int a = 806 ; a < 822; a++)
+	for (int a = 81 ; a < 96; a++)
 	{
 		string num = to_string(a);
 		string filename = foldername + num + "image0001.bmp";
