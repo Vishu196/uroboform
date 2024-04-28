@@ -38,40 +38,40 @@ indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_ed
 	peaks peaks_max = Evaluation::Find_Peaks(mean_range, th_edge, 25.0, -1.0);
 	peaks peaks_min = Evaluation::Find_Peaks(mean_rangeN, -th_edge, 25.0, -1.0);
 
-	if (peaks_max.stripes.size() >= 1 && rank <= peaks_max.s_dic.size())
+	if (peaks_max.index.size() >= 1 && rank <= peaks_max.value.size())
 	{
-		vector<int> indice_arr = Evaluation::ArgSort(peaks_max.s_dic);
-		int tmp = indice_arr[peaks_max.s_dic.size() - rank];
-		index.s_max = peaks_max.stripes[tmp] + i0;
+		vector<int> indice_arr = Evaluation::ArgSort(peaks_max.value);
+		int tmp = indice_arr[peaks_max.value.size() - rank];
+		index.s_max = peaks_max.index[tmp] + i0;
 	}
 	else
 	{
 		index.s_max = nan("");
 	}
-	if ((peaks_max.stripes.size() >= 3 && peaks_min.stripes.size() >= 3))
+	if ((peaks_max.index.size() >= 3 && peaks_min.index.size() >= 3))
 	{
-		if (peaks_min.stripes.front() > 25)
+		if (peaks_min.index.front() > 25)
 		{
-			peaks_min.stripes.insert(peaks_min.stripes.begin(), 0);
-			peaks_min.s_dic.insert(peaks_min.s_dic.begin(), mean_rangeN.front());
+			peaks_min.index.insert(peaks_min.index.begin(), 0);
+			peaks_min.value.insert(peaks_min.value.begin(), mean_rangeN.front());
 		}
-		if (s - peaks_min.stripes.at((peaks_min.stripes.size() - 1)) > 25)
+		if (s - peaks_min.index.at((peaks_min.index.size() - 1)) > 25)
 		{
 			size_t e = s - 1;
-			peaks_min.stripes.insert(peaks_min.stripes.end(), (int)e);
-			peaks_min.s_dic.insert(peaks_min.s_dic.end(), mean_rangeN.at(e));
+			peaks_min.index.insert(peaks_min.index.end(), (int)e);
+			peaks_min.value.insert(peaks_min.value.end(), mean_rangeN.at(e));
 		}
 
-		const int s_dic_min_size = ((int)peaks_min.stripes.size()) - 2;
+		const int s_dic_min_size = ((int)peaks_min.index.size()) - 2;
 		vector<double> s_dic_min(s_dic_min_size);
 		for (auto i = 0; i < s_dic_min_size; i++)
 		{
-			s_dic_min[i] = peaks_min.s_dic[i + 1]; 
+			s_dic_min[i] = peaks_min.value[i + 1];
 		}
 
 		int n_0 = (int)(max_element(s_dic_min.begin(), s_dic_min.end()) - s_dic_min.begin());
 		int h = n_0 + 1;
-		index.s_min = peaks_min.stripes[h] + i0;
+		index.s_min = peaks_min.index[h] + i0;
 	}
 	else
 	{

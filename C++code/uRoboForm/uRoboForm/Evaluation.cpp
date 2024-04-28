@@ -101,8 +101,8 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double dist, double prom)
 {
 	peaks peaks;
-	peaks.stripes.reserve(15);
-	peaks.s_dic.reserve(15);
+	peaks.index.reserve(15);
+	peaks.value.reserve(15);
 
 	if (height != 0.0)
 	{
@@ -110,8 +110,8 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 		{
 			if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) && (arr[i] > height))
 			{
-				peaks.stripes.push_back(i);
-				peaks.s_dic.push_back(arr[i]);
+				peaks.index.push_back(i);
+				peaks.value.push_back(arr[i]);
 
 			}
 		}
@@ -122,8 +122,8 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 		{
 			if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) 
 			{
-				peaks.stripes.push_back(i);
-				peaks.s_dic.push_back(arr[i]);
+				peaks.index.push_back(i);
+				peaks.value.push_back(arr[i]);
 			}
 		}
 	}
@@ -132,21 +132,21 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 	while (changed) 
 	{
 		changed = false;
-		for (int i = 0; i < peaks.stripes.size() - 1; ++i) 
+		for (int i = 0; i < peaks.index.size() - 1; ++i)
 		{
-			if (peaks.stripes[i + 1] - peaks.stripes[i] < dist) 
+			if (peaks.index[i + 1] - peaks.index[i] < dist)
 			{
-				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) 
+				if (peaks.value[i] > peaks.value[i + 1]) 
 				{
-					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i + 1);
+					peaks.index.erase(peaks.index.begin() + i + 1);
+					peaks.value.erase(peaks.value.begin() + i + 1);
 					changed = true;
 					break;
 				}
 				else 
 				{
-					peaks.stripes.erase(peaks.stripes.begin() + i);
-					peaks.s_dic.erase(peaks.s_dic.begin() + i);
+					peaks.index.erase(peaks.index.begin() + i);
+					peaks.value.erase(peaks.value.begin() + i);
 					changed = true;
 					break;
 				}
@@ -157,9 +157,9 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 	if (prom != -1.0)
 	{
 		vector<double> peaksProminence(50);
-		for (int i = 0; i < peaks.stripes.size(); ++i)
+		for (int i = 0; i < peaks.index.size(); ++i)
 		{
-			int peakIndex = peaks.stripes[i];
+			int peakIndex = peaks.index[i];
 
 			int leftBaseIndex = peakIndex;
 			while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex])
@@ -181,11 +181,12 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 			peaksProminence[i] = peakValue - std::max(leftBaseValue, rightBaseValue);
 			if (peaksProminence[i] < prom)
 			{
-				peaks.s_dic.erase(peaks.s_dic.begin() + i);
-				peaks.stripes.erase(peaks.stripes.begin() + i);
+				peaks.value.erase(peaks.value.begin() + i);
+				peaks.index.erase(peaks.index.begin() + i);
 			}
 		}
 	}
+
 
 	return peaks;
 }

@@ -94,22 +94,22 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct peaks B_max, st
 	int xmin = 0;
 	int xmax = 0;
 
-	for (int i_b = 0; i_b < B_max.stripes.size(); ++i_b)
+	for (int i_b = 0; i_b < B_max.index.size(); ++i_b)
 	{
-		int mid = B_max.stripes[i_b];
-		int b_min_size = B_min.stripes.size();
+		int mid = B_max.index[i_b];
+		int b_min_size = B_min.index.size();
 		if (b_min_size >=2)
 		{
 			for (int i_0 = 0; i_0 < b_min_size; ++i_0)
 			{
-				if (B_min.stripes[i_0] < mid)
+				if (B_min.index[i_0] < mid)
 					xmin = i_0;
-				if (B_min.stripes[b_min_size - i_0] > mid)
+				if (B_min.index[b_min_size - i_0] > mid)
 					xmax = i_0;
 			}
-			/*for (int i_1 = 0; i_1 <= B_min.stripes.size(); i_1++)
+			/*for (int i_1 = 0; i_1 <= B_min.index.size(); i_1++)
 			{
-				if (B_min.stripes[B_min.stripes.size() - i_1] > mid)
+				if (B_min.index[B_min.index.size() - i_1] > mid)
 					xmax = i_1;
 			}*/
 
@@ -135,25 +135,25 @@ void grid_pos01::subpx_gauss(const vector<double> &B_cut, struct peaks B_max, st
 
 void grid_pos01::subpx_parabel(const vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos)
 {
-	for (int va = 0; va < B_max.stripes.size(); ++va)
+	for (int va = 0; va < B_max.index.size(); ++va)
 	{
-		int i_b = B_max.stripes[va];
+		int i_b = B_max.index[va];
 		int mid = i_b;
 
-		if (B_min.stripes.size() >= 2)
+		if (B_min.index.size() >= 2)
 		{
 			int xmin{};
 			int xmax{};
 
-			for (int vb = 0; vb < B_min.stripes.size(); ++vb)
+			for (int vb = 0; vb < B_min.index.size(); ++vb)
 			{
-				int i_0 = B_min.stripes[vb];
+				int i_0 = B_min.index[vb];
 				if (i_0 < mid)
 					xmin = int(i_b - d_m/4)+3;
 			}
-			for (int c = B_min.stripes.size()-1; c>=0 ; c--)
+			for (int c = B_min.index.size()-1; c>=0 ; c--)
 			{
-				int i_1 = B_min.stripes[c];
+				int i_1 = B_min.index[c];
 				if (i_1 > mid)
 					xmax = int(i_b + d_m / 4);
 			}
@@ -273,16 +273,16 @@ void grid_pos01::subpx_max_pos(const Mat& cutGrid, string mode, vector<double>& 
 		peaks B_max = Evaluation::Find_Peaks(B_cut,0.0, d_min, prom);
 		peaks B_min = Evaluation::Find_Peaks(B_cut_N,0.0, d_min, 0.0);
 
-		if ((B_max.stripes.size() >= 1) && (B_min.stripes.size() >= 1))
+		if ((B_max.index.size() >= 1) && (B_min.index.size() >= 1))
 		{
-			if ((B_min.stripes[0]>B_max.stripes[0]) && (B_max.stripes[0] >= 0.9*d_min))
-				B_min.stripes.insert(B_min.stripes.begin(),0);
-			if ((B_min.stripes[B_min.stripes.size() - 1] < B_max.stripes[B_max.stripes.size() - 1]) && (y - B_max.stripes[B_max.stripes.size() - 1] >= 0.9 * d_min))
-				B_min.stripes.insert(B_min.stripes.end(), (y - 1));
-			if ((B_max.stripes[0] - B_min.stripes[0] > 0) && (B_max.stripes[0] - B_min.stripes[0] < 0.8*d_min))
-				B_min.stripes.erase(B_min.stripes.begin());
+			if ((B_min.index[0]>B_max.index[0]) && (B_max.index[0] >= 0.9*d_min))
+				B_min.index.insert(B_min.index.begin(),0);
+			if ((B_min.index[B_min.index.size() - 1] < B_max.index[B_max.index.size() - 1]) && (y - B_max.index[B_max.index.size() - 1] >= 0.9 * d_min))
+				B_min.index.insert(B_min.index.end(), (y - 1));
+			if ((B_max.index[0] - B_min.index[0] > 0) && (B_max.index[0] - B_min.index[0] < 0.8*d_min))
+				B_min.index.erase(B_min.index.begin());
 
-			double d_m = Evaluation::MeanR(Evaluation::decumulate(B_max.stripes));
+			double d_m = Evaluation::MeanR(Evaluation::decumulate(B_max.index));
 			//to do
 			if (mode == "gauss")
 			{

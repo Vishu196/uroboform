@@ -5,8 +5,8 @@
 
 struct peaks
 {
-	std::vector<int> stripes;
-	std::vector<double> s_dic;
+	std::vector<int> index;
+	std::vector<double> value;
 };
 
 class Evaluation
