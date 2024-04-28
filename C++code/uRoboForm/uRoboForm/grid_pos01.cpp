@@ -89,36 +89,7 @@ struct FP grid_pos01::Find_Peaks(const vector<double>& arr, double dist, double 
 	peaks.stripes.reserve(15);
 	peaks.s_dic.reserve(15);
 	vector<double> peaksProminence(50);
-	int a = 0;
-
-	//for (int i = 1; i < arr.size() - 1; ++i)
-	//{
-	//	if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]))
-	//	{
-	//		peaks.stripes.push_back(i);
-	//		peaks.s_dic.push_back(arr[i]);
-	//		a++;
-
-	//		/*if ((peaks.stripes.size() > 2) && (abs(peaks.stripes[a-1] - peaks.stripes[a-2]) < dist))
-	//		{
-	//			peaks.stripes[a - 2] = peaks.stripes[a - 1];
-	//			peaks.s_dic[a - 2] = peaks.s_dic[a - 1];
-
-	//		}*/
-	//		 
-	//	}
-	//}
-	//
-	//for (int i =1; i < peaks.stripes.size()-1; i++)
-	//{
-	//	if  (abs(peaks.stripes[i] - peaks.stripes[i-1]) < dist)
-	//	{
-	//		peaks.stripes.erase(peaks.stripes.begin()+i);
-	//		peaks.s_dic.erase(peaks.s_dic.begin() + i);
-	//	}
-
-	//}
-
+	
 	for (int i = 1; i < arr.size() - 1; ++i) {
 		if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) {
 			peaks.stripes.push_back(i);

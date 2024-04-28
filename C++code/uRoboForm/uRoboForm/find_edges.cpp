@@ -24,31 +24,42 @@ std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
 
 peaks find_edges::Find_Peaks(const vector<double> &arr,double th_edge)
 {
-	peaks vec;
-	vec.stripes.reserve(15);
-	vec.s_dic.reserve(15);
+	peaks peaks;
+	peaks.stripes.reserve(15);
+	peaks.s_dic.reserve(15);
 
 	for (int i = 1; i < arr.size() - 1; ++i) 
 	{
 		if ((arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) && (arr[i] > th_edge))
 		{ 
-			bool isFarEnough = true;
-			for (int j : vec.stripes) 
-			{
-				if (abs(j - i) < 25) 
-				{
-					isFarEnough = false;
+			peaks.stripes.push_back(i);
+			peaks.s_dic.push_back(arr[i]);
+
+		}
+	}
+
+	bool changed = true;
+	while (changed) {
+		changed = false;
+		for (int i = 0; i < peaks.stripes.size() - 1; ++i) {
+			if (peaks.stripes[i + 1] - peaks.stripes[i] < 25) {
+				if (arr[peaks.stripes[i]] > arr[peaks.stripes[i + 1]]) {
+					peaks.stripes.erase(peaks.stripes.begin() + i + 1);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i + 1);
+					changed = true;
+					break;
+				}
+				else {
+					peaks.stripes.erase(peaks.stripes.begin() + i);
+					peaks.s_dic.erase(peaks.s_dic.begin() + i);
+					changed = true;
 					break;
 				}
 			}
-			if (isFarEnough) 
-			{
-				vec.stripes.push_back(i);
-				vec.s_dic.push_back(arr[i]);
-			}
 		}
 	}
-	return vec;
+
+	return peaks;
 }
 
 indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_edge, int i0, int rank)
@@ -153,16 +164,30 @@ Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_
 	return thro;
 }
 
+bool isTrue(bool n)
+{
+	return n == true;
+}
+
 vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 {
 	for (int i_cut = ((int)cut_arr.size() - 1); i_cut >= 0; i_cut--)
 	{
+		vector<bool> compare;
+		compare.reserve(cut_arr.size());
 		for (int j = 0; j < cut_arr.size(); j++)
 		{
-			bool c1 = (ideal_d - 40) < abs(cut_arr[j] - cut_arr[i_cut]) < (ideal_d + 40);
-			if (!c1)
-				cut_arr.erase(cut_arr.begin() + i_cut);
+			if (((ideal_d - 40) < abs(cut_arr[j] - cut_arr[i_cut])) && (abs(cut_arr[j] - cut_arr[i_cut]) < (ideal_d + 40)))
+				compare.push_back(true);
 		}
+
+		bool condition = any_of(compare.begin(), compare.end(), isTrue);
+		if (!condition)
+		{
+			cut_arr.erase(cut_arr.begin() + i_cut);
+		}
+		compare.clear();
+
 	}
 
 	vector<int> cut_ver_de = Evaluation::decumulate(cut_arr);
