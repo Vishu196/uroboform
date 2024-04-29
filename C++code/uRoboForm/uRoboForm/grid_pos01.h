@@ -27,7 +27,7 @@ private:
 	void subpx_parabel(const std::vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
 	void subpx_phase(const cv::Mat &cutGrid, vector<double>& max_pos);
 	bool get_mean_grad(stage23& s23, const int row, const int col);
-	cv::Mat get_gridrot(stage23& s23, const int row, const int col, std::string& orientation);
+	cv::Mat get_gridrot(stage23& s23, const int row, const int col, bool &is_hor);
 	cqueue<stage34> fifo;
 
 public:

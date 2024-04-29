@@ -321,7 +321,7 @@ void get_grids(stage23 &s23, stage34 &s34)
 	//return s34.grids;
 }
 
-Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &orientation)
+Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, bool &is_hor)
 {
 	const int x1 = s23.cut_hor[row] * 2;
 	const int x2 = (s23.cut_hor[row + 1] * 2);
@@ -342,16 +342,16 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, string &
 		sourceRegion1.copyTo(grid0.colRange(0, s2));
 	}
 
-	bool is_hor = get_mean_grad(s23, row, col);
+	bool is_ori_hor = get_mean_grad(s23, row, col);
 
-	if (is_hor)
+	if (is_ori_hor)
 	{
-		orientation = "hor";
+		is_hor = true;
 		return grid0.t();
 	}
 	else
 	{
-		orientation = "ver";
+		is_hor = false;
 		return grid0;
 	}
 }
@@ -415,7 +415,7 @@ void grid_pos01::Execute(stage23 s23)
 {
 	stage34 s34;
 	string mode = "parabel";
-	string orientation;
+	bool is_hor;
 	s34.grids = {};
 
 	get_grids(s23, s34);
@@ -427,12 +427,12 @@ void grid_pos01::Execute(stage23 s23)
 	{
 		for (int col = 0; col < (s23.cut_ver.size()-1); ++col)
 		{
-			Mat grid_rot = get_gridrot(s23, row, col, orientation);
+			Mat grid_rot = get_gridrot(s23, row, col, is_hor);
 			vector<double> max_pos;
 			max_pos.reserve(15);
 			const int grid_rot_size = grid_rot.rows * grid_rot.cols;
 
-			if ((grid_rot_size >= five_percent) || (orientation == "ver" && row == 0 && col == 1) || (orientation == "hor" && row == 1 && col == 0))
+			if ((grid_rot_size >= five_percent) || (is_hor == false && row == 0 && col == 1) || (is_hor == true && row == 1 && col == 0))
 			{
 				Mat grid_cut = cutGrid(grid_rot);
 				subpx_max_pos(grid_cut, mode, max_pos);
@@ -440,7 +440,7 @@ void grid_pos01::Execute(stage23 s23)
 			}
 
 			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
-			s34.grids[row][col] = Grid(grid_rot, orientation, coord, max_pos);
+			s34.grids[row][col] = Grid(grid_rot, is_hor, coord, max_pos);
 			
 			/*vector<double> max_p = s34.grids[row][col].max_pos;
 			for(auto vi:max_p)

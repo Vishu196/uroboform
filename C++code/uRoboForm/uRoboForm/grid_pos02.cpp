@@ -9,7 +9,7 @@ using namespace cv;
 std::ostream& operator<<(std::ostream& ostr, const stage45& s45)
 {
 	cout << "index: " << s45.index << endl;
-	cout << "ori: " << s45.ind_ori << endl;
+	cout << "ori: " << s45.is_hor << endl;
 	cout << "grid_pos02 complete." << endl;
 	return ostr;
 }
@@ -61,12 +61,12 @@ Grid** grid_pos02::checkGrid(const stage34 &s34)
 
 				if (r >= 1)
 				{
-					if (((row != (s34.gridRows - 1)) && (grids01[row][col].orientation == "hor") && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (s34.gridCols - 1)) && (grids01[row][col].orientation == "ver") && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
+					if (((row != (s34.gridRows - 1)) && (grids01[row][col].is_hor == true) && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (s34.gridCols - 1)) && (grids01[row][col].is_hor == false) && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
 					{
 						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.back());
 						grids01[row][col].max_pos.push_back(new_mp);
 					}
-					else if (((row != 0) && (grids01[row][col].orientation == "hor") && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].orientation == "ver") && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[1])) > 85)))
+					else if (((row != 0) && (grids01[row][col].is_hor == true) && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].is_hor == false) && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[1])) > 85)))
 					{
 						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.front());
 						grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin(), new_mp);
@@ -106,7 +106,7 @@ vector<int> grid_pos02::linspace(double start, double end, int num)
 RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 {
 	struct RdBinary rd;
-	rd.ind_ori;
+	rd.is_hor;
 	rd.index = 0;
 	vector<double> max_mean;
 	const int x = img.rows;
@@ -114,8 +114,8 @@ RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 
 	if (s45.grids[1][1].max_pos.size() >= 5)
 	{
-		rd.ind_ori = s45.grids[1][1].orientation;
-		if (rd.ind_ori == "hor")
+		rd.is_hor = s45.grids[1][1].is_hor;
+		if (rd.is_hor)
 		{
 			if (s45.grids[0][1].max_pos.size() == 9)
 				max_mean = s45.grids[0][1].max_pos;
@@ -144,7 +144,7 @@ RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 			vector<int> bounds = linspace(start, end, 10);
 			vector<double> coded_line;
 			
-			if (rd.ind_ori == "hor")
+			if (rd.is_hor)
 			{
 				const int w11 = int(s45.grids[1][1].max_pos[0] - d_mean / 4);
 				const int w22 = int(s45.grids[1][1].max_pos[0] + d_mean / 4);
@@ -191,7 +191,7 @@ RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 	else
 	{
 		rd.index = 400;
-		rd.ind_ori = "non";
+		//rd.ind_ori = "non";
 	}
 
 	return rd;
@@ -202,7 +202,7 @@ int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
 	int s_index = 0;
 	int mask_pos = 0;
 
-	if (field.orientation == "hor")
+	if (field.is_hor)
 	{
 		if (row == 0)
 		{
@@ -245,7 +245,7 @@ void grid_pos02::Execute(stage34 s34)
 	s45.gridRows = s34.gridRows;
 	s45.gridCols = s34.gridCols;
 	s45.index = I.index;
-	s45.ind_ori = I.ind_ori;
+	s45.is_hor = I.is_hor;
 
 	fifo.push(s45);
 

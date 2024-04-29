@@ -41,6 +41,8 @@ int main(int argc, char* argv[])
 	string foldername = "D:/Vaishnavi/C++Trial/terlau1/01";
 	//string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
 
+	string orientation;
+
 	// storing all o/p values to respective vector lists and then passing list as i/p to csv fn so that we can get
 	//a table of all o/p values.
 	vector<int> img_num;
@@ -93,18 +95,31 @@ int main(int argc, char* argv[])
 		stage56 s56 = grid_final.Execute(edge.getNext());
 	
 		utility::display_time(t03, high_resolution_clock::now());
-
+		time_i.push_back(utility::get_time(t01, high_resolution_clock::now()));
 	
 		cout << "Complete runtime:";
 		utility::display_time(t01, high_resolution_clock::now());
-		time_i.push_back(utility::get_time(t01, high_resolution_clock::now()));
+
+		if (s56.is_hor)
+		{
+			orientation = "hor";
+		}
+		else if(s56.index == 400)
+		{
+			orientation = "non";
+		}
+		else
+		{
+			orientation = "ver";
+		}
+
 
 		img_num.push_back(a);
 		xi_i.push_back(s56.xi);
 		zi_i.push_back(s56.zi);
 		k_i.push_back(s56.k);
 		index_i.push_back(s56.index);
-		ori_i.push_back(s56.ind_ori);
+		ori_i.push_back(orientation);
 		
 	}
 

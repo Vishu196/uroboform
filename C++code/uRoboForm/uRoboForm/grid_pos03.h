@@ -8,7 +8,7 @@ struct stage56
 	Grid** grids;
 	double k;
 	int index;
-	std::string ind_ori;
+	bool is_hor;
 	double xi;
 	double zi;
 

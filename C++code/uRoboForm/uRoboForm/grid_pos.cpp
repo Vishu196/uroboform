@@ -37,7 +37,7 @@ stage56 grid_pos::Execute(stage23 s23)
 		stage56 s56;
 		s56.index = (int)nan("");
 		s56.k = nan("");
-		s56.ind_ori = ("");
+		s56.is_hor = ("");
 		s56.grids = {};
 		s56.xi = nan("");
 		s56.zi = nan("");

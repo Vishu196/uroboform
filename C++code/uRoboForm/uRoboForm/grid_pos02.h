@@ -9,9 +9,9 @@ struct stage45
 	int gridCols;
 	Grid** grids;
 	int index;
-	std::string ind_ori;
+	bool is_hor;
 
-	stage45() :gridRows(0), gridCols(0), grids(0), index(0), ind_ori()
+	stage45() :gridRows(0), gridCols(0), grids(0), index(0), is_hor()
 	{};
 	friend std::ostream& operator<<(std::ostream& ostr, const stage45& s45);
 };
@@ -19,9 +19,9 @@ struct stage45
 struct RdBinary
 {
 	int index;
-	std::string ind_ori;
+	bool is_hor;
 
-	RdBinary() : index(0), ind_ori()
+	RdBinary() : index(0), is_hor()
 	{};
 };
 

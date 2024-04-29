@@ -56,7 +56,7 @@ double grid_pos03::get_d_k(const stage45 &s45)
 
 			if (field.max_pos.size() >= 1)
 			{
-				if (field.orientation == "hor")
+				if (field.is_hor)
 				{
 					double h11 = (grid_pos02::get_mask_pos(field, row, col, 0));
 					double h12 = (field.max_pos.front());
@@ -168,7 +168,7 @@ list<int> grid_pos03::get_look_el(const stage45 &s45)
 
 	if ((s45.index >= 0) && (s45.index < 200))
 	{
-		if (s45.grids[1][1].orientation == "hor")
+		if (s45.grids[1][1].is_hor)
 		{
 			look_el.push_back(look_up[s45.index][0].front());
 			look_el.push_back(look_up[s45.index][0].back());
@@ -209,7 +209,7 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 				if (i_max < 8)
 				{
 					int mask_pos = grid_pos02::get_mask_pos(field, row, col, i_max);
-					if (field.orientation == "hor")
+					if (field.is_hor)
 						P = mask_pos + look_el.front();
 					else
 						P = mask_pos + look_el.back();
@@ -225,7 +225,7 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 			t1.push_back(cen_mean);
 			t1.push_back(field.px_num);
 
-			if (field.orientation == "hor")
+			if (field.is_hor)
 				a.center_hor.push_back(t1);
 			else
 				a.center_ver.push_back(t1);
@@ -247,7 +247,7 @@ void Execute_1(stage45& s45)
 
 			if (field.max_pos.size() > 0)
 			{
-				if (((field.orientation == "hor") && ((field.max_pos.size() == 7) || (row == (s45.gridRows - 1)))) || ((field.orientation == "ver") && ((field.max_pos.size() >= 9) || (col == (s45.gridCols - 1)))))
+				if (((field.is_hor == true) && ((field.max_pos.size() == 7) || (row == (s45.gridRows - 1)))) || ((field.is_hor == false) && ((field.max_pos.size() >= 9) || (col == (s45.gridCols - 1)))))
 				{
 					field.max_pos.erase(field.max_pos.begin());
 				}
@@ -270,7 +270,7 @@ stage56 grid_pos03::Execute(stage45 s45)
 	s56.gridCols = s45.gridCols;
 	s56.grids = s45.grids;
 	s56.index = s45.index;
-	s56.ind_ori = s45.ind_ori;
+	s56.is_hor = s45.is_hor;
 	
 	fifo.push(s56);
 
