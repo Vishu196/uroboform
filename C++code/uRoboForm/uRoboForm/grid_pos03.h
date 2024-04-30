@@ -1,5 +1,9 @@
 #pragma once
 #include "grid_pos02.h"
+#include "grid.h"
+#include "cqueue.h"
+#include <vector>
+
 
 struct stage56
 {

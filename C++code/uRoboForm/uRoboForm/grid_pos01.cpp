@@ -342,9 +342,7 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, bool &is
 		sourceRegion1.copyTo(grid0.colRange(0, s2));
 	}
 
-	bool is_ori_hor = get_mean_grad(s23, row, col);
-
-	if (is_ori_hor)
+	if (get_mean_grad(s23, row, col))
 	{
 		is_hor = true;
 		return grid0.t();

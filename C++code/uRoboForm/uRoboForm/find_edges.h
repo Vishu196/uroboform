@@ -1,5 +1,9 @@
 #pragma once
 #include "raw_edges.h"
+#include "cqueue.h"
+#include <vector>
+#include <opencv2/opencv.hpp>
+
 
 struct Detect_throu
 {
