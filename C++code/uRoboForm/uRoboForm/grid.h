@@ -38,6 +38,7 @@ public:
             }
         }
     }
+
     int get_mask_pos(int row, int col, size_t i_max) const
     {
         int s_index = 0;
@@ -74,6 +75,7 @@ public:
 
         return mask_pos;
     }
+    
     std::vector<double>& get_max_pos() { return max_pos; }
     const std::vector<double>& get_max_pos() const { return max_pos; }
     cv::Mat image;

@@ -25,11 +25,6 @@ class grid_pos01
 private:
 	
 	std::vector<double> gradient(const std::vector<double> &x);
-	cv::Mat cutGrid(const cv::Mat &grid_rot);
-	void subpx_max_pos(const cv::Mat &cutGrid, string mode, vector<double>& max_pos);
-	void subpx_gauss(const std::vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
-	void subpx_parabel(const std::vector<double> &B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
-	void subpx_phase(const cv::Mat &cutGrid, vector<double>& max_pos);
 	bool get_mean_grad(stage23& s23, const int row, const int col);
 	cv::Mat get_gridrot(stage23& s23, const int row, const int col, bool &is_hor);
 	cqueue<stage34> fifo;

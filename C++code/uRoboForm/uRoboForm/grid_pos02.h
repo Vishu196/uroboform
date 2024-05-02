@@ -9,35 +9,27 @@
 
 struct stage45
 {
+	cv::Mat img;
 	int gridRows;
 	int gridCols;
 	Grid** grids;
-	int index;
-	bool is_hor;
-
-	stage45() :gridRows(0), gridCols(0), grids(0), index(0), is_hor()
+	
+	stage45() :gridRows(0), gridCols(0), grids(0)
 	{};
 	friend std::ostream& operator<<(std::ostream& ostr, const stage45& s45);
 };
 
-struct RdBinary
-{
-	int index;
-	bool is_hor;
-
-	RdBinary() : index(0), is_hor()
-	{};
-};
 
 class grid_pos02
 {
 	friend class grid_pos03;
 private:
-
-	Grid** checkGrid(const stage34& s34);
-	std::vector<int> linspace(double start, double end, int num);
-	RdBinary ReadBinary(const stage45& s45, const cv::Mat& img);
-	int static get_mask_pos(Grid field, int row, int col, size_t i_max);
+	cv::Mat cutGrid(const cv::Mat& grid_rot);
+	void subpx_max_pos(const cv::Mat& cutGrid, string mode, vector<double>& max_pos);
+	void subpx_gauss(const std::vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
+	void subpx_parabel(const std::vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
+	void subpx_phase(const cv::Mat& cutGrid, vector<double>& max_pos);
+	
 	cqueue<stage45> fifo;
 
 public:
