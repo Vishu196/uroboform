@@ -3,9 +3,13 @@
 #include <sstream>
 #include "utility.h"
 #include "constants.h"
+#include "cqueue.h"
 #include "raw_edges.h"
 #include "find_edges.h"
-#include "grid_pos.h"
+#include "grid_pos01.h"
+#include "grid_pos02.h"
+#include "grid_pos03.h"
+#include "grid.h"
 
 using namespace cv;
 using namespace std;
@@ -77,8 +81,9 @@ int main(int argc, char* argv[])
 
 		raw_edges edge0(freq_range);
 		find_edges edge{};
-		grid_pos grid_final{};
-	
+		grid_pos01 grid1;
+		grid_pos02 grid2;
+		grid_pos03 grid3;	
 	
 		auto t01 = high_resolution_clock::now();
 
@@ -92,11 +97,20 @@ int main(int argc, char* argv[])
 		utility::display_time(t02, high_resolution_clock::now());
 		auto t03 = high_resolution_clock::now();
 
-		stage56 s56 = grid_final.Execute(edge.getNext());
-	
+		grid1.Execute(edge.getNext());
+
 		utility::display_time(t03, high_resolution_clock::now());
+		auto t04 = high_resolution_clock::now();
+
+		grid2.Execute(grid1.getNext());
+
+		utility::display_time(t04, high_resolution_clock::now());
+		auto t05 = high_resolution_clock::now();
+
+		stage56 s56 = grid3.Execute(grid2.getNext());
 		time_i.push_back(utility::get_time(t01, high_resolution_clock::now()));
-	
+
+		utility::display_time(t05, high_resolution_clock::now());
 		cout << "Complete runtime:";
 		utility::display_time(t01, high_resolution_clock::now());
 

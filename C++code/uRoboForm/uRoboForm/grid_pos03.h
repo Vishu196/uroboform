@@ -11,13 +11,14 @@ struct stage56
 	int gridRows;
 	int gridCols;
 	Grid** grids;
+	bool edges_sufficient;
 	double k;
 	int index;
 	bool is_hor;
 	double xi;
 	double zi;
 
-	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0), index(0), xi(0.0), zi(0.0)
+	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0), index(0), xi(0.0), zi(0.0), is_hor(), edges_sufficient()
 	{};
 	friend std::ostream& operator<<(std::ostream& ostr, const stage56& s56);
 };

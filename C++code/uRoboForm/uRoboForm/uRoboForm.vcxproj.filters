@@ -39,9 +39,6 @@
     <ClCompile Include="grid_pos03.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="grid_pos.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cqueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="grid_pos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="debug_logs.h">

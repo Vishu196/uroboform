@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClCompile Include="Evaluation.cpp" />
     <ClCompile Include="find_edges.cpp" />
-    <ClCompile Include="grid_pos.cpp" />
     <ClCompile Include="grid_pos01.cpp" />
     <ClCompile Include="grid_pos02.cpp" />
     <ClCompile Include="grid_pos03.cpp" />
@@ -167,7 +166,6 @@
     <ClInclude Include="Evaluation.h" />
     <ClInclude Include="find_edges.h" />
     <ClInclude Include="grid.h" />
-    <ClInclude Include="grid_pos.h" />
     <ClInclude Include="grid_pos01.h" />
     <ClInclude Include="grid_pos02.h" />
     <ClInclude Include="grid_pos03.h" />

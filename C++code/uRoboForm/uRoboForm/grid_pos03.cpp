@@ -442,26 +442,40 @@ void Execute_1(stage56& s56)
 stage56 grid_pos03::Execute(stage45 s45)
 {
 	stage56 s56;
-	s56.gridRows = s45.gridRows;
-	s56.gridCols = s45.gridCols;
+	if (s45.edges_sufficient)
+	{
 
-	s56.grids = checkGrid(s45);
 
-	RdBinary I = ReadBinary(s56, s45.img);	
-	s56.index = I.index;
-	s56.is_hor = I.is_hor;
+		s56.gridRows = s45.gridRows;
+		s56.gridCols = s45.gridCols;
 
-	Execute_1(s56);
+		s56.grids = checkGrid(s45);
 
-	double d_k = get_d_k(s56);
-	s56.k = d_k * (px_size / 200);
+		RdBinary I = ReadBinary(s56, s45.img);
+		s56.index = I.index;
+		s56.is_hor = I.is_hor;
 
-	axis a = get_center_arr(s56);
-	s56.xi = weighted_avg(a.center_ver);
-	s56.zi = weighted_avg(a.center_hor);
+		Execute_1(s56);
+
+		double d_k = get_d_k(s56);
+		s56.k = d_k * (px_size / 200);
+
+		axis a = get_center_arr(s56);
+		s56.xi = weighted_avg(a.center_ver);
+		s56.zi = weighted_avg(a.center_hor);
+	}
+
+	else
+	{
+		s56.index = (int)nan("");
+		s56.k = nan("");
+		s56.is_hor = ("");
+		s56.grids = {};
+		s56.xi = nan("");
+		s56.zi = nan("");
+	}
 
 	fifo.push(s56);
-
 	cout << s56;
 
 	return s56;

@@ -293,33 +293,42 @@ void modify_max_pos(vector<double>& max_pos)
 void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;
-	s45.img = s34.img;
-	s45.gridRows = s34.gridRows;
-	s45.gridCols = s34.gridCols;
-	s45.grids = s34.grids;
-
-	string mode = "parabel";
-	const int image_size = s45.img.cols * s45.img.rows;
-	const double five_percent = image_size * 0.05;
-
-	for (int row = 0; row < (s45.gridRows); ++row)
+	if (s34.edges_sufficient)
 	{
-		for (int col = 0; col < (s45.gridCols); ++col)
-		{
-			vector<double> max_pos;
-			max_pos.reserve(15);
-			const int grid_rot_size = s45.grids[row][col].image.rows * s45.grids[row][col].image.cols;
-			if ((grid_rot_size >= five_percent) || (s45.grids[row][col].is_hor == false && row == 0 && col == 1) || (s45.grids[row][col].is_hor == true && row == 1 && col == 0))
-			{
-				Mat grid_cut = cutGrid(s45.grids[row][col].image);
-				subpx_max_pos(grid_cut, mode, max_pos);
-				modify_max_pos(max_pos);
-				s45.grids[row][col].addmaxPos(max_pos);
-			}
+		s45.img = s34.img;
+		s45.gridRows = s34.gridRows;
+		s45.gridCols = s34.gridCols;
+		s45.grids = s34.grids;
+		s45.edges_sufficient = s34.edges_sufficient;
 
-			/*for(const auto& vi: s45.grids[row][col].max_pos)
-				cout << vi << endl;*/
+		string mode = "parabel";
+		const int image_size = s45.img.cols * s45.img.rows;
+		const double five_percent = image_size * 0.05;
+
+		for (int row = 0; row < (s45.gridRows); ++row)
+		{
+			for (int col = 0; col < (s45.gridCols); ++col)
+			{
+				vector<double> max_pos;
+				max_pos.reserve(15);
+				const int grid_rot_size = s45.grids[row][col].image.rows * s45.grids[row][col].image.cols;
+				if ((grid_rot_size >= five_percent) || (s45.grids[row][col].is_hor == false && row == 0 && col == 1) || (s45.grids[row][col].is_hor == true && row == 1 && col == 0))
+				{
+					Mat grid_cut = cutGrid(s45.grids[row][col].image);
+					subpx_max_pos(grid_cut, mode, max_pos);
+					modify_max_pos(max_pos);
+					s45.grids[row][col].addmaxPos(max_pos);
+				}
+
+				/*for(const auto& vi: s45.grids[row][col].max_pos)
+					cout << vi << endl;*/
+			}
 		}
+	}
+
+	else
+	{
+		s45 = {};
 	}
 
 	fifo.push(s45);
