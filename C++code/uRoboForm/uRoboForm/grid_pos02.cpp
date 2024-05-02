@@ -197,43 +197,6 @@ RdBinary grid_pos02::ReadBinary(const stage45 &s45, const Mat &img)
 	return rd;
 }
 
-int grid_pos02::get_mask_pos(Grid field, int row, int col, size_t i_max)
-{
-	int s_index = 0;
-	int mask_pos = 0;
-
-	if (field.is_hor)
-	{
-		if (row == 0)
-		{
-			size_t i = i_max + 6;
-			s_index = (int)(i - field.max_pos.size());
-		}
-		else
-		{
-			s_index = (int)i_max;
-		}
-		int r = row - 1;
-		mask_pos = (s_index * 200) + 350 + (r * grid_height);
-	}
-	else
-	{
-		if (col == 0)
-		{
-			size_t i = i_max + 8;
-			s_index = (int)(i - field.max_pos.size());
-		}
-		else
-		{
-			s_index = (int)i_max;
-		}
-		int c = col - 1;
-		mask_pos = (s_index * 200) + 350 + (c * grid_width);
-	}
-
-	return mask_pos;
-}
-
 void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;

@@ -312,8 +312,9 @@ void get_grids(stage23 &s23, stage34 &s34)
 	s23.cut_hor.push_back(s23.img.rows / 2);
 	s23.cut_ver.push_back(s23.img.cols / 2);
 
-	s34.grids = new Grid * [s23.cut_hor.size()-1];
-	for (int h = 0; h < (int)(s23.cut_hor.size()-1); ++h)
+	const int horsize = s23.cut_hor.size() - 1;
+	s34.grids = new Grid * [horsize];
+	for (int h = 0; h < horsize; ++h)
 	{
 		s34.grids[h] = new Grid[(int)s23.cut_ver.size()-1];
 	}
@@ -414,7 +415,6 @@ void grid_pos01::Execute(stage23 s23)
 	stage34 s34;
 	string mode = "parabel";
 	bool is_hor;
-	s34.grids = {};
 
 	get_grids(s23, s34);
 	
@@ -426,22 +426,23 @@ void grid_pos01::Execute(stage23 s23)
 		for (int col = 0; col < (s23.cut_ver.size()-1); ++col)
 		{
 			Mat grid_rot = get_gridrot(s23, row, col, is_hor);
+			
+			s34.grids[row][col] = Grid(grid_rot, is_hor);
+			s34.grids[row][col].im_loc.push_back(s23.cut_hor[row] * 2);
+			s34.grids[row][col].im_loc.push_back(s23.cut_ver[col] * 2);
+
 			vector<double> max_pos;
 			max_pos.reserve(15);
-			const int grid_rot_size = grid_rot.rows * grid_rot.cols;
-
+			const int grid_rot_size = grid_rot.rows * grid_rot.cols;			
 			if ((grid_rot_size >= five_percent) || (is_hor == false && row == 0 && col == 1) || (is_hor == true && row == 1 && col == 0))
 			{
 				Mat grid_cut = cutGrid(grid_rot);
 				subpx_max_pos(grid_cut, mode, max_pos);
 				modify_max_pos(max_pos);
+				s34.grids[row][col].addmaxPos(max_pos);
 			}
 
-			vector<int>coord = { (s23.cut_hor[row] * 2), (s23.cut_ver[col] * 2) };
-			s34.grids[row][col] = Grid(grid_rot, is_hor, coord, max_pos);
-			
-			/*vector<double> max_p = s34.grids[row][col].max_pos;
-			for(auto vi:max_p)
+			/*for(const auto& vi: s34.grids[row][col].max_pos)
 				cout << vi << endl;*/
 		}
 	}

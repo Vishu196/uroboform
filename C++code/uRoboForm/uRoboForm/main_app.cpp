@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 		filename = argv[1];
 	int a = 88;
 
-	/*for (int a = 81 ; a < 96; a++)
+	/*for (int a = 806 ; a < 822; a++)
 	{
 		string num = to_string(a);
 		string filename = foldername + num + "image0001.bmp";

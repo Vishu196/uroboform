@@ -34,7 +34,7 @@ stage56 grid_pos::Execute(stage23 s23)
 	}
 	else
 	{
-		stage56 s56;
+		stage56 s56; 
 		s56.index = (int)nan("");
 		s56.k = nan("");
 		s56.is_hor = ("");

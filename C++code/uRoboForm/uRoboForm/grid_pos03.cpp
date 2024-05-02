@@ -58,22 +58,22 @@ double grid_pos03::get_d_k(const stage45 &s45)
 			{
 				if (field.is_hor)
 				{
-					double h11 = (grid_pos02::get_mask_pos(field, row, col, 0));
-					double h12 = (field.max_pos.front());
+					double h11 = field.get_mask_pos(row, col, 0);
+					double h12 = field.max_pos.front();
 					lines_hor.push_back({h11,h12});
 
-					double h21 = (grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
-					double h22 = (field.max_pos.back());
+					double h21 = field.get_mask_pos(row, col, field.max_pos.size() - 1);
+					double h22 = field.max_pos.back();
 					lines_hor.push_back({ h21,h22 });
 				}
 				else
 				{
-					double v11 = (grid_pos02::get_mask_pos(field, row, col, 0));
-					double v12 = (field.max_pos.front());
+					double v11 = field.get_mask_pos(row, col, 0);
+					double v12 = field.max_pos.front();
 					lines_ver.push_back({ v11,v12 });
 					
-					double v21 = (grid_pos02::get_mask_pos(field, row, col, field.max_pos.size() - 1));
-					double v22 = (field.max_pos.back());
+					double v21 = field.get_mask_pos(row, col, field.max_pos.size() - 1);
+					double v22 = field.max_pos.back();
 					lines_ver.push_back({ v21,v22 });
 				}
 			}
@@ -202,19 +202,17 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 		for (int col = 0; col < s45.gridCols; col++)
 		{
 			vector<double> center;
-			Grid& field = s45.grids[row][col];
+			const Grid& field = s45.grids[row][col];
 
 			for (int i_max = 0; i_max < field.max_pos.size(); i_max++)
 			{
 				if (i_max < 8)
 				{
-					int mask_pos = grid_pos02::get_mask_pos(field, row, col, i_max);
+					int mask_pos = field.get_mask_pos(row, col, i_max);
 					if (field.is_hor)
 						P = mask_pos + look_el.front();
 					else
 						P = mask_pos + look_el.back();
-					double pa = (-P * s56.k);
-					double va = (field.max_pos[i_max] * px_size);
 					center.push_back((-P * s56.k) + (field.max_pos[i_max] * px_size));
 				}
 			}
@@ -230,7 +228,7 @@ axis grid_pos03::get_center_arr(const stage45 &s45,const stage56 &s56)
 			else
 				a.center_ver.push_back(t1);
 			
-			s45.grids[row][col] = field;
+			//s45.grids[row][col] = field;
 		}
 	}
 
