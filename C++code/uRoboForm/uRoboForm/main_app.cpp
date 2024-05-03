@@ -42,8 +42,8 @@ void write_to_csv(const string &filename, const vector<string>&colname, const ve
 int main(int argc, char* argv[])
 {
 	string csvname = "Result";
-	string foldername = "D:/Vaishnavi/C++Trial/terlau1/0188";
-	//string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
+	//string foldername = "D:/Vaishnavi/C++Trial/terlau1/01";
+	string foldername = "D:/Vaishnavi/C++Trial/terlau2/5";
 
 	string orientation;
 
@@ -58,17 +58,17 @@ int main(int argc, char* argv[])
 	vector<double>time_i;
 
 
-	string filename = foldername + "image0001.bmp";
+	/*string filename = foldername + "image0001.bmp";
 	if (argc > 1)
 		filename = argv[1];
-	int a = 88;
+	int a = 88;*/
 
-	/*for (int a = 806 ; a < 822; a++)
+	for (int a = 806 ; a < 822; a++)
 	{
 		string num = to_string(a);
 		string filename = foldername + num + "image0001.bmp";
 		if (argc > 1)
-			filename = argv[1];*/
+			filename = argv[1];
 	
 	 // Read the image file in grayscale
 		Mat image = imread(filename, IMREAD_GRAYSCALE);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
 		index_i.push_back(s56.index);
 		ori_i.push_back(orientation); 
 		
-	//}
+	}
 
 	vector<vector<double>> data1(xi_i.size(), vector<double>(3));
 	for (size_t i = 0; i < xi_i.size(); i++)

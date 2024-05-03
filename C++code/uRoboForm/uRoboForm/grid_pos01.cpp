@@ -163,15 +163,17 @@ void grid_pos01::Execute(stage23 s23)
 		s34.img = s23.img;
 		s34.gridRows = (int)s23.cut_hor.size() - 1;
 		s34.gridCols = (int)s23.cut_ver.size() - 1;
+		std::cout << s34;
 	}
 
 	else
 	{
 		s34.edges_sufficient = false;
 		s34 = {};
+		std::cout << " Edges insufficient to process" << endl;
 	}
 
 	fifo.push(s34);
-	std::cout << s34;
+	
 }
 

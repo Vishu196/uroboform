@@ -8,6 +8,7 @@
 class Grid
 {
 private:
+    std::vector<double> max_pos;
 public:
     Grid(cv::Mat img, bool horizontal) : image(img), px_num(img.rows * img.cols), is_hor(horizontal) {}
     Grid(cv::Mat image, bool is_hor, std::vector<int> coord, std::vector<double> maxPos)
@@ -23,13 +24,13 @@ public:
 
     void addmaxPos(const std::vector<double>& maxPos)
     {
-        if (is_hor)
-        {
+       if (is_hor)
+       {
             for (int i = 0; i < maxPos.size(); i++)
             {
                 max_pos.push_back(maxPos[i] + im_loc[0]);
             }
-        }
+       }
         else
         {
             for (int i = 0; i < maxPos.size(); i++)
@@ -82,6 +83,6 @@ public:
     int px_num =0;
     bool is_hor;
     std::vector<int> im_loc;
-    std::vector<double> max_pos;
+    
 };
 

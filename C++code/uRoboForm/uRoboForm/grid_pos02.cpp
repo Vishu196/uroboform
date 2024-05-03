@@ -324,13 +324,11 @@ void grid_pos02::Execute(stage34 s34)
 					cout << vi << endl;*/
 			}
 		}
+		cout << s45;
 	}
 
 	else
-	{
 		s45 = {};
-	}
 
 	fifo.push(s45);
-	cout << s45;
 }

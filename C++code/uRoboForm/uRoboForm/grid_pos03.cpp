@@ -30,16 +30,16 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 	{
 		for (int col = 0; col < s45.gridCols; col++)
 		{
-			size_t r = grids01[row][col].max_pos.size();
+			size_t r = grids01[row][col].get_max_pos().size();
 			if (r > 0)
 			{
 				vector<double> max_pos_arr(r);
-				copy(grids01[row][col].max_pos.begin(), grids01[row][col].max_pos.end(), max_pos_arr.begin());
+				copy(grids01[row][col].get_max_pos().begin(), grids01[row][col].get_max_pos().end(), max_pos_arr.begin());
 				vector<double> m_pos_de = Evaluation::decumulate(max_pos_arr);
 				bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
 				while (con)
 				{
-					vector<int> m_pos_de1;
+					/*vector<int> m_pos_de1;
 					m_pos_de1.reserve(r);
 
 					for (int e = 0; e < r; e++)
@@ -50,29 +50,34 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 						}
 					}
 
-					reverse(m_pos_de1.begin(), m_pos_de1.end());
+					reverse(m_pos_de1.begin(), m_pos_de1.end());*/
 
-					for (auto i = 0; i < m_pos_de1.size(); i++)
+					for (auto i = m_pos_de.rbegin(); i != m_pos_de.rend(); ++i)
 					{
-						int i_fill = m_pos_de1[i];
-						int fill1 = i_fill + 1;
+						if (*i > 100)
+						{
+							int i_fill = *i;
+							int fill1 = i_fill + 1;
 
-						double mean_maxPos = (grids01[row][col].max_pos[i_fill] + grids01[row][col].max_pos[fill1]) / 2;
-						grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin() + fill1, mean_maxPos);
+							double mean_maxPos = (grids01[row][col].get_max_pos()[i_fill] + grids01[row][col].get_max_pos()[fill1]) / 2;
+							grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin() + fill1, mean_maxPos);
+
+						}
 					}
+
 				}
 
 				if (r >= 1)
 				{
-					if (((row != (s45.gridRows - 1)) && (grids01[row][col].is_hor == true) && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].max_pos.back())) > 85)) || ((col != (s45.gridCols - 1)) && (grids01[row][col].is_hor == false) && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].max_pos.back())) > 115)))
+					if (((row != (s45.gridRows - 1)) && (grids01[row][col].is_hor == true) && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].get_max_pos().back())) > 85)) || ((col != (s45.gridCols - 1)) && (grids01[row][col].is_hor == false) && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].get_max_pos().back())) > 115)))
 					{
-						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.back());
-						grids01[row][col].max_pos.push_back(new_mp);
+						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].get_max_pos().back());
+						grids01[row][col].get_max_pos().push_back(new_mp);
 					}
-					else if (((row != 0) && (grids01[row][col].is_hor == true) && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].is_hor == false) && (((grids01[row][col].max_pos[0]) - (grids01[row][col].im_loc[1])) > 85)))
+					else if (((row != 0) && (grids01[row][col].is_hor == true) && (((grids01[row][col].get_max_pos()[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].is_hor == false) && (((grids01[row][col].get_max_pos()[0]) - (grids01[row][col].im_loc[1])) > 85)))
 					{
-						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].max_pos.front());
-						grids01[row][col].max_pos.insert(grids01[row][col].max_pos.begin(), new_mp);
+						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].get_max_pos().front());
+						grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin(), new_mp);
 					}
 				}
 			}
@@ -115,24 +120,24 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 	const int x = img.rows;
 	const int y = img.cols;
 
-	if (s56.grids[1][1].max_pos.size() >= 5)
+	if (s56.grids[1][1].get_max_pos().size() >= 5)
 	{
 		rd.is_hor = s56.grids[1][1].is_hor;
 		if (rd.is_hor)
 		{
-			if (s56.grids[0][1].max_pos.size() == 9)
-				max_mean = s56.grids[0][1].max_pos;
-			else if (s56.grids[2][1].max_pos.size() == 9)
-				max_mean = s56.grids[2][1].max_pos;
+			if (s56.grids[0][1].get_max_pos().size() == 9)
+				max_mean = s56.grids[0][1].get_max_pos();
+			else if (s56.grids[2][1].get_max_pos().size() == 9)
+				max_mean = s56.grids[2][1].get_max_pos();
 			else
 				max_mean.clear();
 		}
 		else
 		{
-			if (s56.grids[1][0].max_pos.size() == 7)
-				max_mean = s56.grids[1][0].max_pos;
-			else if (s56.grids[1][2].max_pos.size() == 7)
-				max_mean = s56.grids[1][2].max_pos;
+			if (s56.grids[1][0].get_max_pos().size() == 7)
+				max_mean = s56.grids[1][0].get_max_pos();
+			else if (s56.grids[1][2].get_max_pos().size() == 7)
+				max_mean = s56.grids[1][2].get_max_pos();
 			else
 				max_mean.clear();
 		}
@@ -149,8 +154,8 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 
 			if (rd.is_hor)
 			{
-				const int w11 = int(s56.grids[1][1].max_pos[0] - d_mean / 4);
-				const int w22 = int(s56.grids[1][1].max_pos[0] + d_mean / 4);
+				const int w11 = int(s56.grids[1][1].get_max_pos()[0] - d_mean / 4);
+				const int w22 = int(s56.grids[1][1].get_max_pos()[0] + d_mean / 4);
 
 				Mat coded_area(w22 - w11, y, CV_8U);
 				Mat sourceRegion = img.rowRange(w11, w22);
@@ -160,8 +165,8 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 			}
 			else
 			{
-				const int l22 = int(s56.grids[1][1].max_pos[0] + d_mean / 4);
-				const int l11 = int(s56.grids[1][1].max_pos[0] - d_mean / 4);
+				const int l22 = int(s56.grids[1][1].get_max_pos()[0] + d_mean / 4);
+				const int l11 = int(s56.grids[1][1].get_max_pos()[0] - d_mean / 4);
 
 				Mat coded_area(x, l22 - l11, CV_8U);
 				Mat sourceRegion = img.colRange(l11, l22);
@@ -239,26 +244,26 @@ double grid_pos03::get_d_k(const stage56 &s56)
 		{
 			Grid field = s56.grids[row][col];
 
-			if (field.max_pos.size() >= 1)
+			if (field.get_max_pos().size() >= 1)
 			{
 				if (field.is_hor)
 				{
 					double h11 = field.get_mask_pos(row, col, 0);
-					double h12 = field.max_pos.front();
+					double h12 = field.get_max_pos().front();
 					lines_hor.push_back({h11,h12});
 
-					double h21 = field.get_mask_pos(row, col, field.max_pos.size() - 1);
-					double h22 = field.max_pos.back();
+					double h21 = field.get_mask_pos(row, col, field.get_max_pos().size() - 1);
+					double h22 = field.get_max_pos().back();
 					lines_hor.push_back({ h21,h22 });
 				}
 				else
 				{
 					double v11 = field.get_mask_pos(row, col, 0);
-					double v12 = field.max_pos.front();
+					double v12 = field.get_max_pos().front();
 					lines_ver.push_back({ v11,v12 });
 					
-					double v21 = field.get_mask_pos(row, col, field.max_pos.size() - 1);
-					double v22 = field.max_pos.back();
+					double v21 = field.get_mask_pos(row, col, field.get_max_pos().size() - 1);
+					double v22 = field.get_max_pos().back();
 					lines_ver.push_back({ v21,v22 });
 				}
 			}
@@ -389,7 +394,7 @@ axis grid_pos03::get_center_arr(const stage56 &s56)
 			vector<double> center;
 			const Grid& field = s56.grids[row][col];
 
-			for (int i_max = 0; i_max < field.max_pos.size(); i_max++)
+			for (int i_max = 0; i_max < field.get_max_pos().size(); i_max++)
 			{
 				if (i_max < 8)
 				{
@@ -398,7 +403,7 @@ axis grid_pos03::get_center_arr(const stage56 &s56)
 						P = mask_pos + look_el.front();
 					else
 						P = mask_pos + look_el.back();
-					center.push_back((-P * s56.k) + (field.max_pos[i_max] * px_size));
+					center.push_back((-P * s56.k) + (field.get_max_pos()[i_max] * px_size));
 				}
 			}
 
@@ -428,11 +433,11 @@ void Execute_1(stage56& s56)
 		{
 			Grid& field = s56.grids[row][col];
 
-			if (field.max_pos.size() > 0)
+			if (field.get_max_pos().size() > 0)
 			{
-				if (((field.is_hor == true) && ((field.max_pos.size() == 7) || (row == (s56.gridRows - 1)))) || ((field.is_hor == false) && ((field.max_pos.size() >= 9) || (col == (s56.gridCols - 1)))))
+				if (((field.is_hor == true) && ((field.get_max_pos().size() == 7) || (row == (s56.gridRows - 1)))) || ((field.is_hor == false) && ((field.get_max_pos().size() >= 9) || (col == (s56.gridCols - 1)))))
 				{
-					field.max_pos.erase(field.max_pos.begin());
+					field.get_max_pos().erase(field.get_max_pos().begin());
 				}
 			}
 		}
