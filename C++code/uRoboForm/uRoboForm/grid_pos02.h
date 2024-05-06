@@ -2,10 +2,10 @@
 #include "grid_pos01.h"
 #include "grid.h"
 #include "cqueue.h"
+#include "ImgSource.h"
+#include "utility.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
-
-
 
 struct stage45
 {
@@ -30,12 +30,36 @@ private:
 	void subpx_gauss(const std::vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
 	void subpx_parabel(const std::vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos);
 	void subpx_phase(const cv::Mat& cutGrid, vector<double>& max_pos);
-	
 	cqueue<stage45> fifo;
+	void Execute(stage34 s34);
+
 
 public:
 
-	void Execute(stage34 s34);
+	grid_pos02(grid_pos01& grid1)
+	{
+#ifdef WITH_THREADING
+		std::thread t1([&]
+			{
+#endif
+				while (1)
+				{
+					auto t04 = std::chrono::high_resolution_clock::now();
+					const stage34 &s34 = grid1.getNext();
+					if (s34.img.data == nullptr)
+					{
+						fifo.push({});
+						return;
+					}
+					Execute(s34);
+					utility::display_time(t04, std::chrono::high_resolution_clock::now());
+				}
+#ifdef WITH_THREADING
+			});
+		t1.detach();
+#endif
+	}
+
 	stage45 getNext()
 	{
 		stage45 s45;

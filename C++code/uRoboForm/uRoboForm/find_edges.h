@@ -1,6 +1,8 @@
 #pragma once
 #include "raw_edges.h"
 #include "cqueue.h"
+#include "ImgSource.h"
+#include "utility.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
 
@@ -46,9 +48,33 @@ private:
 	void get_cut_hor(int& rank, const stage12& s12, stage23& s23);
 	void get_cut_ver(int &rank, const stage12& s12, stage23& s23);
 	cqueue<stage23> fifo;
+	void Execute(const stage12& s12);
+	std::thread t1;
 
 public:
-	void Execute(const stage12 &s12);
+	find_edges(raw_edges& edge0)
+	{
+#ifdef WITH_THREADING
+		t1 = std::thread([&]
+			{
+#endif
+				while (1)
+				{
+					auto t02 = std::chrono::high_resolution_clock::now();
+					const stage12& s12 = edge0.getNext();
+					if (s12.img.data == nullptr)
+					{
+						fifo.push({});
+						return;
+					}
+					Execute(s12);
+					utility::display_time(t02, std::chrono::high_resolution_clock::now());
+				}
+#ifdef WITH_THREADING
+			});
+		t1.detach();
+#endif
+	}
 	stage23 getNext()
 	{
 		stage23 s23;
@@ -56,4 +82,3 @@ public:
 		return s23;
 	}
 };
-

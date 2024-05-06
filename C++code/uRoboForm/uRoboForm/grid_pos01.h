@@ -2,9 +2,10 @@
 #include "find_edges.h"
 #include "grid.h"
 #include "cqueue.h"
+#include "ImgSource.h"
+#include "utility.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
-
 
 struct stage34
 {
@@ -20,7 +21,6 @@ struct stage34
 
 };
 
-
 class grid_pos01
 {
 private:
@@ -29,10 +29,34 @@ private:
 	bool get_mean_grad(stage23& s23, const int row, const int col);
 	cv::Mat get_gridrot(stage23& s23, const int row, const int col, bool &is_hor);
 	cqueue<stage34> fifo;
+	void Execute(stage23 s23);
 
 public:
 
-	void Execute(struct stage23 s23);
+	grid_pos01(find_edges& edge)
+	{
+#ifdef WITH_THREADING
+		std::thread t1([&]
+			{
+#endif
+				while (1)
+				{
+					auto t03 = std::chrono::high_resolution_clock::now();
+					const stage23& s23 = edge.getNext();
+					if (s23.img.data == nullptr)
+					{
+						fifo.push({});
+						return;
+					}
+					Execute(s23);
+					utility::display_time(t03, std::chrono::high_resolution_clock::now());
+				}				
+#ifdef WITH_THREADING
+			});
+		t1.detach();
+#endif
+	}
+	
 	stage34 getNext()
 	{
 		stage34 s34;

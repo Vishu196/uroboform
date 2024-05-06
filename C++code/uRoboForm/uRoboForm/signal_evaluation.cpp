@@ -5,6 +5,8 @@
 
 using namespace std;
 
+std::mutex global_fftw_mutex;
+
 double signal_evaluation::Spek_InterpolR(const vector<double>& A) 
 {
 	const auto A_size = 256;
@@ -38,48 +40,38 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 {
 	size_t size = image_windowR.size();
 	const int N = 256;
-	fftw_complex* y = new fftw_complex[N];
-	double in[N];
+	std::vector<complex<double>> y(N);
+	std::vector<double> in(N, 0);
 	fftw_plan p;
 
-	for (int i = 0; i < N; ++i) {
-		if (i < size) {
-			in[i] = image_windowR[i];
-		}
-		else {
-			in[i] = 0;
-		}
-	}
-	p = fftw_plan_dft_r2c_1d(N, in, y, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-	std::complex<double>* yy;
-	yy = reinterpret_cast<std::complex<double> *>(y);
-	vector<double> y1(N);
-
-	for (int i = 0; i < N; ++i)
+	for (int i = 0; i < image_windowR.size(); ++i)
 	{
-		y1[i] = abs(*reinterpret_cast<std::complex<double>*>(y + i));
+		in[i] = image_windowR[i];
 	}
-
-	fftw_destroy_plan(p);
-
-	return y1;
+	{
+		std::scoped_lock lock(global_fftw_mutex);
+		fftw_plan p = fftw_plan_dft_r2c_1d(N, in.data(), reinterpret_cast<fftw_complex*>(y.data()), FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_execute(p);
+		fftw_destroy_plan(p);
+	}
+	for (int i = 0; i < N; i++)
+	{
+		in[i] = abs(y[i]);
+	}
+	return in;
 }
 
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
 	auto N = x.size();
-	double* x_arr = new double[N]();
-	copy(x.begin(), x.end(), x_arr);
-	double* y = new double[N]();
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d((int)N, x_arr, y, FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-
-	fftw_destroy_plan(p);
+	std::vector<double> x_arr = x;
+	std::vector<double> y(N);
+	{
+		std::scoped_lock lock(global_fftw_mutex);
+		fftw_plan p = fftw_plan_r2r_1d((int)N, x_arr.data(), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_execute(p);
+		fftw_destroy_plan(p);
+	}
 
 	vector<double> yy(N);
 	yy[0] = y[0];
@@ -99,16 +91,14 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 		k++;
 	}
 
-	delete[] y;
 	return yy;
 }
 
 vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 {
 	auto N = x.size();
-	double* y = new double[N]();
+	std::vector<double> xx(N);
 
-	double* xx = new double[N]();
 	xx[0] = x[0];
 	for (int i = 1; i < N / 2; ++i)
 	{
@@ -124,32 +114,27 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 	size_t b = N - 1;
 	xx[N / 2] = x[b];
 
-	fftw_plan p;
-
-	p = fftw_plan_r2r_1d(N, xx, y, FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
-	fftw_execute(p);
-
-	fftw_destroy_plan(p);
-
-	vector<double> yy(N);
-	for (int i = 0; i < N; ++i)
-	{ 
-		y[i] /= N;
-		yy[i] = y[i];
+	std::vector<double> y(N);
+	{
+		std::scoped_lock lock(global_fftw_mutex);
+		fftw_plan p = fftw_plan_r2r_1d(N, xx.data(), y.data(), FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_execute(p);
+		fftw_destroy_plan(p);
 	}
 
-	delete[] xx;
-	return yy;
+	for (int i = 0; i < N; i++)
+	{
+		y[i] /= N;
+	}
+
+	return y;
 }
 
 vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
 	vector<double> f_x = RFFT(x);
-	
 	fill(f_x.begin(), f_x.begin() + x0, 0);
 	fill(f_x.begin() + x1, f_x.end(), 0);
-	
 	return IRFFT(f_x);
 }
 

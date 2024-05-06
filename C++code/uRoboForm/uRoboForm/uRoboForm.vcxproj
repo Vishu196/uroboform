@@ -156,12 +156,15 @@
     <ClCompile Include="grid_pos03.cpp" />
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="raw_edges.cpp" />
+    <ClCompile Include="Results.cpp" />
     <ClCompile Include="signal_evaluation.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqueue.h" />
     <ClInclude Include="debug_logs.h" />
+    <ClInclude Include="ImgSource.h" />
+    <ClInclude Include="Results.h" />
     <ClInclude Include="utility.h" />
     <ClInclude Include="Evaluation.h" />
     <ClInclude Include="find_edges.h" />

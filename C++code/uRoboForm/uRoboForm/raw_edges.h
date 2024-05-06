@@ -2,6 +2,10 @@
 #include "cqueue.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include "constants.h"
+#include "ImgSource.h"
+#include "utility.h"
+
 
 struct stage12
 {		
@@ -26,11 +30,34 @@ private:
 	double Calc_main_d(const std::vector<double> &mean0);
 	cqueue<stage12> fifo;
 	int Freq_Range;
+	void ExecuteR(const cv::Mat& image);
 
 public:
 
-	raw_edges(int _freq_range) : Freq_Range(_freq_range) {}
-	void ExecuteR(const cv::Mat &image);
+	raw_edges(Source& imgsrc, int _freq_range) : Freq_Range(_freq_range)
+	{
+#ifdef WITH_THREADING
+		std::thread t1([&] {
+#endif
+			while (1)
+			{
+				cv::Mat image = imgsrc.getNext();
+				if (image.cols == 0)
+				{
+					std::cout << "Image broken" << std::endl;
+					fifo.push({});
+					return;
+				}
+				auto t01 = std::chrono::high_resolution_clock::now();
+				ExecuteR(image);
+				utility::display_time(t01, std::chrono::high_resolution_clock::now());
+			}
+#ifdef WITH_THREADING
+			});
+		t1.detach();
+#endif
+	}
+	
 	stage12 getNext() 
 	{
 		stage12 s12;

@@ -26,11 +26,11 @@ Mat raw_edges::ImageSliceR(const Mat &image, int n)
 
 double raw_edges::Calc_main_d(const vector<double> &mean0)
 {
-	if (mean0.size() < Freq_Range)
+	/*if (mean0.size() < Freq_Range)
 	{
 		cout << "Mean0 size not sufficient in Calc_main_d " << endl;
 		return -1;
-	}
+	}*/
 
 	int interval = 50;
 	const auto last_index = (int)mean0.size() - Freq_Range;
@@ -51,19 +51,17 @@ void raw_edges::ExecuteR(const Mat &Image)
 {
 	stage12 s12;
 
-	Mat Image2 = ImageSliceR(Image, 2);
+	s12.img = Image;
+	s12.img2 = ImageSliceR(Image, 2);
 	
-	s12.mean0 = Evaluation::Mean0R(Image2);
+	s12.mean0 = Evaluation::Mean0R(s12.img2);
 	s12.main_d_0 = Calc_main_d(s12.mean0);
 	
-	s12.mean1 = Evaluation::Mean1R(Image2);
+	s12.mean1 = Evaluation::Mean1R(s12.img2);
 	s12.main_d_1 = Calc_main_d(s12.mean1);
 
 	s12.th_edge = Evaluation::MeanR(s12.mean0);
-	s12.img = Image;
-	s12.img2 = Image2;
 
 	fifo.push(s12);
-
 	cout << s12;
 }

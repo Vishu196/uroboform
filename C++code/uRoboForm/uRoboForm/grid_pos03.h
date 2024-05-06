@@ -2,6 +2,8 @@
 #include "grid_pos02.h"
 #include "grid.h"
 #include "cqueue.h"
+#include "ImgSource.h"
+#include "utility.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
 
@@ -52,9 +54,35 @@ private:
 	list<int> get_look_el(const stage56& s56);
 	axis get_center_arr(const stage56& s56);
 	cqueue<stage56> fifo;
+	void Execute(stage45 s45);
+	
 
 public:
-	stage56 Execute(stage45 s45);
+	
+	grid_pos03(grid_pos02& grid2)
+	{
+#ifdef WITH_THREADINGs
+		std::thread t1([&]
+			{
+#endif
+				while (1)
+				{
+					auto t05 = std::chrono::high_resolution_clock::now();
+					const stage45& s45 = grid2.getNext();
+					if (s45.img.data == nullptr)
+					{
+						fifo.push({});
+						return;
+					}
+					Execute(s45);
+					utility::display_time(t05, std::chrono::high_resolution_clock::now());
+				}
+#ifdef WITH_THREADING
+			});
+		t1.detach();
+#endif
+	}
+
 	stage56 getNext()
 	{
 		stage56 s56;

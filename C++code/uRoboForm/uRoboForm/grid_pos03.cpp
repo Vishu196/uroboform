@@ -444,13 +444,11 @@ void Execute_1(stage56& s56)
 	}
 }
 
-stage56 grid_pos03::Execute(stage45 s45)
+void grid_pos03::Execute(stage45 s45)
 {
 	stage56 s56;
 	if (s45.edges_sufficient)
 	{
-
-
 		s56.gridRows = s45.gridRows;
 		s56.gridCols = s45.gridCols;
 
@@ -482,6 +480,4 @@ stage56 grid_pos03::Execute(stage45 s45)
 
 	fifo.push(s56);
 	cout << s56;
-
-	return s56;
 }
