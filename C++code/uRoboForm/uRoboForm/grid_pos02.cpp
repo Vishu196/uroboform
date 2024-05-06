@@ -324,7 +324,9 @@ void grid_pos02::Execute(stage34 s34)
 					cout << vi << endl;*/
 			}
 		}
+#ifdef WITH_DEBUGGING
 		cout << s45;
+#endif
 	}
 
 	else

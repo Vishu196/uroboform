@@ -481,4 +481,5 @@ void grid_pos03::Execute(stage45 s45)
 
 	fifo.push(s56);
 	cout << s56;
+
 }

@@ -163,7 +163,11 @@ void grid_pos01::Execute(stage23 s23)
 		s34.img = s23.img;
 		s34.gridRows = (int)s23.cut_hor.size() - 1;
 		s34.gridCols = (int)s23.cut_ver.size() - 1;
+
+#ifdef WITH_DEBUGGING
 		std::cout << s34;
+#endif
+		
 	}
 
 	else

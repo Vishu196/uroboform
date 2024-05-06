@@ -63,5 +63,8 @@ void raw_edges::ExecuteR(const Mat &Image)
 	s12.th_edge = Evaluation::MeanR(s12.mean0);
 
 	fifo.push(s12);
+
+#ifdef WITH_DEBUGGING
 	cout << s12;
+#endif
 }

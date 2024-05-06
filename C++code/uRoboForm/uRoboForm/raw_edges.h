@@ -50,7 +50,9 @@ public:
 				}
 				auto t01 = std::chrono::high_resolution_clock::now();
 				ExecuteR(image);
+#ifdef WITH_DEBUGGING
 				utility::display_time(t01, std::chrono::high_resolution_clock::now());
+#endif	
 			}
 #ifdef WITH_THREADING
 			});

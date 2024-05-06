@@ -49,7 +49,9 @@ public:
 						return;
 					}
 					Execute(s23);
+#ifdef WITH_DEBUGGING
 					utility::display_time(t03, std::chrono::high_resolution_clock::now());
+#endif	
 				}				
 #ifdef WITH_THREADING
 		});

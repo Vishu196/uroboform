@@ -408,5 +408,7 @@ void find_edges::Execute(const stage12 &s12)
 
 	fifo.push(s23);
 
+#ifdef WITH_DEBUGGING
 	cout << s23;
+#endif
 }

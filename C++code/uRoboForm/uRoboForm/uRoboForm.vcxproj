@@ -162,7 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cqueue.h" />
-    <ClInclude Include="debug_logs.h" />
     <ClInclude Include="ImgSource.h" />
     <ClInclude Include="Results.h" />
     <ClInclude Include="utility.h" />
