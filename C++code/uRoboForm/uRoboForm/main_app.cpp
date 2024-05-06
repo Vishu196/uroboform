@@ -13,7 +13,6 @@
 #include "grid.h"
 #include "Results.h"
 
-//#define WITH_THREADING
 
 void create_csv(const std::string& filename, const vector<std::string>& colname)
 {
@@ -49,7 +48,7 @@ int main(int argc, char* argv[])
 		path = argv[1];
 
 #ifdef WITH_THREADING
-		Source imgsrc(path, 2);
+		Source imgsrc(path,2);
 #else
 		Source imgsrc(path);
 #endif
@@ -60,10 +59,10 @@ int main(int argc, char* argv[])
 		grid_pos01 grid1(edge);
 		grid_pos02 grid2(grid1);
 		grid_pos03 grid3(grid2);	
-		Results output(grid3);
+		Results output(grid3, t01);
 
-		cout << "Complete runtime:";
-		utility::display_time(t01, std::chrono::high_resolution_clock::now());
+		/*cout << "Complete runtime:";
+		utility::display_time(t01, std::chrono::high_resolution_clock::now());*/
 
 		
 #ifdef WITH_THREADING

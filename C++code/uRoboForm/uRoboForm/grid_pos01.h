@@ -37,7 +37,7 @@ public:
 	{
 #ifdef WITH_THREADING
 		std::thread t1([&]
-			{
+		{
 #endif
 				while (1)
 				{
@@ -52,7 +52,7 @@ public:
 					utility::display_time(t03, std::chrono::high_resolution_clock::now());
 				}				
 #ifdef WITH_THREADING
-			});
+		});
 		t1.detach();
 #endif
 	}

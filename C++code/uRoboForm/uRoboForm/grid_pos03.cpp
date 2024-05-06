@@ -8,6 +8,7 @@ using namespace cv;
 
 std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 {
+	cout << endl;
 	cout << "index: " << s56.index << endl;
 	cout << "ori: " << s56.is_hor << endl;
 	cout << "k:" << s56.k << endl;

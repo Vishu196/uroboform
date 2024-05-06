@@ -12,11 +12,11 @@ private:
 
 	void write_to_csv(const std::string& filename, const stage56 &s56, const std::string& orientation);
 	//cqueue<stage56> fifo;
-	void Execute(const stage56& s56);
+	void Execute(const stage56& s56, std::chrono::steady_clock::time_point t01);
 
 
 public:
-	Results(grid_pos03& grid3)
+	Results(grid_pos03& grid3, chrono::steady_clock::time_point t01)
 	{
 #ifdef WITH_THREADING
 		std::thread t1([&]
@@ -24,21 +24,25 @@ public:
 #endif
 				while (1)
 				{
-					auto t05 = std::chrono::high_resolution_clock::now();
+					//auto t05 = std::chrono::high_resolution_clock::now();
 					const stage56& s56 = grid3.getNext();
 					if (s56.grids == nullptr)
 					{
+						cout << "Complete runtime:";
+						utility::display_time(t01, std::chrono::high_resolution_clock::now());
 						break;
+
 					}
-					Execute(s56);
-					utility::display_time(t05, std::chrono::high_resolution_clock::now());
-					//exit(1);
+					Execute(s56, t01);
+					/*cout << "Data added to csv" << endl;
+					utility::display_time(t05, std::chrono::high_resolution_clock::now());*/
 				}
+				//exit(1);
 #ifdef WITH_THREADING
 			});
 		t1.detach();
 #endif
-
+		
 	}
 };
 

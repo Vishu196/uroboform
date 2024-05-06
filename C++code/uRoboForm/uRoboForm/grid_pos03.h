@@ -50,20 +50,20 @@ private:
 	double calc_d_k(std::vector<vector<double>> lines);
 	double get_d_k(const stage56& s56);
 	std::vector<vector<list<int>>> grid_params(void);
-	double weighted_avg(const std::vector<vector<double>> &center);
+	double weighted_avg(const std::vector<vector<double>>& center);
 	list<int> get_look_el(const stage56& s56);
 	axis get_center_arr(const stage56& s56);
 	cqueue<stage56> fifo;
 	void Execute(stage45 s45);
-	
+
 
 public:
-	
+
 	grid_pos03(grid_pos02& grid2)
 	{
-#ifdef WITH_THREADINGs
+#ifdef WITH_THREADING
 		std::thread t1([&]
-			{
+		{
 #endif
 				while (1)
 				{
@@ -78,11 +78,11 @@ public:
 					utility::display_time(t05, std::chrono::high_resolution_clock::now());
 				}
 #ifdef WITH_THREADING
-			});
+		});
 		t1.detach();
 #endif
 	}
-
+	
 	stage56 getNext()
 	{
 		stage56 s56;

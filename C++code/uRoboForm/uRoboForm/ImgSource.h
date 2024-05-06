@@ -4,6 +4,8 @@
 #include <string>
 #include "cqueue.h"
 
+#define WITH_THREADING
+
 class Source
 {
 	const std::string Path;
@@ -15,7 +17,7 @@ public:
 	{
 		for (const auto& entry : std::filesystem::directory_iterator(Path))
 		{
-			std::cout << entry << std::endl;
+			//std::cout << entry << std::endl;
 			if (entry.is_regular_file())
 			{
 				cv::Mat image = cv::imread(entry.path().string(), cv::IMREAD_GRAYSCALE);
