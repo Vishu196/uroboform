@@ -64,17 +64,17 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
 	auto N = x.size();
-	std::vector<double> x_arr = x;
+	//std::vector<double> x_arr = x;
 	std::vector<double> y(N);
 	{
 		std::scoped_lock lock(global_fftw_mutex);
-		fftw_plan p = fftw_plan_r2r_1d((int)N, x_arr.data(), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_plan p = fftw_plan_r2r_1d((int)N, const_cast<double*>(x.data()), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
-		fftw_destroy_plan(p);
 	}
 
 	vector<double> yy(N);
 	yy[0] = y[0];
+
 	int j = 0;
 	for (int i = 1; i < N; i += 2)
 	{

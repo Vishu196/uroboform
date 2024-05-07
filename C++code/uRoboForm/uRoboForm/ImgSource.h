@@ -4,7 +4,7 @@
 #include <string>
 #include "cqueue.h"
 
-#define WITH_THREADING
+//#define WITH_THREADING
 //#define WITH_DEBUGGING
 
 
