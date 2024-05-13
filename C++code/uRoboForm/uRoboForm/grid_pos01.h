@@ -15,7 +15,7 @@ struct stage34
 	Grid** grids; 
 	bool edges_sufficient;
 
-	stage34() :gridRows(0), gridCols(0), grids(0), edges_sufficient()
+	stage34() :gridRows(0), gridCols(0), grids(0), edges_sufficient(false)
 	{}
 	friend std::ostream& operator<<(std::ostream& ostr, const stage34& s34);
 
