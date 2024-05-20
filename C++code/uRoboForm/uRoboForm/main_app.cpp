@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
 	std::vector<std::string> colname = { "   xi    ","   zi    ","    k    "," index ","  orientation " };
 	create_csv(csvname, colname);
 
-	//string path = "D:\\Vaishnavi\\C++Trial\\Images";
-	string path = "D:\\Vaishnavi\\C++Trial\\terlau";
+	string path = "D:\\Vaishnavi\\C++Trial\\Images";
+	//string path = "D:\\Vaishnavi\\C++Trial\\terlau";
 
 
 	auto t01 = std::chrono::high_resolution_clock::now();

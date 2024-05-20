@@ -3,7 +3,6 @@
 #include "signal_evaluation.h"
 #include "constants.h"
 #include "utility.h"
-#include "debug_logs.h"
 
 using namespace std;
 using namespace cv;
