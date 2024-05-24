@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <opencv2/opencv.hpp>
 #include "constants.h"
 
 
