@@ -62,30 +62,63 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	return in;
 }
 
-std::vector<complex<double>> signal_evaluation::RFFT(const vector<double>& x)
+vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
 	auto N = x.size();
-	std::vector<complex<double>> y(N);
+	//std::vector<double> x_arr = x;
+	std::vector<double> y(N);
 	{
 		std::scoped_lock lock(global_fftw_mutex);
-		fftw_plan p = fftw_plan_dft_r2c_1d((int)N, const_cast<double*>(x.data()), reinterpret_cast<fftw_complex*>(y.data()),FFTW_ESTIMATE );//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
-
+		fftw_plan p = fftw_plan_r2r_1d((int)N, const_cast<double*>(x.data()), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
-		fftw_destroy_plan(p);
 	}
 
-	return y;
+	vector<double> yy(N);
+	yy[0] = y[0];
+
+	int j = 0;
+	for (int i = 1; i < N; i += 2)
+	{
+		int a = i - j;
+		yy[i] = y[a];
+		j++;
+	}
+
+	int k = 1;
+	for (int i = 2; i < N; i += 2)
+	{
+		size_t a = N - k;
+		yy[i] = (y[a]);
+		k++;
+	}
+
+	return yy;
 }
 
-vector<double> signal_evaluation::IRFFT( std::vector<complex<double>>& x)
+vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 {
 	auto N = x.size();
 	std::vector<double> xx(N);
 
+	xx[0] = x[0];
+	for (int i = 1; i < N / 2; ++i)
+	{
+		int a = (2 * i) - 1;
+		xx[i] = x[a];
+	}
+
+	for (size_t i = N; i > ((N / 2) + 1); --i)
+	{
+		size_t a = (2 * (N - i)) + 2;
+		xx[i - 1] = x[a];
+	}
+	size_t b = N - 1;
+	xx[N / 2] = x[b];
+
 	std::vector<double> y(N);
 	{
 		std::scoped_lock lock(global_fftw_mutex);
-		fftw_plan p = fftw_plan_dft_c2r_1d(N, reinterpret_cast<fftw_complex*>(x.data()), y.data(), FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_plan p = fftw_plan_r2r_1d(N, xx.data(), y.data(), FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
 		fftw_destroy_plan(p);
 	}
@@ -100,15 +133,9 @@ vector<double> signal_evaluation::IRFFT( std::vector<complex<double>>& x)
 
 vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
-	int x2 = (x1 / 2);
-	std::vector<std::complex<double>> f_x = RFFT(x);
+	vector<double> f_x = RFFT(x);
 	fill(f_x.begin(), f_x.begin() + x0, 0);
-	fill(f_x.begin() + x2 +1, f_x.end(), 0);
-	if ((x1 & 1) == 0)
-	{
-		(f_x.at(x2)) = real(f_x.at(x2));
-	}
-	
+	fill(f_x.begin() + x1, f_x.end(), 0);
 	return IRFFT(f_x);
 }
 
