@@ -13,7 +13,7 @@ void Results::write_to_csv(const string& filename,const stage56& s56, const stri
 	myFile.close();
 }
 
-void Results::Execute(const stage56 &s56, std::chrono::steady_clock::time_point t01)
+void Results::Execute(const stage56 &s56, std::chrono::high_resolution_clock::time_point t01)
 {
 	string orientation;
 

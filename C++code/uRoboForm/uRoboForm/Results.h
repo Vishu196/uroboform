@@ -12,11 +12,11 @@ private:
 
 	void write_to_csv(const std::string& filename, const stage56 &s56, const std::string& orientation);
 	//cqueue<stage56> fifo;
-	void Execute(const stage56& s56, std::chrono::steady_clock::time_point t01);
+	void Execute(const stage56& s56, std::chrono::high_resolution_clock::time_point t01);
 
 
 public:
-	Results(grid_pos03& grid3, chrono::steady_clock::time_point t01)
+	Results(grid_pos03& grid3, chrono::high_resolution_clock::time_point t01)
 	{
 #ifdef WITH_THREADING
 		std::thread t1([&]
