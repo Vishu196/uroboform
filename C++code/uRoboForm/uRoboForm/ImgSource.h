@@ -3,8 +3,9 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include "cqueue.h"
+#include "utility.h"
 
-#define WITH_THREADING
+//#define WITH_THREADING
 //#define WITH_DEBUGGING
 
 
@@ -24,14 +25,19 @@ public:
 #endif	
 			if (entry.is_regular_file())
 			{
+				auto t00 = std::chrono::high_resolution_clock::now();
 				cv::Mat image = cv::imread(entry.path().string(), cv::IMREAD_GRAYSCALE);
 				if (image.data != NULL)
 				{
 					Fifo.push(image);
 				}
+#ifdef WITH_DEBUGGING
+				utility::display_time(t00, std::chrono::high_resolution_clock::now());
+#endif	
 			}
 		}
 		Fifo.push(cv::Mat());
+
 	}
 	cv::Mat getNext()
 	{

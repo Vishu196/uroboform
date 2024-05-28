@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
 	std::vector<std::string> colname = { "   xi    ","   zi    ","    k    "," index ","  orientation " };
 	create_csv(csvname, colname);
 
-	//string path = "D:\\Vaishnavi\\C++Trial\\Images";
-	string path = "D:\\Vaishnavi\\C++Trial\\terlau";
+	string path = "D:\\Vaishnavi\\C++Trial\\Images";
+	//string path = "D:\\Vaishnavi\\C++Trial\\terlau";
 
 
 	auto t01 = std::chrono::high_resolution_clock::now();
@@ -52,13 +52,14 @@ int main(int argc, char* argv[])
 #else
 		Source imgsrc(path);
 #endif	
+
 		raw_edges edge0(imgsrc, freq_range);
 		find_edges edge(edge0);
 		grid_pos01 grid1(edge);
 		grid_pos02 grid2(grid1);
-		grid_pos03 grid3(grid2);	
+		grid_pos03 grid3(grid2);
 		Results output(grid3, t01);
-		
+
 #ifdef WITH_THREADING
 	while (1);
 #endif
