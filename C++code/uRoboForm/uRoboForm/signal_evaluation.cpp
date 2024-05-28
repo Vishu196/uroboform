@@ -3,7 +3,6 @@
 #include <fftw3.h>
 #include <complex>
 
-
 using namespace std;
 
 std::mutex global_fftw_mutex;
@@ -45,16 +44,20 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	std::vector<double> in(N, 0);
 	fftw_plan p;
 
-	for (int i = 0; i < image_windowR.size(); ++i)
+	copy(image_windowR.begin(), image_windowR.end(), in.begin());
+	/*for (int i = 0; i < image_windowR.size(); ++i)
 	{
 		in[i] = image_windowR[i];
-	}
+	}*/
+
 	{
 		std::scoped_lock lock(global_fftw_mutex);
 		fftw_plan p = fftw_plan_dft_r2c_1d(N, in.data(), reinterpret_cast<fftw_complex*>(y.data()), FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
 		fftw_destroy_plan(p);
+		//fftw_cleanup;
 	}
+
 	for (int i = 0; i < N; i++)
 	{
 		in[i] = abs(y[i]);
@@ -62,22 +65,45 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	return in;
 }
 
+unsigned int nextPowerOf2(unsigned int n) {
+	// Handle edge case for 0 explicitly if required
+	if (n == 0) return 1;
+
+	// Decrement n (to handle the case when n is already a power of 2)
+	n--;
+
+	// Set all bits to the right of the highest set bit
+	n |= n >> 1;
+	n |= n >> 2;
+	n |= n >> 4;
+	n |= n >> 8;
+	n |= n >> 16;
+
+	// Increment to get the next power of 2
+	return n + 1;
+}
+
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
 	auto N = x.size();
 	//std::vector<double> x_arr = x;
-	std::vector<double> y(N);
+	unsigned int fastN = nextPowerOf2(N);
+	unsigned int start = ((fastN - N) / 2);
+	std::vector<double> in(fastN, 0);
+	copy(x.begin(), x.end(), in.begin() + start);
+
+	std::vector<double> y(fastN);
 	{
 		std::scoped_lock lock(global_fftw_mutex);
-		fftw_plan p = fftw_plan_r2r_1d((int)N, const_cast<double*>(x.data()), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
+		fftw_plan p = fftw_plan_r2r_1d((int)fastN, const_cast<double*>(in.data()), y.data(), FFTW_R2HC, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
 	}
 
-	vector<double> yy(N);
+	vector<double> yy(fastN,0);
 	yy[0] = y[0];
 
 	int j = 0;
-	for (int i = 1; i < N; i += 2)
+	for (int i = 1; i < fastN; i += 2)
 	{
 		int a = i - j;
 		yy[i] = y[a];
@@ -85,9 +111,9 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 	}
 
 	int k = 1;
-	for (int i = 2; i < N; i += 2)
+	for (int i = 2; i < fastN; i += 2)
 	{
-		size_t a = N - k;
+		size_t a = fastN - k;
 		yy[i] = (y[a]);
 		k++;
 	}
@@ -95,10 +121,10 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 	return yy;
 }
 
-vector<double> signal_evaluation::IRFFT(const vector<double>& x)
+vector<double> signal_evaluation::IRFFT(const vector<double>& x, const int original_size)
 {
 	auto N = x.size();
-	std::vector<double> xx(N);
+	std::vector<double> xx(N,0);
 
 	xx[0] = x[0];
 	for (int i = 1; i < N / 2; ++i)
@@ -107,7 +133,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 		xx[i] = x[a];
 	}
 
-	for (size_t i = N; i > ((N / 2) + 1); --i)
+	for (size_t i = N ; i > ((N / 2) + 1); --i)
 	{
 		size_t a = (2 * (N - i)) + 2;
 		xx[i - 1] = x[a];
@@ -120,7 +146,6 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 		std::scoped_lock lock(global_fftw_mutex);
 		fftw_plan p = fftw_plan_r2r_1d(N, xx.data(), y.data(), FFTW_HC2R, FFTW_ESTIMATE);//fftw_plan_dft_1d(N, in, y, FFTW_FORWARD, FFTW_ESTIMATE);
 		fftw_execute(p);
-		fftw_destroy_plan(p);
 	}
 
 	for (int i = 0; i < N; i++)
@@ -128,15 +153,24 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 		y[i] /= N;
 	}
 
-	return y;
+	unsigned int start = ((N - original_size) / 2);
+	vector<double> final_output(original_size);
+	for (int i = 0; i < original_size; ++i) 
+	{
+		final_output[i] = y[i + start];
+	}
+
+	return final_output;
 }
 
 vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
 	vector<double> f_x = RFFT(x);
+	unsigned int original_size = x.size();
+	unsigned int start = ((f_x.size() - x.size()) / 2);
 	fill(f_x.begin(), f_x.begin() + x0, 0);
-	fill(f_x.begin() + x1, f_x.end(), 0);
-	return IRFFT(f_x);
+	fill(f_x.begin() + x1 + start, f_x.end(), 0);
+	return IRFFT(f_x, original_size);
 }
 
 struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, int size)

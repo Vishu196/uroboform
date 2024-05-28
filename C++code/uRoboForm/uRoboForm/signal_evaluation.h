@@ -25,7 +25,7 @@ public:
 	std::vector<double> static FFTR(const std::vector<double>& image_window);
 	std::vector<double> static Bandfilter(const std::vector<double>& x, int start, size_t end);
 	std::vector<double> static RFFT(const std::vector<double>& x);
-	std::vector<double> static IRFFT(const std::vector<double>& x);
+	std::vector<double> static IRFFT(const std::vector<double>& x, const int original_size);
 	struct MFreq static Main_FreqR(const std::vector<double>& B0, int start, int stop);
 };
 
