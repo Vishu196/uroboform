@@ -470,12 +470,13 @@ void grid_pos03::Execute(stage45 s45)
 
 	else
 	{
-		s56.index = nan("");
+		s56.index = -1;
 		s56.k = nan("");
 		s56.is_hor = ("");
 		s56.grids = {};
 		s56.xi = nan("");
 		s56.zi = nan("");
+		s56.last_image = -1;
 	}
 
 	fifo.push(s56);

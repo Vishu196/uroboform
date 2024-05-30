@@ -135,47 +135,46 @@ bool grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
 void grid_pos01::Execute(stage23 s23) 
 {
 	stage34 s34;
-	
 	if ((s23.cut_ver.size() >= 2) && (s23.cut_hor.size() >= 2))
-	{
-		s34.edges_sufficient = true;
-		string mode = "parabel";
-		bool is_hor;
-
-		get_grids(s23, s34);
-
-		for (int row = 0; row < (s23.cut_hor.size() - 1); ++row)
 		{
-			for (int col = 0; col < (s23.cut_ver.size() - 1); ++col)
+			s34.edges_sufficient = true;
+			string mode = "parabel";
+			bool is_hor;
+
+			get_grids(s23, s34);
+
+			for (int row = 0; row < (s23.cut_hor.size() - 1); ++row)
 			{
-				Mat grid_rot = get_gridrot(s23, row, col, is_hor);
+				for (int col = 0; col < (s23.cut_ver.size() - 1); ++col)
+				{
+					Mat grid_rot = get_gridrot(s23, row, col, is_hor);
 
-				s34.grids[row][col] = Grid(grid_rot, is_hor);
-				s34.grids[row][col].im_loc.push_back(s23.cut_hor[row] * 2);
-				s34.grids[row][col].im_loc.push_back(s23.cut_ver[col] * 2);
+					s34.grids[row][col] = Grid(grid_rot, is_hor);
+					s34.grids[row][col].im_loc.push_back(s23.cut_hor[row] * 2);
+					s34.grids[row][col].im_loc.push_back(s23.cut_ver[col] * 2);
 
-				/*for (const auto& vi : s34.grids[row][col].im_loc)
-					cout << vi << endl;*/
+					/*for (const auto& vi : s34.grids[row][col].im_loc)
+						cout << vi << endl;*/
+				}
 			}
-		}
 
-		s34.img = s23.img;
-		s34.gridRows = (int)s23.cut_hor.size() - 1;
-		s34.gridCols = (int)s23.cut_ver.size() - 1;
+			s34.img = s23.img;
+			s34.gridRows = (int)s23.cut_hor.size() - 1;
+			s34.gridCols = (int)s23.cut_ver.size() - 1;
 
 #ifdef WITH_DEBUGGING
-		std::cout << s34;
+			std::cout << s34;
 #endif
-		
-	}
+		}
 
-	else
-	{
-		s34.edges_sufficient = false;
-		s34 = {};
-		std::cout << " Edges insufficient to process" << endl;
-	}
-
+		else
+		{
+			s34.edges_sufficient = false;
+			s34 = {};
+			s34.last_image = -1;
+			std::cout << " Edges insufficient to process" << endl;
+		}
+	
 	fifo.push(s34);
 	
 }

@@ -26,7 +26,7 @@ public:
 				{
 					//auto t05 = std::chrono::high_resolution_clock::now();
 					const stage56& s56 = grid3.getNext();
-					if (s56.grids == nullptr)
+					if (s56.grids == nullptr && s56.last_image != (-1))
 					{
 						cout << "Complete runtime:";
 						utility::display_time(t01, std::chrono::high_resolution_clock::now());

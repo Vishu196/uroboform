@@ -19,8 +19,9 @@ struct stage56
 	bool is_hor;
 	double xi;
 	double zi;
+	int last_image;
 
-	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0), index(0), xi(0.0), zi(0.0), is_hor(false), edges_sufficient(false)
+	stage56() :gridRows(0), gridCols(0), grids(0), k(0.0), index(0), xi(0.0), zi(0.0), is_hor(false), edges_sufficient(false), last_image(0)
 	{};
 	friend std::ostream& operator<<(std::ostream& ostr, const stage56& s56);
 };
@@ -69,7 +70,7 @@ public:
 				{
 					auto t05 = std::chrono::high_resolution_clock::now();
 					const stage45& s45 = grid2.getNext();
-					if (s45.img.data == nullptr)
+					if (s45.img.data == nullptr && s45.last_image != (-1))
 					{
 						fifo.push({});
 						return;

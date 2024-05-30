@@ -28,8 +28,9 @@ struct stage23
 	cv::Mat img2;
 	std::vector<int> cut_hor;
 	std::vector<int> cut_ver;
+	bool last_image;
 
-	stage23()
+	stage23() :last_image(false)
 	{
 		cut_hor = {};
 		cut_ver = {};

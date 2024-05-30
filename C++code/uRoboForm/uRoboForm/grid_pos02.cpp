@@ -292,6 +292,7 @@ void modify_max_pos(vector<double>& max_pos)
 void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;
+	s45.last_image = s34.last_image;
 	if (s34.edges_sufficient)
 	{
 		s45.img = s34.img;
@@ -299,7 +300,7 @@ void grid_pos02::Execute(stage34 s34)
 		s45.gridCols = s34.gridCols;
 		s45.grids = s34.grids;
 		s45.edges_sufficient = s34.edges_sufficient;
-
+		
 		string mode = "parabel";
 		const int image_size = s45.img.cols * s45.img.rows;
 		const double five_percent = image_size * 0.05;
@@ -326,10 +327,14 @@ void grid_pos02::Execute(stage34 s34)
 #ifdef WITH_DEBUGGING
 		cout << s45;
 #endif
+
 	}
 
 	else
+	{
 		s45 = {};
+		s45.last_image = -1;
+	}	
 
 	fifo.push(s45);
 }

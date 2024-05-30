@@ -14,8 +14,9 @@ struct stage45
 	int gridCols;
 	Grid** grids;
 	bool edges_sufficient;
+	int last_image;
 	
-	stage45() :gridRows(0), gridCols(0), grids(0), edges_sufficient(false)
+	stage45() :gridRows(0), gridCols(0), grids(0), edges_sufficient(false), last_image(0)
 	{};
 	friend std::ostream& operator<<(std::ostream& ostr, const stage45& s45);
 };
@@ -46,7 +47,7 @@ public:
 				{
 					auto t04 = std::chrono::high_resolution_clock::now();
 					const stage34 &s34 = grid1.getNext();
-					if (s34.img.data == nullptr)
+					if (s34.img.data == nullptr && s34.last_image != (-1))
 					{
 						fifo.push({});
 						return;
