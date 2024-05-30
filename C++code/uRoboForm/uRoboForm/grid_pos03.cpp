@@ -470,7 +470,7 @@ void grid_pos03::Execute(stage45 s45)
 
 	else
 	{
-		s56.index = (int)nan("");
+		s56.index = nan("");
 		s56.k = nan("");
 		s56.is_hor = ("");
 		s56.grids = {};
