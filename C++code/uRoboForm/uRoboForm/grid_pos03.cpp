@@ -142,8 +142,15 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 				max_mean.clear();
 		}
 
-		vector<double> max_mean_de = Evaluation::decumulate(max_mean);
-		double d_mean = Evaluation::MeanR(max_mean_de);
+		double d_mean;
+		if (max_mean.size() > 0)
+		{
+			vector<double> max_mean_de = Evaluation::decumulate(max_mean);
+			d_mean = Evaluation::MeanR(max_mean_de);
+		}
+		else
+			d_mean = nan("");
+		
 
 		if ((max_mean.size() >= 4) && (d_mean >= 50) && (d_mean <= 70))
 		{
