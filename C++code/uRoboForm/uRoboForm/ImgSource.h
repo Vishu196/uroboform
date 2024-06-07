@@ -30,6 +30,7 @@ public:
 				if (image.data != NULL)
 				{
 					Fifo.push(image);
+					std::cout << "Image name is: " << entry;
 				}
 #ifdef WITH_DEBUGGING
 				utility::display_time(t00, std::chrono::high_resolution_clock::now());
@@ -45,7 +46,7 @@ public:
 		Fifo.pop(img);
 		return img;
 	}
-	Source(const std::string& path, int size = 10) : Path(path), Fifo(size)
+	Source(const std::string& path, int size = 5) : Path(path), Fifo(size)
 	{
 #ifdef WITH_THREADING
 		Task = std::thread([&] {

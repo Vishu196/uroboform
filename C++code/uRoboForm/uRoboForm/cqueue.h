@@ -15,7 +15,7 @@ private:
     condition_variable cv_out;
     size_t capacity;
 public:
-    cqueue() : capacity(10) {}
+    cqueue() : capacity(5) {}
     cqueue(int size) : capacity(size) {}
 
     void push(Data const& data)
