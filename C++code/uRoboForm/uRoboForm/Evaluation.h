@@ -31,14 +31,21 @@ public:
 	template<class T>
 	static std::vector<T> decumulate(const std::vector<T>& x)
 	{
-		const size_t n = x.size() - 1;
-		std::vector<T> xi(n);
-
-		for (int i = 0; i < n; i++)
+		std::vector<T> xi;
+		if (x.size() <= 1)
 		{
-			xi[i] = x[i + 1] - x[i];
+			std::vector<T> xi;
 		}
-
+		
+		else
+		{
+			const size_t n = x.size() - 1;
+			xi.resize(n);
+			for (int i = 0; i < n; i++)
+			{
+				xi[i] = x[i + 1] - x[i];
+			}
+		}
 		return xi;
 	}
 

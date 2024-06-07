@@ -31,8 +31,7 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 		for (int col = 0; col < s45.gridCols; col++)
 		{
 			size_t r = grids01[row][col].get_max_pos().size();
-			if (r > 0)
-			{
+			
 				vector<double> max_pos_arr(r);
 				copy(grids01[row][col].get_max_pos().begin(), grids01[row][col].get_max_pos().end(), max_pos_arr.begin());
 				vector<double> m_pos_de = Evaluation::decumulate(max_pos_arr);
@@ -80,7 +79,7 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 						grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin(), new_mp);
 					}
 				}
-			}
+			
 		}
 	}
 
@@ -143,13 +142,8 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 		}
 
 		double d_mean;
-		if (max_mean.size() > 0)
-		{
-			vector<double> max_mean_de = Evaluation::decumulate(max_mean);
-			d_mean = Evaluation::MeanR(max_mean_de);
-		}
-		else
-			d_mean = nan("");
+		vector<double> max_mean_de = Evaluation::decumulate(max_mean);
+		d_mean = Evaluation::MeanR(max_mean_de);
 		
 
 		if ((max_mean.size() >= 4) && (d_mean >= 50) && (d_mean <= 70))
