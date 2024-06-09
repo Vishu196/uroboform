@@ -187,7 +187,13 @@ vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			if (d_m_0 > d_m_1)
 				cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
 			else
-				cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
+			{
+				if (close_edges.size() > 1)
+					cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
+				else
+					cut_arr.clear();
+			}
+				
 		}
 	}
 	return cut_arr;

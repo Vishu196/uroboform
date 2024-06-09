@@ -46,7 +46,7 @@ public:
 		Fifo.pop(img);
 		return img;
 	}
-	Source(const std::string& path, int size = 5) : Path(path), Fifo(size)
+	Source(const std::string& path, int size = 10) : Path(path), Fifo(size)
 	{
 #ifdef WITH_THREADING
 		Task = std::thread([&] {
