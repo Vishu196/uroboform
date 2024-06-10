@@ -165,35 +165,43 @@ vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			vector<int>d_cut_ver_0;
 			vector<int> d_cut_ver_1;
 
-			const int vl = close_edges[i_close];
-			if (vl > 0)
-			{
-				d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl - 1]));
-				d_cut_ver_1.push_back(abs(cut_arr[vl + 1] - cut_arr[vl - 1]));
-			}
-			if (vl < (cut_arr.size() - 2))
-			{
-				d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl + 2]));
-				d_cut_ver_1.push_back(abs(cut_arr[vl + 1] - cut_arr[vl + 2]));
-			}
+			if (close_edges.size() <= 1)
+				cut_arr.clear();
 
-			auto op_subtract = [ideal_d](auto x) { return x - ideal_d; };
-			transform(d_cut_ver_0.begin(), d_cut_ver_0.end(), d_cut_ver_0.begin(), op_subtract);
-			transform(d_cut_ver_1.begin(), d_cut_ver_1.end(), d_cut_ver_1.begin(), op_subtract);
-
-			double d_m_0 = abs(Evaluation::MeanR(d_cut_ver_0));
-			double d_m_1 = abs(Evaluation::MeanR(d_cut_ver_1));
-
-			if (d_m_0 > d_m_1)
-				cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
 			else
 			{
-				if (close_edges.size() > 1)
-					cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
+				const int vl = close_edges[i_close];
+				if (vl > 0)
+				{
+					d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl - 1]));
+					d_cut_ver_1.push_back(abs(cut_arr[vl + 1] - cut_arr[vl - 1]));
+				}
+				if (vl < (cut_arr.size() - 2))
+				{
+					d_cut_ver_0.push_back(abs(cut_arr[vl] - cut_arr[vl + 2]));
+					d_cut_ver_1.push_back(abs(cut_arr[vl + 1] - cut_arr[vl + 2]));
+				}
+
+				auto op_subtract = [ideal_d](auto x) { return x - ideal_d; };
+				transform(d_cut_ver_0.begin(), d_cut_ver_0.end(), d_cut_ver_0.begin(), op_subtract);
+				transform(d_cut_ver_1.begin(), d_cut_ver_1.end(), d_cut_ver_1.begin(), op_subtract);
+
+				double d_m_0 = abs(Evaluation::MeanR(d_cut_ver_0));
+				double d_m_1 = abs(Evaluation::MeanR(d_cut_ver_1));
+
+				if (d_m_0 > d_m_1)
+					cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
 				else
-					cut_arr.clear();
+					cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
+
+				close_edges.clear();
+				cut_ver_de = Evaluation::decumulate(cut_arr);
+				for (int i = 0; i < cut_ver_de.size(); i++)
+				{
+					if (cut_ver_de[i] < (ideal_d - 20))
+						close_edges.push_back(i);
+				}
 			}
-				
 		}
 	}
 	return cut_arr;
