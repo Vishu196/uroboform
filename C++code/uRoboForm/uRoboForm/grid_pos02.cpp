@@ -322,7 +322,7 @@ void grid_pos02::Execute(stage34 s34)
 
 				for(const auto& vi: s45.grids[row][col].get_max_pos())
 					cout << vi << endl;
-			}
+				}
 		}
 #ifdef WITH_DEBUGGING
 		cout << s45;

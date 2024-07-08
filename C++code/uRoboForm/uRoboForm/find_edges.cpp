@@ -165,7 +165,7 @@ vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 			vector<int>d_cut_ver_0;
 			vector<int> d_cut_ver_1;
 
-			if (close_edges.size() <= 1)
+			if (close_edges.size() < 1)
 				cut_arr.clear();
 
 			else
@@ -192,8 +192,12 @@ vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 				if (d_m_0 > d_m_1)
 					cut_arr.erase(cut_arr.begin() + close_edges[i_close]);
 				else
-					cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
-
+				{
+					if (close_edges.size() > (i_close + 1))
+						cut_arr.erase(cut_arr.begin() + close_edges[i_close + 1]);
+					else
+						cut_arr.clear();
+				}
 				close_edges.clear();
 				cut_ver_de = Evaluation::decumulate(cut_arr);
 				for (int i = 0; i < cut_ver_de.size(); i++)

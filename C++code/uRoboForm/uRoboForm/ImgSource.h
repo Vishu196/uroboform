@@ -5,8 +5,8 @@
 #include "cqueue.h"
 #include "utility.h"
 
-#define WITH_THREADING
-//#define WITH_DEBUGGING
+//#define WITH_THREADING
+#define WITH_DEBUGGING
 
 
 class Source

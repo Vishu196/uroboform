@@ -17,11 +17,14 @@ double signal_evaluation::Spek_InterpolR(const vector<double>& A)
 
 	const auto a = n_0 + 1;
 	const auto b = n_0 - 1;
-	const auto y_ln1 = log(A[a]);
-	const auto y_ln0 = log(A[n_0]);
-	const auto y_ln_1 = log(A[b]);
-	const auto tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
-	
+	double tmp = 0.0;
+	if ((a >= 0) && (b >= 0))
+	{
+		const auto y_ln1 = log(A[a]);
+		const auto y_ln0 = log(A[n_0]);
+		const auto y_ln_1 = log(A[b]);
+		tmp = (y_ln_1 - y_ln1) / (y_ln_1 - (2 * y_ln0) + y_ln1);
+	}
 	return (n_0 + tmp / 2);
 }
 
