@@ -6,6 +6,7 @@ void Results::write_to_csv(const string& filename,const stage56& s56, const stri
 {
 	ofstream myFile(filename, ios::app); 
 
+	myFile << fixed << setprecision(10);
 	myFile << s56.xi << "  ; " << s56.zi << " ; " << s56.k << " ;  " << s56.index << "  ;  " << orientation ;
 		//if (j != data1.size() - 1) myFile << ","; // No comma at end of line	
 	myFile << "\n";

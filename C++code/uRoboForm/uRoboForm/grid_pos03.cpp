@@ -1,6 +1,7 @@
 #include "grid_pos03.h"
 #include "constants.h"
 #include"Evaluation.h"
+#include <iomanip>
 
 using namespace std;
 using namespace cv;
@@ -10,9 +11,9 @@ std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 	cout << endl;
 	cout << "index: " << s56.index << endl;
 	cout << "ori: " << s56.is_hor << endl;
-	cout << "k:" << s56.k << endl;
-	cout << "xi: " << s56.xi << endl;
-	cout << "zi: " << s56.zi << endl;
+	cout << fixed << setprecision(10) << "k:" << s56.k << endl;
+	cout << fixed << setprecision(10) << "xi: " << s56.xi << endl;
+	cout << fixed << setprecision(10) << "zi: " << s56.zi << endl;
 	cout << "Stage 5 complete." << endl;
 	return ostr;
 }
@@ -38,10 +39,10 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 				bool con = any_of(m_pos_de.begin(), m_pos_de.end(), isGreater);
 				while (con)
 				{
-					/*vector<int> m_pos_de1;
+					vector<int> m_pos_de1;
 					m_pos_de1.reserve(r);
 
-					for (int e = 0; e < r; e++)
+					for (int e = 0; e < r-1; e++)
 					{
 						if (m_pos_de[e] > 100)
 						{
@@ -49,19 +50,19 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 						}
 					}
 
-					reverse(m_pos_de1.begin(), m_pos_de1.end());*/
+					reverse(m_pos_de1.begin(), m_pos_de1.end());
 
-					for (auto i = m_pos_de.rbegin(); i != m_pos_de.rend(); ++i)
+					for (int i_fill = 0; i_fill < m_pos_de1.size(); ++i_fill)
 					{
-						if (*i > 100)
-						{
-							int i_fill = *i;
+						/*if (*i > 100)
+						{*/
+							//int i_fill = *i;
 							int fill1 = i_fill + 1;
 
 							double mean_maxPos = (grids01[row][col].get_max_pos()[i_fill] + grids01[row][col].get_max_pos()[fill1]) / 2;
 							grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin() + fill1, mean_maxPos);
 
-						}
+						//}
 					}
 
 				}
@@ -70,12 +71,12 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 				{
 					if (((row != (s45.gridRows - 1)) && (grids01[row][col].is_hor == true) && (((grids01[row + 1][col].im_loc[0]) - (grids01[row][col].get_max_pos().back())) > 85)) || ((col != (s45.gridCols - 1)) && (grids01[row][col].is_hor == false) && (((grids01[row][col + 1].im_loc[1]) - (grids01[row][col].get_max_pos().back())) > 115)))
 					{
-						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].get_max_pos().back());
+						double new_mp = Evaluation::MeanR(m_pos_de) + (grids01[row][col].get_max_pos().back());
 						grids01[row][col].get_max_pos().push_back(new_mp);
 					}
 					else if (((row != 0) && (grids01[row][col].is_hor == true) && (((grids01[row][col].get_max_pos()[0]) - (grids01[row][col].im_loc[0])) > 85)) || ((col != 0) && (grids01[row][col].is_hor == false) && (((grids01[row][col].get_max_pos()[0]) - (grids01[row][col].im_loc[1])) > 85)))
 					{
-						double new_mp = Evaluation::MeanR(max_pos_arr) + (grids01[row][col].get_max_pos().front());
+						double new_mp = - Evaluation::MeanR(m_pos_de) + (grids01[row][col].get_max_pos().front());
 						grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin(), new_mp);
 					}
 				}
