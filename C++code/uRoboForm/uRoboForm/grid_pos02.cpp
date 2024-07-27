@@ -320,8 +320,8 @@ void grid_pos02::Execute(stage34 s34)
 					s45.grids[row][col].addmaxPos(max_pos);
 				}
 
-				for(const auto& vi: s45.grids[row][col].get_max_pos())
-					cout << vi << endl;
+				/*for(const auto& vi: s45.grids[row][col].get_max_pos())
+					cout << vi << endl;*/
 				}
 		}
 #ifdef WITH_DEBUGGING

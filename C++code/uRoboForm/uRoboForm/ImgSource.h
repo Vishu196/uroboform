@@ -4,9 +4,10 @@
 #include <string>
 #include "cqueue.h"
 #include "utility.h"
+#include <thread>
 
-//#define WITH_THREADING
-#define WITH_DEBUGGING
+#define WITH_THREADING
+//#define WITH_DEBUGGING
 
 
 class Source
@@ -30,7 +31,7 @@ public:
 				if (image.data != NULL)
 				{
 					Fifo.push(image);
-					std::cout << "Image name is: " << entry;
+					//std::cout << "Image name is: " << entry;
 				}
 #ifdef WITH_DEBUGGING
 				utility::display_time(t00, std::chrono::high_resolution_clock::now());

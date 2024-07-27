@@ -2,6 +2,7 @@
 #include "cqueue.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <thread>
 #include "constants.h"
 #include "ImgSource.h"
 #include "utility.h"

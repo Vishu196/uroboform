@@ -38,12 +38,10 @@ int main(int argc, char* argv[])
 	std::vector<std::string> colname = { "   xi    ","   zi    ","    k    "," index ","  orientation " };
 	create_csv(csvname, colname);
 
-	//string path = "D:\\Vaishnavi\\C++Trial\\terlau1";
-	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\faulty";
-	//string path = "E:\\Set2";
-
-
 	auto t01 = std::chrono::high_resolution_clock::now();
+	//string path = "D:\\Vaishnavi\\C++Trial\\terlau1";
+	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\Test";
+	//string path = "E:\\Set1";
 
 	if (argc > 1)
 		path = argv[1];
@@ -53,6 +51,7 @@ int main(int argc, char* argv[])
 #else
 		Source imgsrc(path);
 #endif	
+		
 
 		raw_edges edge0(imgsrc, freq_range);
 		find_edges edge(edge0);
