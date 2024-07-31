@@ -34,13 +34,23 @@ std::mutex output_mutex;
 
 int main(int argc, char* argv[])
 {
+#ifdef WITH_TESTING
+	int test_count = 5;
+	ofstream myFile("Timing_Results");
+#endif
+
 	string csvname = "Result";
 	std::vector<std::string> colname = { "   xi    ","   zi    ","    k    "," index ","  orientation " };
 	create_csv(csvname, colname);
 
+	
+#ifdef WITH_TESTING
+	for (size_t test_i = 0; test_i < test_count; test_i++)
+	{
+#endif
 	auto t01 = std::chrono::high_resolution_clock::now();
-	//string path = "D:\\Vaishnavi\\C++Trial\\terlau1";
-	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\Test";
+	//string path = "D:\\Vaishnavi\\C++Trial\\Images";
+	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\test";
 	//string path = "E:\\Set1";
 
 	if (argc > 1)
@@ -51,7 +61,6 @@ int main(int argc, char* argv[])
 #else
 		Source imgsrc(path);
 #endif	
-		
 
 		raw_edges edge0(imgsrc, freq_range);
 		find_edges edge(edge0);
@@ -62,6 +71,14 @@ int main(int argc, char* argv[])
 
 #ifdef WITH_THREADING
 	while (1);
+#endif
+
+#ifdef WITH_TESTING
+	auto t00 = utility::get_time(t01, std::chrono::high_resolution_clock::now());
+	myFile << t00;
+	myFile << "\n";
+	//myFile.close();
+	}
 #endif
 	return 0;
 }
