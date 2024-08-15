@@ -118,9 +118,9 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 	}
 	else
 	{
-		for (int i = 1; i < arr.size() - 1; ++i) 
+		for (int i = 1; i < arr.size() - 1; ++i)
 		{
-			if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) 
+			if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1])
 			{
 				peaks.index.push_back(i);
 				peaks.value.push_back(arr[i]);
@@ -129,21 +129,21 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 	}
 
 	bool changed = true;
-	while (changed) 
+	while (changed)
 	{
 		changed = false;
 		for (int i = 0; i < peaks.index.size() - 1; ++i)
 		{
 			if (peaks.index[i + 1] - peaks.index[i] < dist)
 			{
-				if (peaks.value[i] > peaks.value[i + 1]) 
+				if (peaks.value[i] > peaks.value[i + 1])
 				{
 					peaks.index.erase(peaks.index.begin() + i + 1);
 					peaks.value.erase(peaks.value.begin() + i + 1);
 					changed = true;
 					break;
 				}
-				else 
+				else
 				{
 					peaks.index.erase(peaks.index.begin() + i);
 					peaks.value.erase(peaks.value.begin() + i);
@@ -162,16 +162,72 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 			int peakIndex = peaks.index[i];
 
 			int leftBaseIndex = peakIndex;
-			while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex])
+			int greater_left_index = peakIndex;
+			if(i>0)
 			{
-				--leftBaseIndex;
+				for (int k = 1; k < peaks.index.size(); k++)
+				{
+					if ((i - k) > 0)
+					{
+						if (peaks.value[i] < peaks.value[i - k])
+						{
+							greater_left_index = peaks.index[i - k];
+							leftBaseIndex = peaks.index[i - k + 1];
+							break;
+						}
+					}
+					else
+						greater_left_index = 0;
+				}				
+			}
+
+			if (i==0 || greater_left_index == 0)
+			{
+				auto it = std::min_element(std::begin(arr), std::begin(arr)+ leftBaseIndex);
+				leftBaseIndex = std::distance(std::begin(arr), it);
+			}
+			else
+			{
+				while (leftBaseIndex > greater_left_index && arr[leftBaseIndex - 1] < arr[leftBaseIndex])
+				{
+					--leftBaseIndex;
+				}
 			}
 
 			int rightBaseIndex = peakIndex;
-			while (rightBaseIndex < arr.size() - 1 && arr[rightBaseIndex + 1] < arr[rightBaseIndex])
+			int greater_right_index = peakIndex;
+
+			if (i < (peaks.index.size() - 1))
 			{
-				++rightBaseIndex;
+				for (int k = 1; k < peaks.index.size(); k++)
+				{
+					if ((i + k) < peaks.index.size())
+					{
+						if (peaks.value[i+k] > peaks.value[i])
+						{
+							greater_right_index = peaks.index[i + k];
+							//rightBaseIndex = peaks.index[i + k - 1];
+							break;
+						}
+					}
+					else
+						greater_right_index = 0;
+				}
 			}
+
+			if (i == (peaks.index.size() - 1) || greater_right_index == 0)
+			{
+				auto it = std::min_element(std::begin(arr) + rightBaseIndex, std::end(arr));
+				rightBaseIndex = std::distance(std::begin(arr), it);
+			}
+			else
+			{
+				while (rightBaseIndex < greater_right_index && arr[rightBaseIndex + 1] < arr[rightBaseIndex])
+				{
+					++rightBaseIndex;
+				}
+			}
+			
 
 			double leftBaseValue = arr[leftBaseIndex];
 			double rightBaseValue = arr[rightBaseIndex];
@@ -186,7 +242,6 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 			}
 		}
 	}
-
 
 	return peaks;
 }
