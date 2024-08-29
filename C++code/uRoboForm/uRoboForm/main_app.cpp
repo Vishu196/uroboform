@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 #endif
 	auto t01 = std::chrono::high_resolution_clock::now();
 	//string path = "D:\\Vaishnavi\\C++Trial\\Images";
-	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\test";
-	//string path = "E:\\Set1";
+	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\not_matching";
+	//string path = "E:\\Set3";
 
 	if (argc > 1)
 		path = argv[1];
