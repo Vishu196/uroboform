@@ -3,6 +3,11 @@
 #include <mutex>
 #include <condition_variable>
 
+/* This class has functions for data transfer between two classes with mutex protection in FIFO manner
+A buffer of size 10 is created and so upto 10 structs or datas can be stored for exchnage, When a classes completes processing of
+current data, it sends 
+*/
+
 using namespace std;
 
 template<typename Data>
@@ -33,18 +38,22 @@ public:
             cv_out.notify_one();
         }
     }
+
+    //Function to check if the queue is empty
     bool empty() const
     {
         scoped_lock lock(my_mutex);
         return fifo.empty();
     }
 
+    //Function to get the front element of the queue
     Data& front()
     {
         scoped_lock lock(my_mutex);
         return fifo.front();
     }
 
+    //Overloaded function to get front elemnt for const objects
     Data const& front() const
     {
         scoped_lock lock(my_mutex);

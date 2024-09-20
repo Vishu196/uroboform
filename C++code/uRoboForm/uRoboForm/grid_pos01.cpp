@@ -4,11 +4,16 @@
 #include "constants.h"
 #include "utility.h"
 
+//This is the third class for algorithm implementation, the grid_pos function in python algorithm is
+//divided into 3 classes in C++ for threads implementation, this is first one of them - hence - grid_pos01
+//This class has functions to generate the Grid type object of required size and partially fill it and 
+//provide it to next class for further calculation
+
 using namespace std;
 using namespace cv;
 using std::chrono::high_resolution_clock;
 
-
+//displays the required information on console
 std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 {
 	std::cout << "GridRows: " << s34.gridRows << endl;
@@ -17,6 +22,7 @@ std::ostream& operator<<(std::ostream& ostr, const stage34& s34)
 	return ostr;
 }
 
+//calculates the gradient value of the input vector
 vector<double> grid_pos01::gradient(const vector<double> &x)
 {
 	const auto x_size = x.size();
@@ -32,6 +38,8 @@ vector<double> grid_pos01::gradient(const vector<double> &x)
 	return grad;
 }
 
+//calculates additional values of the grids based on the values found in previous class
+//and forms a 2d array of cut_ver and cut_hor size for storing grid type object 
 void get_grids(stage23 &s23, stage34 &s34)
 {
 	if (s23.cut_ver.front() * 2 < 10)
@@ -56,6 +64,7 @@ void get_grids(stage23 &s23, stage34 &s34)
 	//return s34.grids;
 }
 
+//performs rotation on the input grid if required as per conditions and returns the grid object
 Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, bool &is_hor)
 {
 	const int x1 = s23.cut_hor[row] * 2;
@@ -89,6 +98,7 @@ Mat grid_pos01::get_gridrot(stage23& s23, const int row, const int col, bool &is
 	}
 }
 
+//performs calculation on each grid row-col wise and finds the orientation
 bool grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
 {
 	const int x11 = s23.cut_hor[row ];
@@ -132,6 +142,9 @@ bool grid_pos01::get_mean_grad(stage23 &s23, const int row, const int col)
 		return false;
 }
 
+/*This is the main Execute function of the class which is called for every image and implented further
+if cut_hor and cut_ver size is  greater than 2.
+It first creates a grid type object of required size and then partially enters the data */
 void grid_pos01::Execute(stage23 s23) 
 {
 	stage34 s34;

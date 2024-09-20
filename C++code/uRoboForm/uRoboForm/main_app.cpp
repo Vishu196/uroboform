@@ -13,7 +13,11 @@
 #include "grid.h"
 #include "Results.h"
 
+//This is the main file for algorithm implementation where classes are executed one after other for processing
+//the images in threads and results stored in a csv file
 
+
+// This function creates a csv file which is used for storing the results of various images at the same location
 void create_csv(const std::string& filename, const vector<std::string>& colname)
 {
 	// Create an output filestream object
@@ -34,6 +38,10 @@ std::mutex output_mutex;
 
 int main(int argc, char* argv[])
 {
+
+//pre processor ifdef is used for with_testing when testing was needed to be performed for 100 iterations for 
+//getting the execution time data, test_count is the number of times testing needs to be done
+
 #ifdef WITH_TESTING
 	int test_count = 5;
 	ofstream myFile("Timing_Results");
@@ -48,6 +56,8 @@ int main(int argc, char* argv[])
 	for (size_t test_i = 0; test_i < test_count; test_i++)
 	{
 #endif
+
+//enter the path of the folder where images to be processed are stored
 	auto t01 = std::chrono::high_resolution_clock::now();
 	//string path = "D:\\Vaishnavi\\C++Trial\\Images";
 	string path = "D:\\Vaishnavi\\Master Thesis\\BIMAQ\\New images\\not_matching";
@@ -77,7 +87,6 @@ int main(int argc, char* argv[])
 	auto t00 = utility::get_time(t01, std::chrono::high_resolution_clock::now());
 	myFile << t00;
 	myFile << "\n";
-	//myFile.close();
 	}
 #endif
 	return 0;

@@ -5,12 +5,16 @@
 #include <opencv2/opencv.hpp>
 #include "constants.h"
 
+//This class has functions and constructor to create the Grid type object used to perform calculations in the 
+// algorithm after finding the edges of grids
 
 class Grid
 {
 private:
     std::vector<double> max_pos;
 public:
+    //two contructors are use to initialize the grid class as it is called from two different classes in the 
+    //algorithm and initialized accordingly
     Grid(cv::Mat img, bool horizontal) : image(img), px_num(img.rows * img.cols), is_hor(horizontal) {}
     Grid(cv::Mat image, bool is_hor, std::vector<int> coord, std::vector<double> maxPos)
     {
@@ -25,6 +29,7 @@ public:
 
     void get_px_num(int &px_num) { px_num = image.rows * image.cols; }
 
+    //Function used to add the value of max_pos vector based on the orientation
     void addmaxPos(const std::vector<double>& maxPos)
     {
        if (is_hor)
@@ -43,6 +48,7 @@ public:
         }
     }
 
+    //function to get the mask_pos value based on the oreintation
     int get_mask_pos(int row, int col, size_t i_max) const
     {
         int s_index = 0;

@@ -1,6 +1,8 @@
 #include "Results.h"
 #include <string>
 
+/*This is the last class in algorithm implementation which has functions to write the output result of multiple images in a common csv
+file which is created in main function and passed as argument*/
 
 void Results::write_to_csv(const string& filename,const stage56& s56, const string& orientation)
 {
@@ -8,7 +10,6 @@ void Results::write_to_csv(const string& filename,const stage56& s56, const stri
 
 	myFile << fixed << setprecision(10);
 	myFile << s56.xi << "  ; " << s56.zi << " ; " << s56.k << " ;  " << s56.index << "  ;  " << orientation ;
-		//if (j != data1.size() - 1) myFile << ","; // No comma at end of line	
 	myFile << "\n";
 
 	myFile.close();
@@ -18,6 +19,8 @@ void Results::Execute(const stage56 &s56, std::chrono::high_resolution_clock::ti
 {
 	string orientation;
 
+	// is_hor is a boolen parameter used to store the orientation, so here conversion is done to
+	// interprate orientation as hor, ver or non in csv file
 	if (s56.is_hor)
 	{
 		orientation = "hor";

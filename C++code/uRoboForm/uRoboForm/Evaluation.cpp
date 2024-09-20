@@ -2,9 +2,12 @@
 #include <algorithm>
 #include <stdexcept>
 
+//This class contains functions for vector manipulation in mathematical terms 
+
 using namespace std;
 using namespace cv;
 
+//Calculates the mean of input 2D data in horizontal axis
 vector<double> Evaluation::Mean0R(const Mat &image2)
 {
 	vector<double> Mean0Arr;
@@ -14,6 +17,7 @@ vector<double> Evaluation::Mean0R(const Mat &image2)
 	return Mean0Arr;
 }
 
+//Calculates the mean of input 2D data in vertical axis
 vector<double> Evaluation::Mean1R(const Mat &image2)
 {
 	vector<double> Mean1Arr(image2.rows,0.0);
@@ -30,12 +34,14 @@ vector<double> Evaluation::Mean1R(const Mat &image2)
 	return Mean1Arr;
 }
 
+//calculates mean of input vector
 double Evaluation::Mean(vector<double>::const_iterator start, vector<double>::const_iterator end)
 {
 	const double sum = std::accumulate(start, end, 0.0);
 	return sum / (end - start);
 }
 
+//calculates median of input vector
 double Evaluation::Median(vector<double> array)
 {
 	size_t size = array.size();
@@ -59,6 +65,7 @@ double Evaluation::Median(vector<double> array)
 
 }
 
+//calculates standard deviation of input vector 
 double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 {
 	double standardDeviation = 0.0;
@@ -75,6 +82,7 @@ double Evaluation::std_dev(const vector<double>& arr, int start, int stop)
 	return sqrt(standardDeviation / size);
 }
 
+//returns the indices of input vector in sorted order
 vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 {
 	vector<int> indice_arr((int)s_dic.size());
@@ -98,12 +106,15 @@ vector<int> Evaluation::ArgSort(const vector<double>& s_dic)
 	return indice_arr;
 }
 
+//this function detects peaks in the input signal based on the various parameters provided
+//replication of find_peaks function in scipy library of python
 peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double dist, double prom)
 {
 	peaks peaks;
 	peaks.index.reserve(15);
 	peaks.value.reserve(15);
 
+	//when height is given as an input parameter
 	if (height != 0.0)
 	{
 		for (int i = 1; i < arr.size() - 1; ++i)
@@ -128,6 +139,7 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 		}
 	}
 
+	//when distance is given as an input parameter
 	bool changed = true;
 	while (changed)
 	{
@@ -154,8 +166,10 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 		}
 	}
 
+	//when prominence is given as an input parameter
 	if (prom != -1.0)
 	{
+		//this step was added when a peak was found at the starting of the signal to obtain the correct results
 		if (peaks.index[0] == 1 && peaks.value[0] > 0)
 		{
 			peaks.value.erase(peaks.value.begin());
@@ -170,6 +184,10 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 			int peakIndex = peaks.index[i];
 
 			int leftBaseIndex = peakIndex;
+
+			/*previously the below algorithm was implemented to calulcatethe values of leftbases and right bases
+			 which even yielded the correct out for most of the images but was not completely correct and hence
+			 changes were done based on reverse debugging of python code*/
 
 			//while (leftBaseIndex > 0 && arr[leftBaseIndex - 1] < arr[leftBaseIndex])
 			//{
@@ -191,7 +209,6 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 						if (peaks.value[i] < peaks.value[i - k])
 						{
 							greater_left_index = peaks.index[i - k];
-							//leftBaseIndex = peaks.index[i - k + 1];
 							break;
 						}
 
@@ -225,7 +242,6 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 						if (peaks.value[i + k] > peaks.value[i])
 						{
 							greater_right_index = peaks.index[i + k];
-							//rightBaseIndex = peaks.index[i + k - 1];
 							break;
 						}
 			
@@ -258,6 +274,9 @@ peaks Evaluation::Find_Peaks(const vector<double>& arr, double height, double di
 			{
 				peaks.value.erase(peaks.value.begin() + i);
 				peaks.index.erase(peaks.index.begin() + i);
+				/*the decrement in value of i was also added at a later stage when it was observed that once an
+				element is erased from the vector, the next element was also excluded because the size of vector was
+				reset and decremented by one*/
 				i--;
 			}
 			else

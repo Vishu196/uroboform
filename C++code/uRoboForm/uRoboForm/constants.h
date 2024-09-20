@@ -1,5 +1,7 @@
 #pragma once
 
+//This header file contains declarations of all the constant values needed for the code
+
 static const int freq_range = 150;
 const int search_range = 150;
 const int h1 = 800;

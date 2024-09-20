@@ -16,6 +16,7 @@ public:
 	std::vector<double> static Mean0R(const cv::Mat &image2);
 	std::vector<double> static Mean1R(const cv::Mat &image2);
 
+	//Function for calculating mean value of given input vector of any data type T
 	template<class T>
 	double static MeanR(const std::vector<T>& mean0)
 	{
@@ -28,6 +29,7 @@ public:
 	std::vector<int> static ArgSort(const std::vector<double>& s_dic);
 	double static std_dev(const std::vector<double>& arr, int start, int stop);
 	
+	//Function for calculating the decumulating values of the input vector of any data type
 	template<class T>
 	static std::vector<T> decumulate(const std::vector<T>& x)
 	{

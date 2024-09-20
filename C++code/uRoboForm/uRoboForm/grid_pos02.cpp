@@ -3,15 +3,22 @@
 #include "signal_evaluation.h"
 #include "constants.h"
 
+/*This is the fourth class for algorithm implementation, the grid_pos function in python algorithm is
+divided into 3 classes in C++ for threads implementation, this is second one of them - hence - grid_pos02
+This class has functions to mainly add max_pos vector to the Grid type object and 
+provide it to next class for further calculation*/
+
 using namespace std;
 using namespace cv;
 
+//displays the required information on console
 std::ostream& operator<<(std::ostream& ostr, const stage45& s45)
 {
 	cout << "Stage 4 complete." << endl;
 	return ostr;
 }
 
+//This function partions the grid as per edges values and does further calculation
 Mat grid_pos02::cutGrid(const Mat& grid_rot)
 {
 	int grid_cutRows = 0;
@@ -62,12 +69,15 @@ Mat grid_pos02::cutGrid(const Mat& grid_rot)
 	return grid_cut;
 }
 
+//In python algorithm, final claculations can be done by using any of the three modes - parabel, 
+//gauss and phase. Gauss mode is not implemented in C++ as curve_fit function was not correctly replicated
 //to do
 double* gauss_limited(double x, double k, double sigma, double mu, double offset, int max_cut)
 {
 	return 0;
 }
 
+//This gauss implementation is pending
 void grid_pos02::subpx_gauss(const vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos)
 {
 	int xmin = 0;
@@ -112,6 +122,7 @@ void grid_pos02::subpx_gauss(const vector<double>& B_cut, struct peaks B_max, st
 	}
 }
 
+//function called when parabel mode is selected for calculation of max_pos vector
 void grid_pos02::subpx_parabel(const vector<double>& B_cut, struct peaks B_max, struct peaks B_min, double d_m, vector<double>& max_pos)
 {
 	for (int va = 0; va < B_max.index.size(); ++va)
@@ -176,6 +187,7 @@ void grid_pos02::subpx_parabel(const vector<double>& B_cut, struct peaks B_max, 
 	}
 }
 
+//function called when phase mode is selected for max_pos calculation
 void grid_pos02::subpx_phase(const Mat& cutGrid, vector<double>& max_pos)
 {
 	vector<double> B0 = Evaluation::Mean0R(cutGrid);
@@ -277,6 +289,7 @@ void grid_pos02::subpx_max_pos(const Mat& cutGrid, string mode, vector<double>& 
 	//return p;
 }
 
+//This function is used to modify the max_pos vector are per conditions
 void modify_max_pos(vector<double>& max_pos)
 {
 	size_t r = max_pos.size();
@@ -289,6 +302,9 @@ void modify_max_pos(vector<double>& max_pos)
 		max_pos.erase(max_pos.begin());
 }
 
+/*This is the main Execute function of the class which is called for every grid and implented further
+if cut_hor and cut_ver size is  greater than 2.
+It enters the required data in grid type object only if the found grid is greater than 5% size of the image  */
 void grid_pos02::Execute(stage34 s34)
 {
 	stage45 s45;

@@ -3,9 +3,15 @@
 #include"Evaluation.h"
 #include <iomanip>
 
+/*This is the fifth class for algorithm implementation, the grid_pos function in python algorithm is
+divided into 3 classes in C++ for threads implementation, this is third one of them - hence - grid_pos03
+This class has functions to check the grid obtained and calclate the final attributes required in 
+the algorithm which is then provided to next class for storing data in csv file*/
+
 using namespace std;
 using namespace cv;
 
+//displays the required information on console
 std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 {
 	cout << endl;
@@ -18,11 +24,13 @@ std::ostream& operator<<(std::ostream& ostr, const stage56& s56)
 	return ostr;
 }
 
+//checks if the provided number is greater than 100 
 bool isGreater(double n)
 {
 	return n > 100;
 }
 
+//This function takes the input grid and performs checks as per given conditions
 Grid** grid_pos03::checkGrid(const stage45& s45)
 {
 	Grid** grids01 = s45.grids;
@@ -54,15 +62,10 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 
 					for (int i_fill = 0; i_fill < m_pos_de1.size(); ++i_fill)
 					{
-						/*if (*i > 100)
-						{*/
-							//int i_fill = *i;
 							int fill1 = i_fill + 1;
 
 							double mean_maxPos = (grids01[row][col].get_max_pos()[i_fill] + grids01[row][col].get_max_pos()[fill1]) / 2;
 							grids01[row][col].get_max_pos().insert(grids01[row][col].get_max_pos().begin() + fill1, mean_maxPos);
-
-						//}
 					}
 
 				}
@@ -87,6 +90,8 @@ Grid** grid_pos03::checkGrid(const stage45& s45)
 	return grids01;
 }
 
+//This function replicates the linspace function of Numpy library in python, which is used to create an 
+//array of evenly spaced values over a specified range of start to end.
 vector<int> grid_pos03::linspace(double start, double end, int num)
 {
 	vector<int> bounds;
@@ -111,6 +116,7 @@ vector<int> grid_pos03::linspace(double start, double end, int num)
 	return bounds;
 }
 
+//This function derieves the value of index from the binary coding in the grid
 RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 {
 	struct RdBinary rd;
@@ -207,6 +213,7 @@ RdBinary grid_pos03::ReadBinary(const stage56& s56, const Mat& img)
 	return rd;
 }
 
+//This is an intermediate function used for calculation of value of k - the ratio
 double grid_pos03::calc_d_k(vector<vector <double>> lines)
 {
 	int n = (int)lines.size();
@@ -236,6 +243,7 @@ double grid_pos03::calc_d_k(vector<vector <double>> lines)
 	return (line_n - line_0) / ((lines[n1][0] - lines[0][0]) / 200);
 }
 
+//This function calculates the value of k
 double grid_pos03::get_d_k(const stage56 &s56)
 {
 	vector<vector<double>>lines_hor;
@@ -288,6 +296,7 @@ double grid_pos03::get_d_k(const stage56 &s56)
 	return d_k_mean;
 }
 
+
 vector<vector<list<int>>> grid_pos03::grid_params(void)
 {
 	vector<vector<list<int>>> look_up(200, vector<list<int>>(2));
@@ -319,6 +328,7 @@ bool is_x_nan(double x)
 	return isnan(x);
 }
 
+//This function calculates the average value of the given input vector as per the conditions
 double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 {
 	vector<vector<double>> valid_vals;
@@ -353,6 +363,7 @@ double grid_pos03::weighted_avg(const vector<vector<double>> &center)
 	return av_val;
 }
 
+//This function is an intermediate function used in grid_params function
 list<int> grid_pos03::get_look_el(const stage56 &s56)
 {
 	list<int> look_el;
@@ -380,6 +391,7 @@ list<int> grid_pos03::get_look_el(const stage56 &s56)
 	return look_el;
 }
 
+//This function is an intermediate function made for a cleaner code and efficient memory management
 axis grid_pos03::get_center_arr(const stage56 &s56)
 {
 	list<int> look_el = get_look_el(s56);
@@ -427,6 +439,7 @@ axis grid_pos03::get_center_arr(const stage56 &s56)
 	return a;
 }
 
+//This function is an intermediate function made for a cleaner code and efficient memory management
 void Execute_1(stage56& s56)
 {
 	for (int row = 0; row < s56.gridRows; row++)
@@ -446,6 +459,9 @@ void Execute_1(stage56& s56)
 	}
 }
 
+/*This is the main Execute function of the class which is called for every grid and implented further
+if cut_hor and cut_ver size is  greater than 2. It calculates all the required attributes from the 
+image and extracted grids. If sufficient edges are not present, it passes on all attributes as nan value */
 void grid_pos03::Execute(stage45 s45)
 {
 	stage56 s56;

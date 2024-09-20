@@ -3,10 +3,13 @@
 #include <fftw3.h>
 #include <complex>
 
+//This class contains functions which are used for signal manipulation throughout all the classes
+
 using namespace std;
 
 std::mutex global_fftw_mutex;
 
+//calulates spectral interpolation of the input signal
 double signal_evaluation::Spek_InterpolR(const vector<double>& A) 
 {
 	const auto A_size = 256;
@@ -28,6 +31,8 @@ double signal_evaluation::Spek_InterpolR(const vector<double>& A)
 	return (n_0 + tmp / 2);
 }
 
+//Blackman window is a techinque applied to minimize spectral leakage and improve 
+// the frequency resolution of a signal.
 double signal_evaluation::BlackmanWindowR(int n, int pos)
 {
 	const double a0 = 0.42;
@@ -39,6 +44,7 @@ double signal_evaluation::BlackmanWindowR(int n, int pos)
 	return a0 - (a1 * cos((2 * M_PI * pos) / wLen)) + (a2 * cos((4 * M_PI * pos) / wLen));
 }
 
+//calculates Fast Fourier Transform for Real data
 vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 {
 	size_t size = image_windowR.size();
@@ -64,6 +70,8 @@ vector<double> signal_evaluation::FFTR(const vector<double>& image_windowR)
 	return in;
 }
 
+//calculates Discrete Fourier Transform (DFT) of real-valued signals converting data from 
+// time domain to frequency domain
 vector<double> signal_evaluation::RFFT(const vector<double>& x)
 {
 	auto N = x.size();
@@ -97,6 +105,8 @@ vector<double> signal_evaluation::RFFT(const vector<double>& x)
 	return yy;
 }
 
+//calculates Inverse Real Fast Fourier Transform or real-valued input data, converting
+// data from the frequency domain back into the time domain
 vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 {
 	auto N = x.size();
@@ -132,6 +142,7 @@ vector<double> signal_evaluation::IRFFT(const vector<double>& x)
 	return y;
 }
 
+//performs band passing of signal within the range of x0 and x1
 vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, size_t x1)
 {
 	vector<double> f_x = RFFT(x);
@@ -140,6 +151,8 @@ vector<double>  signal_evaluation::Bandfilter(const vector<double>& x, int x0, s
 	return IRFFT(f_x);
 }
 
+//calculates mean, FFTR and Blackman window of the input signal and then performs
+//spectral interpolation giving output struct
 struct MFreq signal_evaluation::Main_FreqR(const vector<double>& B0, int start, int size)
 {
 	struct MFreq mf;

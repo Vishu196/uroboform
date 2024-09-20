@@ -6,8 +6,13 @@
 #include <functional>
 #include <cmath>
 
+/*This is the second class for algorithm implementation
+This class has functions to derive the values of edges of grids present in each image and 
+provide it to next class for further calculation*/
+
 using namespace std;
 
+//displays the required information on console
 std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
 {
 	ostr << "cut_hor: ";
@@ -21,6 +26,8 @@ std::ostream& operator<<(std::ostream& ostr, const stage23& s23)
 	return ostr;
 }
 
+//This function performs number of calculations on input vector based on functions from signal_evaluation and 
+//evaluation class, and provides indexes struct as output. 
 indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_edge, int i0, int rank)
 {
 	indexes index;
@@ -80,6 +87,7 @@ indexes find_edges::Line_Index(const vector<double>& mean_range_in, double th_ed
 	return index;
 }
 
+//This function
 Detect_throu find_edges::Detect_Through(const vector<double> &im_col, double th_edge)
 {
 	Detect_throu thro;
@@ -128,6 +136,7 @@ bool isTrue(bool n)
 	return n == true;
 }
 
+//This function checks the found edges and deletes the required value when too many edges are detected
 vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 {
 	for (int i_cut = ((int)cut_arr.size() - 1); i_cut >= 0; i_cut--)
@@ -211,6 +220,7 @@ vector<int> find_edges::Delete_Edges(vector<int> cut_arr, int ideal_d)
 	return cut_arr;
 }
 
+//This is an intermediate function made to make the code more readable and is called in get_cut_hor function
 vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &index)
 {
 	//double s_max, s_min;
@@ -258,6 +268,8 @@ vector<double> find_edges::Execute_1(const stage12 &s12, int &rank, indexes &ind
 	return im_col;
 }
 
+//This is an intermediate function made to make the code more readable and do efficient memory management
+//It calculates the horizontal edges of the grid
 void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
 {
 	indexes index;
@@ -306,6 +318,8 @@ void find_edges::get_cut_hor(int& rank, const stage12& s12, stage23& s23)
 	
 }
 
+//This is an intermediate function made to make the code more readable and do efficient memory management
+//It calculates the vertical edges of the grid
 void find_edges::get_cut_ver(int &rank, const stage12& s12, stage23 &s23)
 {
 	indexes index;
@@ -397,6 +411,9 @@ void find_edges::get_cut_ver(int &rank, const stage12& s12, stage23 &s23)
 
 }
 
+/*This is the main Execute function of the class which is called for every image.It first computes the
+horizontal edges and they are more than 2, the vertical edges are calculated. This edges are provided 
+along with the image to the next class*/
 void find_edges::Execute(const stage12 &s12)
 {
 	stage23 s23;

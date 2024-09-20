@@ -6,9 +6,15 @@
 #include "utility.h"
 #include <thread>
 
+/*These are two preprocessor directive used to showcase if threading and debugging are used or not
+in the code execution, when with_threading is enabled, threads are implemented in each class for 
+faster execution. When with_debugging is enabled, intermediate results are displayed on console*/
+
 #define WITH_THREADING
 //#define WITH_DEBUGGING
 
+//This class has functions for sourcing images in parallel from input folder in FIFO manner
+//reads the image in greyscale and stores in buffer 
 
 class Source
 {
@@ -27,7 +33,9 @@ public:
 			if (entry.is_regular_file())
 			{
 				auto t00 = std::chrono::high_resolution_clock::now();
+				//reads images from the path specified in grayscale format
 				cv::Mat image = cv::imread(entry.path().string(), cv::IMREAD_GRAYSCALE);
+				//will push the image only if it is not empty
 				if (image.data != NULL)
 				{
 					Fifo.push(image);

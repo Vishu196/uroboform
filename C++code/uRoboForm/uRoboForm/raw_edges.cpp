@@ -1,12 +1,16 @@
 #include "raw_edges.h"
-#include"Evaluation.h"
+#include "Evaluation.h"
 #include "signal_evaluation.h"
 #include "constants.h"
 
+/*This is the first class for algorithm implementation after sourcing the image
+This class takes input of image in MAT format and calculates values of main_d_0, main_d_1, thresold
+for further calculation of edges in the next class, so name is given as raw edges*/
 
 using namespace cv;
 using namespace std;
 
+//displays the required information on console
 std::ostream& operator<<(std::ostream& ostr, const stage12& s12)
 {
 	ostr << endl;
@@ -16,6 +20,7 @@ std::ostream& operator<<(std::ostream& ostr, const stage12& s12)
 	return ostr;
 }
 
+//returns the Mat object by resizing the input Mat with a fcator of n
 Mat raw_edges::ImageSliceR(const Mat &image, int n)
 {
 	Mat newImg;
@@ -23,6 +28,7 @@ Mat raw_edges::ImageSliceR(const Mat &image, int n)
 	return newImg;
 }
 
+//calculates the main_freq vector on input vector and then calculates the median
 double raw_edges::Calc_main_d(const vector<double> &mean0)
 {
 	/*if (mean0.size() < Freq_Range)
@@ -46,6 +52,9 @@ double raw_edges::Calc_main_d(const vector<double> &mean0)
 	return Evaluation::Median(t1);;
 }
 
+/*This is the main execute function of this class which is called for each image
+for every input image in Mat format, it is first sliced by factor of 2, then mean is calculated 
+for both axis and values of main_d_0, main_d_1 and th_edge are obtained*/
 void raw_edges::ExecuteR(const Mat &Image)
 {
 	stage12 s12;
